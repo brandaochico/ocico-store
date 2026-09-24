@@ -13,11 +13,10 @@
     </div>
     <div class="flex items-center gap-x-4 xl:gap-x-8 w-full justify-center lg:justify-start">
       <%= link_to root_path, class: 'absolute lg:relative left-1/2 lg:left-0 lg:-translate-x-0 -translate-x-1/2 flex items-center space-x-3' do %>
-        <%= image_tag "logo_small_no_label.svg" %>
-        <span class="uppercase font-sans font-semibold mb-0 dark:text-sand text-body lg:text-body-sm xl:text-body-sm"><%= Spree::Store.default.name %></span>
+        <span class="uppercase font-heading font-semibold mb-0 dark:text-sand text-body lg:text-h6"><%= Spree::Store.default.name %></span>
       <% end %>
 
-      <% categories = taxonomies.first %>
+      <% categories = taxonomies.find { |t| t.name == "Set" } || taxonomies.first %>
       <% navMobileClasses = '
         categories-menu bg-white
         fixed top-0 left-0 z-40 w-[80%] max-w-[400px] min-w-[270px] h-full
@@ -58,13 +57,6 @@
         <div class="lg:hidden mt-auto">
         <div class="flex justify-between">
           <%= render "shared/navigation/theme_switcher" %>
-
-          <%= link_to "https://solidus.io", class:"flex flex-row items-center gap-1" do %>
-            <span class="font-semibold text-black dark:text-white">solidus.io</span>
-            <svg class='w-5 h-5 fill-black dark:fill-white'>
-              <use xlink:href="<%= image_path('remixicon.symbol.svg') %>#ri-arrow-right-up-line"></use>
-            </svg>
-          <% end %>
         </div>
         </div>
       </nav>
