@@ -2,6 +2,14 @@
 # Domain-specific strings live in their own files (storefront.yml, checkout.yml, admin.yml)
 # so a growing translation set stays scannable instead of one giant YAML.
 "pt-BR":
+  # Required for Spree.i18n_available_locales (solidus_core's lib/spree/i18n.rb)
+  # to recognize pt-BR at all — without this key, Solidus's own set_user_language
+  # before_action silently drops pt-BR from its candidate list and sets I18n.locale
+  # to nil, which then randomly reads back as :en or default_locale depending on
+  # timing. This is the actual fix for that, not a decorative translation.
+  spree:
+    i18n:
+      this_file_language: "Português (Brasil)"
   site:
     name: "Ocico Store"
   common:
