@@ -9,3 +9,5 @@
 #   end
 Spree::Core::Engine.load_seed
 Spree::Auth::Engine.load_seed
+
+load Rails.root.join("db/seeds/catalog.rb")
