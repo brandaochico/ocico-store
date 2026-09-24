@@ -3,6 +3,12 @@
 CI.run do
   step "Setup", "bin/setup --skip-server"
 
+  # app/assets/builds/*.css is gitignored (build output). Some Rake-task chain
+  # builds it automatically for local `bundle exec rspec` runs, but that hasn't
+  # proven reliable on a truly fresh checkout (CI) — build it explicitly instead
+  # of depending on that.
+  step "Build assets", "bin/rails tailwindcss:build solidus_admin:tailwindcss:build"
+
   step "Style: Ruby", "bin/rubocop"
 
   step "Security: Gem audit", "bin/bundler-audit"
