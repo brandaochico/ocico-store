@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_24_151342) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_24_172033) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -496,6 +496,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_24_151342) do
     t.string "meta_title"
     t.datetime "discontinue_on", precision: nil
     t.integer "primary_taxon_id"
+    t.string "country_of_origin"
     t.index ["available_on"], name: "index_spree_products_on_available_on"
     t.index ["deleted_at"], name: "index_spree_products_on_deleted_at"
     t.index ["name"], name: "index_spree_products_on_name"
