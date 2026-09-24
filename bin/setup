@@ -15,6 +15,15 @@ FileUtils.chdir APP_ROOT do
   puts "== Installing dependencies =="
   system("bundle check") || system!("bundle install")
 
+  # sassc's FFI loader expects libsass.<dlext> next to lib/sassc/native.rb, but
+  # Bundler's extension cache builds it under vendor/bundle/.../extensions/ instead.
+  # Copy it into place so solidus_backend's Sprockets/Sass pipeline can load it.
+  Dir.glob("vendor/bundle/ruby/*/extensions/*/*/sassc-*/sassc/libsass.*").each do |built_lib|
+    gem_dir = built_lib[%r{vendor/bundle/ruby/[^/]+/extensions/[^/]+/[^/]+/(sassc-[^/]+)}, 1]
+    target = Dir.glob("vendor/bundle/ruby/*/gems/#{gem_dir}/lib/sassc/#{File.basename(built_lib)}").first
+    FileUtils.cp(built_lib, target) if target && !File.exist?(target)
+  end
+
   # puts "\n== Copying sample files =="
   # unless File.exist?("config/database.yml")
   #   FileUtils.cp "config/database.yml.sample", "config/database.yml"
