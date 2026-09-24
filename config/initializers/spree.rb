@@ -21,6 +21,19 @@ Spree.config do |config|
   config.image_attachment_module = "Spree::Image::ActiveStorageAttachment"
   config.taxon_attachment_module = "Spree::Taxon::ActiveStorageAttachment"
 
+  # solidus_starter_frontend's views render images at size: :big and :full,
+  # neither of which Solidus's default product_image_styles defines —
+  # ImageProcessing then errors with "either width or height must be
+  # specified". Add them alongside the defaults (mini/small/product/large).
+  config.product_image_styles = {
+    mini: "48x48>",
+    small: "400x400>",
+    product: "680x680>",
+    large: "1200x1200>",
+    big: "900x900>",
+    full: "1600x1600>"
+  }
+
   # Uncomment to recalculate cart prices when the cart changes
   # config.recalculate_cart_prices = true
 
