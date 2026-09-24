@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class UserRegistrationsController < Devise::RegistrationsController
-  before_action :check_permissions, only: [:edit, :update]
+  before_action :check_permissions, only: [ :edit, :update ]
   skip_before_action :require_no_authentication
 
   def create
@@ -22,7 +22,7 @@ class UserRegistrationsController < Devise::RegistrationsController
   protected
 
   def translation_scope
-    'devise.user_registrations'
+    "devise.user_registrations"
   end
 
   def check_permissions
@@ -32,6 +32,6 @@ class UserRegistrationsController < Devise::RegistrationsController
   private
 
   def spree_user_params
-    params.require(:spree_user).permit(Spree::PermittedAttributes.user_attributes | [:email])
+    params.require(:spree_user).permit(Spree::PermittedAttributes.user_attributes | [ :email ])
   end
 end

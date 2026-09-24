@@ -3,7 +3,7 @@
 require 'solidus_starter_frontend_spec_helper'
 
 RSpec.describe 'Checkout', :js, type: :system do
-  include  SolidusStarterFrontend::System::CheckoutHelpers
+  include SolidusStarterFrontend::System::CheckoutHelpers
 
   include_context 'checkout setup'
 
@@ -321,7 +321,7 @@ RSpec.describe 'Checkout', :js, type: :system do
       create(:store_credit, user: user)
       order = Spree::TestingSupport::OrderWalkthrough.up_to(:payment, user: user)
 
-      allow(order).to receive_messages(available_payment_methods: [check_payment_method, credit_card_payment_method])
+      allow(order).to receive_messages(available_payment_methods: [ check_payment_method, credit_card_payment_method ])
       allow_any_instance_of(CheckoutsController).to receive_messages(current_order: order)
       allow_any_instance_of(CheckoutsController).to receive_messages(spree_current_user: order.user)
     end
@@ -348,7 +348,7 @@ RSpec.describe 'Checkout', :js, type: :system do
 
     it "disables the details of other payment methods", js: true do
       order = Spree::TestingSupport::OrderWalkthrough.up_to(:delivery)
-      allow(order).to receive_messages(available_payment_methods: [check_payment, credit_card_payment])
+      allow(order).to receive_messages(available_payment_methods: [ check_payment, credit_card_payment ])
       order.user = create(:user)
       order.recalculate
 

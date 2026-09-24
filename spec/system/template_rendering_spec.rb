@@ -43,7 +43,7 @@ RSpec.describe 'Template rendering', type: :system do
   end
 
   it "renders a canonical tag for the products index with a taxon query string" do
-    create(:product_in_stock, name: 'Solidus Mug', taxons: [taxon])
+    create(:product_in_stock, name: 'Solidus Mug', taxons: [ taxon ])
 
     visit products_path(keywords: 'solidus', taxon: taxon.id)
 
@@ -55,7 +55,7 @@ RSpec.describe 'Template rendering', type: :system do
   end
 
   it "renders a canonical tag for taxon pages with a search filter query string" do
-    create(:product_in_stock, name: 'Solidus Mug', taxons: [taxon])
+    create(:product_in_stock, name: 'Solidus Mug', taxons: [ taxon ])
 
     visit nested_taxons_path(taxon)
 
@@ -66,15 +66,15 @@ RSpec.describe 'Template rendering', type: :system do
     expect(page).to have_content "No products found"
 
     expect(
-      URI::decode_uri_component find('link[rel=canonical]')[:href]
+      URI.decode_uri_component find('link[rel=canonical]')[:href]
     ).to eql(
       "http://spreestore.example.com/t/solidus-brand/accessories?search[price_range_any][]=Under+$10.00"
     )
   end
 
   it "renders a canonical tag for taxon pages with multiple pages of search results" do
-    create(:product_in_stock, name: 'Solidus Mug 1', taxons: [taxon])
-    create(:product_in_stock, name: 'Solidus Mug 2', taxons: [taxon])
+    create(:product_in_stock, name: 'Solidus Mug 1', taxons: [ taxon ])
+    create(:product_in_stock, name: 'Solidus Mug 2', taxons: [ taxon ])
 
     visit nested_taxons_path(taxon, per_page: 1, page: 2)
 

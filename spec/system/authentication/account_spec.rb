@@ -42,7 +42,7 @@ RSpec.feature 'Accounts', type: :system do
     end
 
     scenario 'can edit an existing user account' do
-      stub_spree_preferences(Spree::Auth::Config ,signout_after_password_change: false)
+      stub_spree_preferences(Spree::Auth::Config, signout_after_password_change: false)
       user = create(:user, email: 'email@person.com', password: 'secret', password_confirmation: 'secret')
       visit login_path
 

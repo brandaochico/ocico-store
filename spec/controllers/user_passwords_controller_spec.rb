@@ -39,7 +39,7 @@ RSpec.describe UserPasswordsController, type: :controller do
         put :update, params: { spree_user: { password: '', password_confirmation: '', reset_password_token: token } }
         expect(assigns(:spree_user).is_a?(Spree::User)).to eq true
         expect(assigns(:spree_user).reset_password_token).to eq token
-        expect(flash[:error]).to eq I18n.t(:cannot_be_blank, scope: [:devise, :user_passwords, :spree_user])
+        expect(flash[:error]).to eq I18n.t(:cannot_be_blank, scope: [ :devise, :user_passwords, :spree_user ])
         expect(response).to render_template :edit
       end
     end

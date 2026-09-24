@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class CartsController < StoreController
-  helper 'spree/products', 'orders'
+  helper "spree/products", "orders"
 
   respond_to :html
 
@@ -14,7 +14,7 @@ class CartsController < StoreController
     @order = current_order(build_order_if_necessary: true)
     authorize! :edit, @order, cookies.signed[:guest_token]
     if params[:id] && @order.number != params[:id]
-      flash[:error] = t('spree.cannot_edit_orders')
+      flash[:error] = t("spree.cannot_edit_orders")
       redirect_to cart_path
     end
   end
@@ -50,7 +50,7 @@ class CartsController < StoreController
   private
 
   def accurate_title
-    t('spree.shopping_cart')
+    t("spree.shopping_cart")
   end
 
   def order_params
@@ -64,9 +64,8 @@ class CartsController < StoreController
   def assign_order
     @order = current_order
     unless @order
-      flash[:error] = t('spree.order_not_found')
+      flash[:error] = t("spree.order_not_found")
       redirect_to(root_path) && return
     end
   end
-
 end

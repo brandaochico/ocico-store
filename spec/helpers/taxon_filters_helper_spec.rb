@@ -7,6 +7,6 @@ RSpec.describe TaxonFiltersHelper, type: :helper do
   subject { applicable_filters_for(taxon) }
 
   it "returns the price/brand filters" do
-    expect(subject.map { |y| y[:name] }).to eq ['Brands', 'Price Range']
+    expect(subject.map { |y| y[:name] }).to eq [ 'Brands', 'Price Range' ]
   end
 end

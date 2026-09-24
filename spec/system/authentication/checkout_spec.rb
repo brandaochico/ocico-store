@@ -3,7 +3,7 @@
 require 'solidus_starter_frontend_spec_helper'
 
 RSpec.feature 'Checkout', :js, type: :system do
-  include  SolidusStarterFrontend::System::CheckoutHelpers
+  include SolidusStarterFrontend::System::CheckoutHelpers
 
   given!(:store) { create(:store) }
   given!(:country) { create(:country, name: 'United States', states_required: true) }
@@ -17,7 +17,7 @@ RSpec.feature 'Checkout', :js, type: :system do
 
   given!(:zone)    { create(:zone) }
   given!(:address) { create(:address) }
-  given!(:payment_method){ create :check_payment_method }
+  given!(:payment_method) { create :check_payment_method }
 
   background do
     @product = create(:product, name: 'Solidus hoodie')

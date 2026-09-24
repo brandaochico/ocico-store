@@ -20,7 +20,7 @@ RSpec.describe UserMailer, type: :mailer do
       context 'subject includes' do
         it 'translated devise instructions' do
           expect(@message.subject).to include(
-            I18n.t(:subject, scope: [:devise, :mailer, :reset_password_instructions])
+            I18n.t(:subject, scope: [ :devise, :mailer, :reset_password_instructions ])
           )
         end
 

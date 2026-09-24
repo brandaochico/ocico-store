@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class CartLineItemsController < StoreController
-  helper 'spree/products', 'orders'
+  helper "spree/products", "orders"
 
   respond_to :html
 
@@ -15,7 +15,7 @@ class CartLineItemsController < StoreController
 
     # 2,147,483,647 is crazy. See issue https://github.com/spree/spree/issues/2695.
     if !quantity.between?(1, 2_147_483_647)
-      @order.errors.add(:base, t('spree.please_enter_reasonable_quantity'))
+      @order.errors.add(:base, t("spree.please_enter_reasonable_quantity"))
     else
       begin
         @line_item = @order.contents.add(variant, quantity)

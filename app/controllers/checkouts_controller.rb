@@ -62,8 +62,8 @@ class CheckoutsController < CheckoutBaseController
   end
 
   def set_successful_flash_notice
-    flash.notice = t('spree.order_processed_successfully')
-    flash['order_completed'] = true
+    flash.notice = t("spree.order_processed_successfully")
+    flash["order_completed"] = true
   end
 
   def send_to_next_state
@@ -109,7 +109,7 @@ class CheckoutsController < CheckoutBaseController
     return if skip_state_validation?
     return if @order.has_checkout_step?(params[:state] || @order.state)
 
-    @order.state = 'cart'
+    @order.state = "cart"
     redirect_to checkout_state_path(@order.checkout_steps.first)
   end
 
@@ -135,7 +135,7 @@ class CheckoutsController < CheckoutBaseController
     # If the user has a default address, the previous method call takes care
     # of setting that; but if he doesn't, we need to build an empty one here
     @order.bill_address ||= Spree::Address.build_default
-    @order.ship_address ||= Spree::Address.build_default if @order.checkout_steps.include?('delivery')
+    @order.ship_address ||= Spree::Address.build_default if @order.checkout_steps.include?("delivery")
   end
 
   def before_delivery

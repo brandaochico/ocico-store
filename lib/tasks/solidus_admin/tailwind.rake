@@ -9,17 +9,17 @@ namespace :solidus_admin do
       tailwindcss,
       "--config", root.join("config/solidus_admin/tailwind.config.js"),
       "--input", root.join("app/assets/stylesheets/solidus_admin/application.tailwind.css"),
-      "--output", root.join("app/assets/builds/solidus_admin/tailwind.css"),
+      "--output", root.join("app/assets/builds/solidus_admin/tailwind.css")
     ]
 
-    desc 'Build Tailwind CSS'
+    desc "Build Tailwind CSS"
     task :build do
       sh tailwindcss_command.shelljoin
     end
 
-    desc 'Watch Tailwind CSS'
+    desc "Watch Tailwind CSS"
     task :watch do
-      sh (tailwindcss_command + ['--watch']).shelljoin
+      sh (tailwindcss_command + [ "--watch" ]).shelljoin
     end
   end
 end
@@ -33,5 +33,5 @@ end
 ].each do |task_name|
   next unless Rake::Task.task_defined?(task_name)
 
-  Rake::Task[task_name].enhance(['solidus_admin:tailwindcss:build'])
+  Rake::Task[task_name].enhance([ "solidus_admin:tailwindcss:build" ])
 end

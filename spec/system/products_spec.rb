@@ -208,7 +208,7 @@ RSpec.describe 'Visiting Products', type: :system do
     product_names = page.all('ul.products-grid li a').map(&:text).flatten.reject(&:blank?).sort
 
     expect(product_names)
-      .to eq(['Solidus canvas tote bag'])
+      .to eq([ 'Solidus canvas tote bag' ])
   end
 
   it 'lists products without a price' do

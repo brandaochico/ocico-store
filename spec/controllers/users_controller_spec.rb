@@ -74,7 +74,7 @@ RSpec.describe UsersController, type: :controller do
     end
 
     it 'does not update roles' do
-      put :update, params: { user: { spree_role_ids: [role.id] } }
+      put :update, params: { user: { spree_role_ids: [ role.id ] } }
       expect(assigns[:user].spree_roles).to_not include role
     end
   end

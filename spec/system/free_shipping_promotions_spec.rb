@@ -3,7 +3,7 @@
 require 'solidus_starter_frontend_spec_helper'
 
 RSpec.describe 'Free shipping promotions', type: :system, js: true do
-  include  SolidusStarterFrontend::System::CheckoutHelpers
+  include SolidusStarterFrontend::System::CheckoutHelpers
 
   let!(:store) { create(:store) }
   let!(:country) { create(:country, name: "United States of America", states_required: true) }
@@ -22,7 +22,7 @@ RSpec.describe 'Free shipping promotions', type: :system, js: true do
     create(
       :promotion,
       apply_automatically: true,
-      promotion_actions: [Spree::Promotion::Actions::FreeShipping.new],
+      promotion_actions: [ Spree::Promotion::Actions::FreeShipping.new ],
       name: "Free Shipping",
       starts_at: 1.day.ago,
       expires_at: 1.day.from_now,

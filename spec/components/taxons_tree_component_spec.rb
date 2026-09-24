@@ -62,7 +62,7 @@ RSpec.describe TaxonsTreeComponent, type: :component do
           let(:root_taxon) { taxon_with_descendants }
 
           it "renders a list of the root taxon's children" do
-            expect(page.all('li').map(&:text)).to match(['child 1', 'child 2'])
+            expect(page.all('li').map(&:text)).to match([ 'child 1', 'child 2' ])
           end
         end
       end
@@ -83,7 +83,7 @@ RSpec.describe TaxonsTreeComponent, type: :component do
 
           it "renders a list of the root taxon's descendants" do
             # child 1's text includes the text of the grandchild 1.
-            expect(page.all('li').map(&:text)).to match(['child 1grandchild 1', 'grandchild 1', 'child 2'])
+            expect(page.all('li').map(&:text)).to match([ 'child 1grandchild 1', 'grandchild 1', 'child 2' ])
           end
         end
       end

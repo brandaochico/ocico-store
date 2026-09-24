@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 class TaxonsController < StoreController
-  helper 'spree/taxons', 'spree/products', 'taxon_filters'
+  helper "spree/taxons", "spree/products", "taxon_filters"
 
-  before_action :load_taxon, only: [:show]
+  before_action :load_taxon, only: [ :show ]
 
   respond_to :html
 

@@ -57,7 +57,7 @@ RSpec.describe CheckoutGuestSessionsController, type: :controller do
 
       it 'renders the registration view' do
         subject
-        expect(flash[:registration_error]).to eq I18n.t(:email_is_invalid, scope: [:errors, :messages])
+        expect(flash[:registration_error]).to eq I18n.t(:email_is_invalid, scope: [ :errors, :messages ])
         expect(response).to render_template 'checkout_sessions/new'
       end
     end

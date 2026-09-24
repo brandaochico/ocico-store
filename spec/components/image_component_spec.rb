@@ -13,7 +13,7 @@ RSpec.describe ImageComponent, type: :component do
     end
 
     context 'when no arguments are provided' do
-      let(:arguments) { { } }
+      let(:arguments) { {} }
 
       it 'renders a placeholder' do
         expect(page).to have_selector('div.image-placeholder.mini')
@@ -50,8 +50,8 @@ RSpec.describe ImageComponent, type: :component do
           image: build(:image),
           size: :small,
           itemprop: 'some-itemprop',
-          classes: ['some-class'],
-          data: { key: 'value' },
+          classes: [ 'some-class' ],
+          data: { key: 'value' }
         }
       end
 

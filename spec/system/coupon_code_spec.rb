@@ -4,7 +4,7 @@ require 'solidus_starter_frontend_spec_helper'
 
 RSpec.describe 'Coupon code promotions', type: :system, js: true do
   include_context 'featured products'
-  include  SolidusStarterFrontend::System::CheckoutHelpers
+  include SolidusStarterFrontend::System::CheckoutHelpers
 
   let!(:store) { create(:store) }
   let!(:zone) { create(:zone) }
@@ -159,7 +159,7 @@ RSpec.describe 'Coupon code promotions', type: :system, js: true do
 
           fill_in "coupon_code", with: "onetwo"
           click_button "Apply Code"
-          expect(page).to have_content(I18n.t(:item_total_less_than_or_equal, scope: [:spree, :eligibility_errors, :messages], amount: "$100.00"))
+          expect(page).to have_content(I18n.t(:item_total_less_than_or_equal, scope: [ :spree, :eligibility_errors, :messages ], amount: "$100.00"))
         end
       end
 

@@ -4,7 +4,7 @@ class ProductsController < StoreController
   before_action :load_product, only: :show
   before_action :load_taxon, only: :index
 
-  helper 'spree/products', 'spree/taxons', 'taxon_filters'
+  helper "spree/products", "spree/taxons", "taxon_filters"
 
   respond_to :html
 
@@ -22,7 +22,7 @@ class ProductsController < StoreController
       variants_including_master.
       display_includes.
       with_prices(current_pricing_options).
-      includes([:option_values, :images])
+      includes([ :option_values, :images ])
 
     @product_properties = @product.product_properties.includes(:property)
     @taxon = Spree::Taxon.find(params[:taxon_id]) if params[:taxon_id]
