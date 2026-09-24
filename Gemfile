@@ -15,7 +15,9 @@ gem "turbo-rails"
 # Hotwire's modest JavaScript framework [https://stimulus.hotwired.dev]
 gem "stimulus-rails"
 # Use Tailwind CSS [https://github.com/rails/tailwindcss-rails]
-gem "tailwindcss-rails"
+# Pinned to 3.x: solidus_starter_frontend's install generator targets the v3
+# JS-config Tailwind pipeline, not v4's CSS-first config.
+gem "tailwindcss-rails", "~> 3.0"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
 
@@ -60,3 +62,32 @@ group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
 end
+
+gem "solidus", "~> 4.7"
+
+gem "solidus_auth_devise", "~> 2.6"
+gem "responders"
+gem "solidus_support", ">= 0.12.0"
+gem "view_component", "~> 3.0"
+
+group :test do
+  gem "capybara"
+  gem "selenium-webdriver"
+  gem "capybara-screenshot", "~> 1.0"
+  gem "database_cleaner", "~> 2.0"
+end
+
+group :development, :test do
+  gem "rspec-rails"
+  gem "rails-controller-testing", "~> 1.0.5"
+  gem "rspec-activemodel-mocks", "~> 1.1.0"
+  gem "factory_bot", ">= 4.8"
+  gem "factory_bot_rails"
+  gem "ffaker", "~> 2.13"
+  gem "rubocop", "~> 1.0"
+  gem "rubocop-performance", "~> 1.5"
+  gem "rubocop-rails", "~> 2.3"
+  gem "rubocop-rspec", "~> 3.0"
+end
+
+gem "solidus_admin", ">= 0.2"
