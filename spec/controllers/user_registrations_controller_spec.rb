@@ -34,7 +34,10 @@ RSpec.describe UserRegistrationsController, type: :controller do
 
       it 'sets flash message' do
         subject
-        expect(flash[:notice]).to eq(I18n.t('devise.registrations.signed_up'))
+        # devise.registrations.signed_up (the generic key) has no pt-BR translation;
+        # solidus_auth_devise bundles one at the resource-scoped user_registrations
+        # key instead, which is what Devise's set_flash_message! actually resolves.
+        expect(flash[:notice]).to eq(I18n.t('devise.user_registrations.signed_up', locale: I18n.default_locale))
       end
 
       it 'signs in user' do

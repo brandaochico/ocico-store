@@ -19,7 +19,7 @@ RSpec.describe 'Locale', type: :request do
     context "unavailable locale" do
       it 'does not change locale and redirects' do
         get locale_set_path, params: { switch_to_locale: 'klingon' }
-        expect(I18n.locale).to eq :en
+        expect(I18n.locale).to eq I18n.default_locale
         expect(response).to redirect_to('/')
         expect(flash[:error]).to eq(I18n.t("spree.locale_not_changed"))
       end
@@ -39,7 +39,7 @@ RSpec.describe 'Locale', type: :request do
     context "unavailable locale" do
       it 'does not change locale and redirects' do
         get locale_set_path, params: { locale: 'klingon' }
-        expect(I18n.locale).to eq :en
+        expect(I18n.locale).to eq I18n.default_locale
         expect(response).to redirect_to('/')
         expect(flash[:error]).to eq(I18n.t("spree.locale_not_changed"))
       end
