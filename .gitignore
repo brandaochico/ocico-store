@@ -43,3 +43,9 @@ app/assets/builds/solidus_admin/
 
 # RSpec run-history artifact (spec/examples.txt), not meaningful to commit.
 /spec/examples.txt
+
+# Vintage font is "free for personal use only" (dafont) — this repo is public,
+# so committing it would be redistribution the license doesn't grant. Kept
+# locally for reference only; see the README next to it for the pending
+# commercial-license decision.
+/app/assets/fonts/vintage-UNLICENSED-personal-use-only

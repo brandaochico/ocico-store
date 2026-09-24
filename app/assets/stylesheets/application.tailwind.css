@@ -2,6 +2,66 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Ocico Store brand fonts — see config/tailwind.config.js for the font-heading/
+   font-body/font-ui tokens these back, and the visual identity memory for the
+   full design system. Served from app/assets/fonts/ (Propshaft auto-serves any
+   top-level app/assets/* subdirectory under /assets/). */
+@font-face {
+  font-family: "Compagnon";
+  src: url("/assets/compagnon/Compagnon-Roman.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Compagnon";
+  src: url("/assets/compagnon/Compagnon-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Compagnon";
+  src: url("/assets/compagnon/Compagnon-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Compagnon";
+  src: url("/assets/compagnon/Compagnon-Italic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Courier Prime";
+  src: url("/assets/courier-prime/CourierPrime-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Courier Prime";
+  src: url("/assets/courier-prime/CourierPrime-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Courier Prime";
+  src: url("/assets/courier-prime/CourierPrime-Italic.ttf") format("truetype");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* "Vintage" (headings) is NOT wired in yet: dafont lists it as free for
+   personal use only, and Ocico Store is commercial. Pending a decision
+   (buy a license or pick an OFL alternative) — see
+   app/assets/fonts/vintage-UNLICENSED-personal-use-only/README.md. */
+
 @layer base {
   html,
   body {

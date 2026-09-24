@@ -22,6 +22,12 @@ module.exports = {
       'sans-md': ['"Inter Medium"', 'system-ui', 'sans-serif'],
       serif: ['Source Serif', 'system-ui', 'serif'],
       'serif-md': ['"Source Serif Medium"', 'system-ui', 'serif'],
+      // Ocico Store brand tokens (see @font-face rules in application.tailwind.css).
+      // font-heading is a placeholder (Georgia) until the Vintage font's commercial
+      // license is resolved — do not treat this as the final heading typeface.
+      heading: ['Georgia', 'serif'],
+      body: ['Compagnon', 'ui-serif', 'serif'],
+      ui: ['"Courier Prime"', 'ui-monospace', 'monospace'],
     },
     fontSize: {
       h1: ['4rem', '120%'],
