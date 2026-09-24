@@ -1,31 +1,72 @@
 /* tailwindcss-ruby only ships v4 binaries now (no v3 release left on RubyGems).
    v4 can't load config/tailwind.config.js as JS (tried both the `-c` CLI flag
    and the `@config` at-rule — both need to evaluate the CommonJS config and
-   hit a "missing babel.cjs" bug in this binary build), so `@apply`-ing any
-   utility class that depended on that JS config's theme.extend (custom colors/
-   fontSize/etc.) fails the build. Ported just the subset of tokens this file's
-   own @apply rules actually use into native v4 @theme vars below — NOT a full
-   port of config/tailwind.config.js (which stays as the source of truth for
-   content-scanning paths and whatever plugins still resolve). This whole theme
-   is Solidus's placeholder demo look anyway; Fase 1 replaces it wholesale with
-   Ocico Store's brand, authored natively in @theme from the start. */
+   hit a "missing babel.cjs" bug in this binary build), so config/tailwind.config.js
+   is gone — this @theme block below is the single source of truth for the whole
+   design system (Fase 1: replaced Solidus's placeholder theme with the real
+   Ocico Store brand, authored natively in @theme instead of a JS config). */
 @import "tailwindcss";
 
 @theme {
-  --color-sand: #F5F3F0;
-  --color-black: #222222;
-  --color-primary: #EF3023;
-  --color-gray-mid: #D8DAD8;
-  --color-seafoam: #C1E0DE;
-  --color-yellow: #FDC071;
+  /* Brand palette (see visual identity memory / architecture plan) */
+  --color-sand: #f4eee8;
+  --color-black: #151413;
+  --color-light-black: #2b2a28;
+  --color-primary: #fb7a98;
+  --color-seafoam: #78e48c;
+  --color-yellow: #f5d463;
+  --color-accent-blue: #79c8e7;
+  --color-gray-mid: #dad3c9;
 
+  /* Ocico Store brand fonts, @font-face rules below. font-heading is a
+     Georgia placeholder until the Vintage font's commercial license is
+     resolved (see app/assets/fonts/vintage-UNLICENSED-personal-use-only/). */
+  --font-heading: Georgia, serif;
+  --font-body: Compagnon, ui-serif, serif;
+  --font-ui: "Courier Prime", ui-monospace, monospace;
   --font-sans-md: "Inter Medium", system-ui, sans-serif;
 
+  /* Custom breakpoints solidus_starter_frontend's views were built against */
+  --breakpoint-xs: 320px;
+  --breakpoint-sm: 576px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 992px;
+  --breakpoint-xl: 1200px;
+  --breakpoint-2xl: 1386px;
+  --breakpoint-3xl: 1536px;
+
+  --text-h1: 4rem;
+  --text-h1--line-height: 120%;
+  --text-h2: 3.375rem;
+  --text-h2--line-height: 125%;
+  --text-h3: 2.5rem;
+  --text-h3--line-height: 125%;
+  --text-h4: 2rem;
+  --text-h4--line-height: 125%;
+  --text-h5: 1.75rem;
+  --text-h5--line-height: 125%;
+  --text-h6: 1.5rem;
+  --text-h6--line-height: 125%;
+  --text-body-lg: 1.5rem;
+  --text-body-lg--line-height: 150%;
+  --text-body-md: 1.125rem;
+  --text-body-md--line-height: 140%;
   --text-body: 1rem;
   --text-body--line-height: 120%;
   --text-body-sm: 0.875rem;
   --text-body-sm--line-height: 120%;
   --text-body-xs: 0.75rem;
+  --text-eyebrow: 0.875rem;
+  --text-eyebrow--line-height: 1;
+  --text-eyebrow--letter-spacing: 0.07em;
+  --text-caption: 0.75rem;
+  --text-caption--line-height: 150%;
+
+  --radius-2xl: 2rem;
+
+  --width-1_col-3: 32%;
+  --width-collection-card: calc(33% - 12px);
+  --height-1_col-3: 32%;
 }
 
 /* Ocico Store brand fonts — see config/tailwind.config.js for the font-heading/
