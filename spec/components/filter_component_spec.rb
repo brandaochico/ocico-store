@@ -15,12 +15,12 @@ RSpec.describe FilterComponent, type: :component do
 
     it 'renders a list of checkboxes for the filter labels' do
       expect(inputs).to_not be_empty
-      expect(inputs.first[:id]).to eq('Price_Range_Under__10.00')
+      expect(inputs.first[:id]).to eq('Faixa_de_Pre_o_At__R_100.00')
     end
 
     context 'when a filter list item was checked' do
       let(:search_params) do
-        { price_range_any: [ "Under $10.00" ] }
+        { price_range_any: [ "Até R$100.00" ] }
       end
 
       it 'renders as checked' do
