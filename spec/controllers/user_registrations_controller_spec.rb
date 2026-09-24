@@ -34,7 +34,7 @@ RSpec.describe UserRegistrationsController, type: :controller do
 
       it 'sets flash message' do
         subject
-        expect(flash[:notice]).to eq('Welcome! You have signed up successfully.')
+        expect(flash[:notice]).to eq(I18n.t('devise.registrations.signed_up'))
       end
 
       it 'signs in user' do
