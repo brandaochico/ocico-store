@@ -3,5 +3,12 @@
 "pt-BR":
   storefront:
     home:
-      shop_collection: "Nossa Coleção"
-      new_arrivals: "Novidades"
+      shop_collection: "Cartas em Destaque"
+      new_arrivals: "Chegaram Agora"
+      cta_headline: "Direto do Japão e dos EUA para sua coleção."
+      cta_label: "Ver Catálogo"
+    product:
+      shop_now: "Comprar"
+      you_may_also_like: "Você Também Pode Gostar"
+    footer:
+      tagline: "Cartas e produtos selados de Pokémon TCG, avulsos e importados."

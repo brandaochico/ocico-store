@@ -1,0 +1,7 @@
+# Overrides for specific Solidus-gem-owned keys (config/locales/pt-BR fallback
+# is :en per config/application.rb, so any key we don't override here shows in
+# English until someone notices and adds it — expected, not exhaustive by design).
+"pt-BR":
+  spree:
+    continue_shopping: "Continuar comprando"
+    look_for_similar_items: "Veja também"
