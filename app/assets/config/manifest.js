@@ -4,3 +4,4 @@
 //= link spree/backend/all.css
 //= link spree/backend/all.js
 //= link_tree ../builds
+//= link tailwind.css

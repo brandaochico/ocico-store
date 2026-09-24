@@ -22,7 +22,7 @@ module OcicoStore
   class Application < Rails::Application
     if defined?(FactoryBotRails)
       initializer after: "factory_bot.set_factory_paths" do
-        require 'spree/testing_support/factory_bot'
+        require "spree/testing_support/factory_bot"
 
         # The paths for Solidus' core factories.
         solidus_paths = Spree::TestingSupport::FactoryBot.definition_file_paths
@@ -36,7 +36,7 @@ module OcicoStore
 
         # Your application's own factories.
         app_paths = [
-          Rails.root.join('spec/factories'),
+          Rails.root.join("spec/factories")
         ]
 
         FactoryBot.definition_file_paths = solidus_paths + extension_paths + app_paths
@@ -67,9 +67,16 @@ module OcicoStore
     # pt-BR is the only active locale for now; fall back to Solidus/Devise's bundled
     # :en translations for gem-owned strings we haven't overridden yet.
     config.i18n.default_locale = :"pt-BR"
-    config.i18n.available_locales = [:"pt-BR", :en]
+    config.i18n.available_locales = [ :"pt-BR", :en ]
     # `true` would fall back to default_locale, which IS pt-BR here — no-op.
     # Explicitly fall back to :en so gem-owned strings we haven't translated still render.
-    config.i18n.fallbacks = { "pt-BR" => [:en] }
+    config.i18n.fallbacks = { "pt-BR" => [ :en ] }
+
+    # sassc-rails auto-sets this to :sass outside development, which makes Sprockets
+    # run our already-built Tailwind v4 output (and any other plain .css) through the
+    # legacy libsass compressor — it can't parse modern syntax like range media
+    # queries and breaks every page in test/production. We don't need Sprockets to
+    # compress CSS it doesn't own; Tailwind's own CLI already minifies its output.
+    config.assets.css_compressor = nil
   end
 end

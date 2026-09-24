@@ -1,17 +1,32 @@
-/* KNOWN ISSUE (pre-existing, not caused by the font work below): tailwindcss-ruby
-   only ships v4 binaries now (no v3 release left on RubyGems), but this file +
-   config/tailwind.config.js use v3's JS-config/@tailwind-directive style that
-   solidus_starter_frontend generated. `bin/rails tailwindcss:build` currently
-   fails ("Cannot apply unknown utility class `bg-sand`") because the v4 binary
-   doesn't load the JS config for custom colors/fontFamily/etc. The `@config
-   "...tailwind.config.js";` v4 compat at-rule was tried and hits a separate
-   bug in this binary build (missing babel.cjs module for JS config parsing).
-   Not worth chasing further here: Fase 1 replaces this whole theme (Solidus's
-   placeholder colors/tokens) with the real Ocico Store brand anyway, authored
-   natively in v4's CSS-first @theme syntax instead of a JS config. */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* tailwindcss-ruby only ships v4 binaries now (no v3 release left on RubyGems).
+   v4 can't load config/tailwind.config.js as JS (tried both the `-c` CLI flag
+   and the `@config` at-rule — both need to evaluate the CommonJS config and
+   hit a "missing babel.cjs" bug in this binary build), so `@apply`-ing any
+   utility class that depended on that JS config's theme.extend (custom colors/
+   fontSize/etc.) fails the build. Ported just the subset of tokens this file's
+   own @apply rules actually use into native v4 @theme vars below — NOT a full
+   port of config/tailwind.config.js (which stays as the source of truth for
+   content-scanning paths and whatever plugins still resolve). This whole theme
+   is Solidus's placeholder demo look anyway; Fase 1 replaces it wholesale with
+   Ocico Store's brand, authored natively in @theme from the start. */
+@import "tailwindcss";
+
+@theme {
+  --color-sand: #F5F3F0;
+  --color-black: #222222;
+  --color-primary: #EF3023;
+  --color-gray-mid: #D8DAD8;
+  --color-seafoam: #C1E0DE;
+  --color-yellow: #FDC071;
+
+  --font-sans-md: "Inter Medium", system-ui, sans-serif;
+
+  --text-body: 1rem;
+  --text-body--line-height: 120%;
+  --text-body-sm: 0.875rem;
+  --text-body-sm--line-height: 120%;
+  --text-body-xs: 0.75rem;
+}
 
 /* Ocico Store brand fonts — see config/tailwind.config.js for the font-heading/
    font-body/font-ui tokens these back, and the visual identity memory for the
