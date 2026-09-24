@@ -1,0 +1,7 @@
+# Storefront-facing strings (product listing/detail, cart, navigation).
+# Convention: never hardcode user-facing text in storefront views/controllers — add it here instead.
+"pt-BR":
+  storefront:
+    home:
+      shop_collection: "Nossa Coleção"
+      new_arrivals: "Novidades"

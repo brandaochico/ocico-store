@@ -1,0 +1,6 @@
+# Strings for OUR custom admin additions only (e.g. cash-flow dashboard, import
+# duty report from Fase 4). Solidus's own admin UI ships its own :en translations
+# via solidus_backend/solidus_admin — override specific keys under spree_overrides.yml
+# only when we need to change gem-owned copy, not here.
+"pt-BR":
+  admin: {}

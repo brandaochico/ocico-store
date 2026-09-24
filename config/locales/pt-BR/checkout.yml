@@ -1,0 +1,3 @@
+# Checkout-flow strings (address, shipping, payment, confirmation steps).
+"pt-BR":
+  checkout: {}

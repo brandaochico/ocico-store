@@ -1,0 +1,10 @@
+# Site-wide strings shared across storefront/checkout/admin (site name, common actions).
+# Domain-specific strings live in their own files (storefront.yml, checkout.yml, admin.yml)
+# so a growing translation set stays scannable instead of one giant YAML.
+"pt-BR":
+  site:
+    name: "Ocico Store"
+  common:
+    save: "Salvar"
+    cancel: "Cancelar"
+    back: "Voltar"

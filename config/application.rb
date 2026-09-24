@@ -60,5 +60,16 @@ module OcicoStore
 
     # Don't generate system test files.
     config.generators.system_tests = nil
+
+    # Solidus's default asset variant styles use vips-only pipeline steps (e.g. `.saver`),
+    # so this must stay on :vips (the Rails 8 default) — requires the libvips system library.
+
+    # pt-BR is the only active locale for now; fall back to Solidus/Devise's bundled
+    # :en translations for gem-owned strings we haven't overridden yet.
+    config.i18n.default_locale = :"pt-BR"
+    config.i18n.available_locales = [:"pt-BR", :en]
+    # `true` would fall back to default_locale, which IS pt-BR here — no-op.
+    # Explicitly fall back to :en so gem-owned strings we haven't translated still render.
+    config.i18n.fallbacks = { "pt-BR" => [:en] }
   end
 end
