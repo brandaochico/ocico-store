@@ -408,7 +408,7 @@ GEM
       rspec-core (~> 3.13.0)
       rspec-expectations (~> 3.13.0)
       rspec-mocks (~> 3.13.0)
-    rspec-activemodel-mocks (1.1.0)
+    rspec-activemodel-mocks (1.3.0)
       activemodel (>= 3.0)
       activesupport (>= 3.0)
       rspec-mocks (>= 2.99, < 4.0)
@@ -672,7 +672,7 @@ DEPENDENCIES
   rails (~> 8.1.4)
   rails-controller-testing (~> 1.0.5)
   responders
-  rspec-activemodel-mocks (~> 1.1.0)
+  rspec-activemodel-mocks (~> 1.3.0)
   rspec-rails
   rubocop (~> 1.0)
   rubocop-performance (~> 1.5)
@@ -853,7 +853,7 @@ CHECKSUMS
   responders (3.2.1) sha256=c2772970cbda654c0e772d852e5a851e82cd8e96f5fa958650861ba75b8ffa84
   rexml (3.4.4) sha256=19e0a2c3425dfbf2d4fc1189747bdb2f849b6c5e74180401b15734bc97b5d142
   rspec (3.13.2) sha256=206284a08ad798e61f86d7ca3e376718d52c0bc944626b2349266f239f820587
-  rspec-activemodel-mocks (1.1.0) sha256=5731d96d400acbdb13475f7330e338fa83d42336802540467f0af9d5e84704d9
+  rspec-activemodel-mocks (1.3.0) sha256=b51b111b726370a20a2103a8a6851296783a70d2b0bd0287bfa24d293f58d76e
   rspec-core (3.13.6) sha256=a8823c6411667b60a8bca135364351dda34cd55e44ff94c4be4633b37d828b2d
   rspec-expectations (3.13.5) sha256=33a4d3a1d95060aea4c94e9f237030a8f9eae5615e9bd85718fe3a09e4b58836
   rspec-mocks (3.13.8) sha256=086ad3d3d17533f4237643de0b5c42f04b66348c28bf6b9c2d3f4a3b01af1d47
