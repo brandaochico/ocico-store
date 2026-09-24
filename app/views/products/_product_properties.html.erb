@@ -1,16 +1,16 @@
 <% unless product_properties.empty? %>
   <div class="product-page__details">
     <div class="product-properties">
-      <h2 class="product-properties__title">
+      <h2 class="font-heading text-h6 mb-2">
         <%= t('spree.properties')%>
       </h2>
 
-      <table class="product-properties__table">
+      <table class="product-properties__table font-body text-body-sm w-full">
         <tbody>
           <% product_properties.each do |product_property| %>
             <tr>
-              <td><%= product_property.property.presentation %></td>
-              <td><%= product_property.value %></td>
+              <td class="text-gray-500 pr-4 py-1"><%= product_property.property.presentation %></td>
+              <td class="py-1"><%= product_property.value %></td>
             </tr>
           <% end %>
 

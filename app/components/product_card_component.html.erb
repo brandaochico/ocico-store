@@ -39,7 +39,7 @@
     <section
       class="dark:text-black <%= text_flex_classes %>"
     >
-      <header class="product-card_header <%= title_text_classes %>">
+      <header class="product-card_header font-heading <%= title_text_classes %>">
         <span>
           <%= link_to(
             truncate(product.name, length: 50),
@@ -50,8 +50,8 @@
           ) %>
         </span>
       </header>
-      <section 
-        class="product-card_price font-sans-md mt-1 lg:mt-0 <%= price_classes %>"
+      <section
+        class="product-card_price font-body mt-1 lg:mt-0 <%= price_classes %>"
         itemprop="offers"
         itemscope
         itemtype="http://schema.org/Offer"

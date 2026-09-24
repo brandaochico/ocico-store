@@ -1,13 +1,11 @@
 <% if !product.taxons.blank? %>
-  <section class="product-taxons">
-    <h1 class="product-taxons__title">
-      <%= t('spree.look_for_similar_items') %>:
-    </h1>
+  <section class="product-taxons font-ui text-body-sm">
+    <span class="text-gray-500"><%= t('spree.look_for_similar_items') %>:</span>
 
-    <ul class="product-taxons__list">
+    <ul class="product-taxons__list inline-flex gap-x-2">
       <% product.taxons.each do |taxon| %>
         <li>
-          <%= link_to taxon.name, taxon_seo_url(taxon) %>
+          <%= link_to taxon.name, taxon_seo_url(taxon), class: "text-primary hover:underline" %>
         </li>
       <% end %>
     </ul>

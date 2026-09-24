@@ -15,11 +15,13 @@
         <%= render 'product_promotions', product: @product %>
         <%= render 'cart_line_items/form', product: @product %>
         <%= render 'product_info', product: @product %>
+        <%= render 'product_properties', product_properties: @product.product_properties %>
+        <%= render 'product_taxons', product: @product %>
       </div>
     </div>
 
     <div class="col-span-full pt-12">
-      <%= render partial: 'home/collection', :locals => { :title => "You May Also Like", :products => @similar_products } %>
+      <%= render partial: 'home/collection', :locals => { :title => t("storefront.product.you_may_also_like"), :products => @similar_products } %>
     </div>
   </section>
 <% end %>
