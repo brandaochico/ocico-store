@@ -1,3 +1,14 @@
+/* KNOWN ISSUE (pre-existing, not caused by the font work below): tailwindcss-ruby
+   only ships v4 binaries now (no v3 release left on RubyGems), but this file +
+   config/tailwind.config.js use v3's JS-config/@tailwind-directive style that
+   solidus_starter_frontend generated. `bin/rails tailwindcss:build` currently
+   fails ("Cannot apply unknown utility class `bg-sand`") because the v4 binary
+   doesn't load the JS config for custom colors/fontFamily/etc. The `@config
+   "...tailwind.config.js";` v4 compat at-rule was tried and hits a separate
+   bug in this binary build (missing babel.cjs module for JS config parsing).
+   Not worth chasing further here: Fase 1 replaces this whole theme (Solidus's
+   placeholder colors/tokens) with the real Ocico Store brand anyway, authored
+   natively in v4's CSS-first @theme syntax instead of a JS config. */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
