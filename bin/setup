@@ -20,8 +20,11 @@ FileUtils.chdir APP_ROOT do
   # Copy it into place so solidus_backend's Sprockets/Sass pipeline can load it.
   Dir.glob("vendor/bundle/ruby/*/extensions/*/*/sassc-*/sassc/libsass.*").each do |built_lib|
     gem_dir = built_lib[%r{vendor/bundle/ruby/[^/]+/extensions/[^/]+/[^/]+/(sassc-[^/]+)}, 1]
-    target = Dir.glob("vendor/bundle/ruby/*/gems/#{gem_dir}/lib/sassc/#{File.basename(built_lib)}").first
-    FileUtils.cp(built_lib, target) if target && !File.exist?(target)
+    target_dir = Dir.glob("vendor/bundle/ruby/*/gems/#{gem_dir}/lib/sassc").first
+    next unless target_dir
+
+    target = File.join(target_dir, File.basename(built_lib))
+    FileUtils.cp(built_lib, target) unless File.exist?(target)
   end
 
   # puts "\n== Copying sample files =="
