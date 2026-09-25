@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "rails_helper"
+require "solidus_starter_frontend_spec_helper"
 
 # Money logic gets the strictest coverage in this project, and the seed is what
 # decides how every environment's Stripe payment method is configured — most

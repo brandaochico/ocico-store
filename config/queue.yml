@@ -3,7 +3,9 @@ default: &default
     - polling_interval: 1
       batch_size: 500
   workers:
-    - queues: "*"
+    # "critical" first, then everything else: payment webhooks shouldn't wait
+    # behind slower background work (mailers, report warmers).
+    - queues: "critical,*"
       threads: 3
       processes: <%= ENV.fetch("JOB_CONCURRENCY", 1) %>
       polling_interval: 1
