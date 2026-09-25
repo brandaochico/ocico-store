@@ -274,13 +274,19 @@ below).
 
 ## Visual identity (storefront only — admin keeps Solidus's default skin)
 
-- **Typography:** headings/product names → "Vintage" (dafont.com) — **not
-  wired in yet**: dafont lists it as free for personal use only, and this is a
-  commercial store. Currently a Georgia placeholder
-  (`--font-heading` in `app/assets/stylesheets/application.tailwind.css`).
+- **Typography:** headings/product names → **Modak** (Ek Type, OFL —
+  commercial use granted), `--font-heading`. This replaced the original
+  "Vintage" pick from dafont, which is licensed for personal use only and so
+  was never wired in; the Georgia placeholder that stood in for it is now just
+  the fallback. Only the latin and latin-ext subsets are self-hosted (Google
+  also publishes devanagari, which this store has no use for).
+  **Modak ships a single weight (400)** — don't pair `font-heading` with
+  `font-semibold`/`font-bold`, or the browser synthesises a fake bold on an
+  already very heavy display face.
   Descriptions/prices/specs → Compagnon (Velvetyne, OFL-style, commercial-safe,
   `--font-body`). General UI/footer → Courier Prime (Google Fonts, OFL,
-  `--font-ui`). Font files live in `app/assets/fonts/`.
+  `--font-ui`). Font files live in `app/assets/fonts/`, one directory per
+  family, each with its license file alongside.
 - **Palette:** background `#f4eee8`, dark text `#151413`, accents yellow
   `#F5D463` / blue `#79C8E7` / pink `#FB7A98` (chosen as the primary CTA
   color) / green `#78E48C`. Pastel mood referencing the YouTube channel
@@ -380,7 +386,7 @@ reasons — worth understanding before changing them:
 - ✅ **Fase 0 — Foundation.** Rails 8 + Solidus 4.7.1 + starter frontend
   installed, Postgres via Docker locally, RSpec/FactoryBot/CI working,
   Kamal config scaffolded (not yet deployed anywhere real), brand fonts
-  installed (Vintage license pending), repo public on GitHub with CI green.
+  installed, repo public on GitHub with CI green.
 - ✅ **Fase 1 — Catalog & visual identity.** Tailwind migrated to native
   `@theme` (v4), Ocico Store palette/fonts applied across storefront, Solidus
   community branding removed, catalog data model seeded (option

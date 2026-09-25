@@ -18,10 +18,12 @@
   --color-accent-blue: #79c8e7;
   --color-gray-mid: #dad3c9;
 
-  /* Ocico Store brand fonts, @font-face rules below. font-heading is a
-     Georgia placeholder until the Vintage font's commercial license is
-     resolved (see app/assets/fonts/vintage-UNLICENSED-personal-use-only/). */
-  --font-heading: Georgia, serif;
+  /* Ocico Store brand fonts, @font-face rules below. Modak (Ek Type, OFL —
+     commercial use granted) replaced the "Vintage" display face, which dafont
+     licenses for personal use only. Modak ships a single weight: never pair
+     font-heading with font-semibold/font-bold, or the browser synthesises a
+     fake bold on an already very heavy face. */
+  --font-heading: Modak, Georgia, serif;
   --font-body: Compagnon, ui-serif, serif;
   --font-ui: "Courier Prime", ui-monospace, monospace;
   --font-sans-md: "Inter Medium", system-ui, sans-serif;
@@ -69,10 +71,10 @@
   --height-1_col-3: 32%;
 }
 
-/* Ocico Store brand fonts — see config/tailwind.config.js for the font-heading/
-   font-body/font-ui tokens these back, and the visual identity memory for the
-   full design system. Served from app/assets/fonts/ (Propshaft auto-serves any
-   top-level app/assets/* subdirectory under /assets/). */
+/* Ocico Store brand fonts — the @theme block above holds the font-heading/
+   font-body/font-ui tokens these back (there is no JS Tailwind config; see
+   docs/ARCHITECTURE.md). Served from app/assets/fonts/ (Propshaft auto-serves
+   any top-level app/assets/* subdirectory under /assets/). */
 @font-face {
   font-family: "Compagnon";
   src: url("/assets/compagnon/Compagnon-Roman.woff2") format("woff2");
@@ -124,10 +126,26 @@
   font-display: swap;
 }
 
-/* "Vintage" (headings) is NOT wired in yet: dafont lists it as free for
-   personal use only, and Ocico Store is commercial. Pending a decision
-   (buy a license or pick an OFL alternative) — see
-   app/assets/fonts/vintage-UNLICENSED-personal-use-only/README.md. */
+/* Modak (headings). Only the latin and latin-ext subsets are self-hosted —
+   Google also publishes a devanagari subset this store has no use for. The
+   unicode-range declarations are copied from Google's own stylesheet so the
+   browser only downloads latin-ext when a page actually needs it. */
+@font-face {
+  font-family: "Modak";
+  src: url("/assets/modak/Modak-Regular-latin.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Modak";
+  src: url("/assets/modak/Modak-Regular-latin-ext.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
 
 @layer base {
   html,
