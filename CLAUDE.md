@@ -60,6 +60,12 @@ RAILS_ENV=test bin/ci   # runs the exact same steps as CI (config/ci.rb), locall
 
 Admin login (seeded): `admin@example.com` / `test123`.
 
+## Brand name
+
+The store is called **`ocico store`** — always lowercase, exactly that, everywhere: storefront copy, page
+titles, seeds, locale files, docs, commit messages. Never "Ocico Store" and never `Ocico store`. Don't apply
+a CSS `uppercase`/`capitalize` to the wordmark either; it's rendered as-is on purpose.
+
 ## Commit convention
 
 One discrete change per commit. Message format `[category]: message`, category lowercase (`feat`, `fix`,

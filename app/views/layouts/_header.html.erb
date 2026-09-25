@@ -13,7 +13,7 @@
     </div>
     <div class="flex items-center gap-x-4 xl:gap-x-8 w-full justify-center lg:justify-start">
       <%= link_to root_path, class: 'absolute lg:relative left-1/2 lg:left-0 lg:-translate-x-0 -translate-x-1/2 flex items-center space-x-3' do %>
-        <span class="uppercase font-heading mb-0 dark:text-sand text-body lg:text-h6"><%= Spree::Store.default.name %></span>
+        <span class="font-heading mb-0 dark:text-sand text-body lg:text-h6"><%= Spree::Store.default.name %></span>
       <% end %>
 
       <% categories = taxonomies.find { |t| t.name == "Set" } || taxonomies.first %>

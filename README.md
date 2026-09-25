@@ -1,4 +1,4 @@
-# Ocico Store
+# ocico store
 
 Pokémon TCG e-commerce (singles, sealed product, future graded cards) for the
 Brazilian market. Rails 8 + [Solidus](https://solidus.io) monolith — storefront

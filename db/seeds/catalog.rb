@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Idempotent — safe to run more than once (bin/rails db:seed re-runs everything).
-# Seeds Ocico Store's illustrative Pokémon TCG catalog: option types
+# Seeds ocico store's illustrative Pokémon TCG catalog: option types
 # (condition/language/grading), properties (rarity/card number), the "Set"
 # taxonomy, and a handful of sample products across real sets. This is
 # demo/dev data meant to prove the data model out — replace with a real
@@ -24,7 +24,7 @@ module OcicoStore
       return unless store
 
       store.update!(
-        name: "Ocico Store",
+        name: "ocico store",
         default_currency: "BRL",
         mail_from_address: "contato@ocicostore.com.br"
       )

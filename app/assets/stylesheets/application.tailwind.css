@@ -4,7 +4,7 @@
    hit a "missing babel.cjs" bug in this binary build), so config/tailwind.config.js
    is gone — this @theme block below is the single source of truth for the whole
    design system (Fase 1: replaced Solidus's placeholder theme with the real
-   Ocico Store brand, authored natively in @theme instead of a JS config). */
+   ocico store brand, authored natively in @theme instead of a JS config). */
 @import "tailwindcss";
 
 @theme {
@@ -18,7 +18,7 @@
   --color-accent-blue: #79c8e7;
   --color-gray-mid: #dad3c9;
 
-  /* Ocico Store brand fonts, @font-face rules below. Modak (Ek Type, OFL —
+  /* ocico store brand fonts, @font-face rules below. Modak (Ek Type, OFL —
      commercial use granted) replaced the "Vintage" display face, which dafont
      licenses for personal use only. Modak ships a single weight: never pair
      font-heading with font-semibold/font-bold, or the browser synthesises a
@@ -71,7 +71,7 @@
   --height-1_col-3: 32%;
 }
 
-/* Ocico Store brand fonts — the @theme block above holds the font-heading/
+/* ocico store brand fonts — the @theme block above holds the font-heading/
    font-body/font-ui tokens these back (there is no JS Tailwind config; see
    docs/ARCHITECTURE.md). Served from app/assets/fonts/ (Propshaft auto-serves
    any top-level app/assets/* subdirectory under /assets/). */

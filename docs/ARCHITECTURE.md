@@ -1,4 +1,4 @@
-# Ocico Store — Architecture & Roadmap
+# ocico store — Architecture & Roadmap
 
 This is the durable reference for *why* this project is built the way it is, and
 *what's left*. It's meant to survive across sessions/agents/machines — unlike
@@ -388,7 +388,7 @@ reasons — worth understanding before changing them:
   Kamal config scaffolded (not yet deployed anywhere real), brand fonts
   installed, repo public on GitHub with CI green.
 - ✅ **Fase 1 — Catalog & visual identity.** Tailwind migrated to native
-  `@theme` (v4), Ocico Store palette/fonts applied across storefront, Solidus
+  `@theme` (v4), ocico store palette/fonts applied across storefront, Solidus
   community branding removed, catalog data model seeded (option
   types/properties/Set taxonomy/8 sample products), Set-based nav and a new
   condition filter implemented, currency fixed to BRL throughout.
