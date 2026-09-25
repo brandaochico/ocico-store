@@ -87,10 +87,11 @@ builder:
 # ssh:
 #   user: app
 
-# Postgres + Redis run as Kamal accessories on the same VPS (single-server setup).
-# Redis backs Sidekiq once it's introduced in Fase 2 (see architecture plan) — the
-# SOLID_QUEUE_IN_PUMA env var above is a placeholder from `rails new` and should be
-# removed once background jobs move to Sidekiq.
+# Postgres runs as a Kamal accessory on the same VPS (single-server setup).
+# There's no Redis accessory: background jobs run on Solid Queue, backed by the
+# dedicated `queue` Postgres database, inside Puma via SOLID_QUEUE_IN_PUMA above
+# (see architecture plan, Fase 2). Split jobs onto their own machine before
+# adding a second web server, not before.
 accessories:
   db:
     image: postgres:18
@@ -104,9 +105,3 @@ accessories:
         - POSTGRES_PASSWORD
     directories:
       - data:/var/lib/postgresql
-  redis:
-    image: redis:7
-    host: YOUR_VPS_IP
-    port: "127.0.0.1:6379:6379"
-    directories:
-      - data:/data

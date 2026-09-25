@@ -16,7 +16,7 @@ directory must be on `PATH`:
 export PATH="$HOME/.local/share/gem/ruby/3.4.0/bin:$PATH"
 ```
 
-Dev Postgres + Redis run via Docker (see `docker-compose.yml`):
+Dev Postgres runs via Docker (see `docker-compose.yml`):
 
 ```
 docker compose up -d
