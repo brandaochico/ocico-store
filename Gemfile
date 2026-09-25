@@ -91,3 +91,8 @@ group :development, :test do
 end
 
 gem "solidus_admin", ">= 0.2"
+
+# Stripe payments (Payment Intents). Pinned to a main-branch SHA, not the
+# released 5.0.2: that release predates Rails 8 / Solidus 4.7, while main is
+# actively maintained and CI-tested against Solidus v4.7 + Ruby 3.4.
+gem "solidus_stripe", github: "solidusio/solidus_stripe", ref: "cdf1784a89e8e54f004c1ef9961306306cb9e595"
