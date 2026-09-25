@@ -12,9 +12,7 @@ CI.run do
   step "Style: Ruby", "bin/rubocop"
 
   step "Security: Gem audit", "bin/bundler-audit"
-  # No config/importmap.rb / bin/importmap binstub: solidus_starter_frontend's JS
-  # pipeline loads via Sprockets (javascript_include_tag) instead of pinned
-  # importmap packages, so there's nothing for `importmap audit` to check yet.
+  step "Security: JS import map audit", "bin/importmap audit"
   step "Security: Brakeman code analysis", "bin/brakeman --quiet --no-pager --exit-on-warn --exit-on-error"
 
   # System specs need a real browser driver (not set up yet) and currently also
