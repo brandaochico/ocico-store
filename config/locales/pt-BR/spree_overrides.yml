@@ -5,3 +5,28 @@
   spree:
     continue_shopping: "Continuar comprando"
     look_for_similar_items: "Veja também"
+
+  solidus_stripe:
+    loading: "Carregando..."
+
+    # `unexpected_error` is the one key here that isn't an override: the gem
+    # hardcodes this message in its Stimulus controller, so our copy of that
+    # controller reads it from a Stimulus value instead (see
+    # app/javascript/controllers/solidus_stripe_payment_controller.js).
+    unexpected_error: "Ocorreu um erro inesperado. Tente novamente."
+
+    # Shown to the customer by SolidusStripe::PaymentIntent when a payment
+    # intent comes back in a non-final state.
+    intent_status:
+      canceled: "Seu pagamento foi cancelado."
+      processing: "Seu pagamento está sendo processado."
+      requires_action: "Seu pagamento precisa de uma confirmação adicional antes de prosseguir."
+      requires_capture: "Pagamento autorizado com sucesso!"
+      requires_confirmation: "Confirme o pagamento para prosseguir."
+      requires_payment_method: "Seu pagamento não foi aprovado. Tente novamente."
+      succeeded: "Pagamento aprovado!"
+
+  activerecord:
+    models:
+      solidus_stripe/payment_source: "Fonte de pagamento Stripe"
+      solidus_stripe/payment_method: "Forma de pagamento Stripe"

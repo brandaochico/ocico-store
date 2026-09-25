@@ -273,6 +273,19 @@
   .badge.badge-returned {
     @apply bg-yellow text-black;
   }
+
+  /* solidus_stripe checkout partial (app/views/checkouts/payment/_stripe.html.erb).
+     w-full because the payment step renders each method inside a flex fieldset,
+     where the Stripe Elements container would otherwise collapse to its
+     content width. The disabled rule covers the submit button that
+     solidus_stripe_payment_controller.js locks while Stripe is working. */
+  .solidus-stripe-payment {
+    @apply w-full py-4;
+  }
+
+  #checkout_form_payment [type="submit"]:disabled {
+    @apply opacity-50 cursor-not-allowed;
+  }
 }
 
 @layer utilities {
