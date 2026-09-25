@@ -21,7 +21,18 @@ Dev Postgres runs via Docker (see `docker-compose.yml`):
 ```
 docker compose up -d
 bin/setup            # bundle install, db:prepare, etc. (--skip-server to not launch bin/dev)
-bin/rails db:seed    # idempotent — safe to re-run; seeds option types/properties/Set taxonomy/sample catalog
+bin/rails db:seed    # idempotent — safe to re-run; seeds catalog + payment methods
+```
+
+Stripe is only wired up when credentials are present. Until `config/master.key` is recovered (see
+`docs/ARCHITECTURE.md`, "Environment gotchas"), pass **test-mode** keys through ENV — with none set, the seed
+skips the payment method and checkout simply shows no Stripe option:
+
+```
+SOLIDUS_STRIPE_API_KEY=sk_test_... SOLIDUS_STRIPE_PUBLISHABLE_KEY=pk_test_... \
+  SOLIDUS_STRIPE_WEBHOOK_SIGNING_SECRET=whsec_... bin/rails db:seed
+
+stripe listen --forward-to http://localhost:3000/solidus_stripe/test/webhooks   # local webhook delivery
 ```
 
 Local dev also requires the `libvips` **system package** (not a gem) — Solidus's product image variant styles
@@ -42,6 +53,7 @@ bundle exec rspec spec/path/to/foo_spec.rb:42               # single example by 
 bin/rubocop          # lint (rubocop-rails-omakase); add -A to autocorrect
 bin/brakeman --quiet --no-pager --exit-on-warn --exit-on-error
 bin/bundler-audit
+bin/importmap audit  # JS pins (config/importmap.rb) — don't delete that file, see ARCHITECTURE.md
 
 RAILS_ENV=test bin/ci   # runs the exact same steps as CI (config/ci.rb), locally
 ```

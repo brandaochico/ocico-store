@@ -67,7 +67,7 @@ illustrative sample products across 3 real sets (Obsidian Flames, 151, Paldea
 Evolved). **This is demo/dev data, not a real catalog** — replace with a real
 import when the business has one.
 
-## Payment (Fase 2 — not started)
+## Payment (Fase 2 — card flow in place, Pix/Boleto not started)
 
 **Decision: start with `solidus_stripe` (official gem, Payment Intents) for
 cards, add Pix/Boleto on top.** Do *not* build a custom Pagar.me/Mercado Pago
@@ -76,15 +76,75 @@ webhook signatures, partial refunds) written by agents with no Solidus
 reference implementation to pattern-match against, exactly the kind of code
 most likely to have expensive bugs (double charges, webhook races).
 
-- `Spree::PaymentMethod::StripePaymentIntents` created via seed
-  (`Spree::PaymentMethod.create!`), not the admin UI — reproducible per
-  environment.
+### Done
+
+- **The gem is pinned to a `main`-branch SHA, not a released version.** The
+  last release (5.0.2) is from 2023 and predates Rails 8 and Solidus 4.7;
+  `main` is actively maintained and CI-tested against Solidus v4.7 on Ruby
+  3.4. Re-pin deliberately when updating — don't switch to the released gem
+  thinking it's newer.
+- **Payment method created by seed** (`db/seeds/payment_methods.rb`), not the
+  admin UI, so every environment gets the same record reproducibly. The class
+  is `SolidusStripe::PaymentMethod` (the v5 rewrite), *not* the v4-era
+  `Spree::PaymentMethod::StripePaymentIntents` an older plan mentioned.
+  `auto_capture` is **off**: the card is authorized at checkout and captured
+  when the order ships, so we never charge for stock we can't send, and Fase
+  3's freight/import duty can still move the total before capture.
+- **Secrets never touch the database.** The payment method's
+  `preference_source` points at the `solidus_stripe_env_credentials` static
+  preference registered in `config/initializers/solidus_stripe.rb`. That
+  initializer reads Rails encrypted credentials first and falls back to ENV
+  (`SOLIDUS_STRIPE_API_KEY`, `_PUBLISHABLE_KEY`, `_WEBHOOK_SIGNING_SECRET`).
+  Same seeded row works in test and live mode; rotating a key changes no row.
+  With neither source configured the seed skips the payment method entirely
+  rather than creating one that can't transact — that's the state of a fresh
+  clone, and it's why checkout shows no Stripe option out of the box.
+- **Storefront integration is hand-wired, not generated.** `bin/rails
+  generate solidus_stripe:install` was run with `--no-storefront`: its
+  storefront step injects into asset files this app names differently. The
+  partials, both Stimulus controllers, the vendored `@stripe/stripe-js` and
+  the CSS were copied and adapted by hand (see the commit). Re-running the
+  generator with storefront enabled will fail; redo it by hand.
+- **Webhooks are processed asynchronously and exactly once.** See below.
+
+### Webhooks — the part that deviates most from upstream
+
+Upstream's `SolidusStripe::WebhooksController#create` verifies the signature
+and then publishes to `Spree::Bus` **inline**, so the payment state transition
+runs while Stripe waits on the HTTP response — and a slow or timed-out
+response makes Stripe redeliver and run it again.
+
+`app/overrides/stripe_webhooks_async_processing.rb` replaces the publish with
+an enqueue:
+
+- Signature verification stays in the request. An unverifiable event must
+  still be rejected with a 400, and Stripe's signature tolerance is measured
+  against delivery time, not against whenever a worker picks the job up.
+- `ProcessStripeWebhookEventJob` re-publishes to `Spree::Bus` from the
+  background, so solidus_stripe's own subscribers keep handling the event
+  unchanged — only *when* they run moves.
+- Idempotency is a **database guarantee**, not a check-then-act: each delivery
+  claims a row in `stripe_webhook_events` (unique index on the Stripe event
+  id) and the transition runs inside that row's lock. This covers duplicate
+  *and* concurrent delivery — without it a redelivered `charge.refunded` can
+  race past `RefundsSynchronizer`'s "already synced?" check and create the
+  same `Spree::Refund` twice. A job that raises leaves `processed_at` unset so
+  an Active Job retry still gets to run.
+
+Registering the endpoint with Stripe is still to do: production URL is
+`/solidus_stripe/live/webhooks`, everywhere else `/solidus_stripe/test/webhooks`
+(the slug comes from the key prefix). Locally, forward with
+`stripe listen --forward-to http://localhost:3000/solidus_stripe/test/webhooks`.
+
+### Not started
+
 - Pix/Boleto: no ready-made partial in Solidus. Build additional subclasses
-  (`Spree::PaymentMethod::StripePix`, `...::StripeBoleto`) reusing the same
-  gateway logic with different `payment_method_types` + their own checkout
-  partials — additive, doesn't touch `solidus_stripe` internals.
-- Stripe webhooks → enqueue a Sidekiq job to process the state transition;
-  never write directly in the webhook controller (retries would double-process).
+  reusing the same gateway logic with different `payment_method_types` + their
+  own checkout partials — additive, doesn't touch `solidus_stripe` internals.
+  Note the pinned gem depends on `stripe ~> 8.0` (SDK from 2023); confirm that
+  SDK version can create Pix/Boleto intents before committing to the approach.
+- System specs for the full card checkout (blocked on browser driver setup,
+  see "Environment gotchas").
 - **Revisit only if data justifies it:** if Pix/Boleto dominate volume (likely
   in Brazil) and Stripe's BR fees become a real problem, consider a custom
   Pagar.me/Mercado Pago gateway as a Fase 6+ initiative — don't build both
@@ -103,8 +163,10 @@ directly later only if needed.
 - Credentials via `Rails.application.credentials`, never a loose ENV var or a
   custom settings table.
 - Synchronous call during checkout (customer needs to see freight before
-  paying), but with an aggressive timeout + a Redis-cached rate fallback per
-  weight bracket/CEP, so a slow carrier API never blocks checkout.
+  paying), but with an aggressive timeout + a cached rate fallback per weight
+  bracket/CEP, so a slow carrier API never blocks checkout. Cache via
+  `Rails.cache` (Solid Cache, already configured) — there is no Redis in this
+  stack any more, see "Background jobs".
 
 ## Import duty / landed cost (Fase 3 — not started)
 
@@ -139,11 +201,23 @@ capture/refund/void per order, `Spree::RefundReason`, store credits.
 Scope proportionally: "good-enough dashboards + CSV" for a single-owner store,
 not a full BI system.
 
-## Background jobs — Sidekiq + Redis (Fase 2+)
+## Background jobs — Solid Queue (Fase 2+)
+
+**Changed from the original plan, which called for Sidekiq + Redis.** The app
+generated by `rails new` was already fully wired for Solid Queue — production
+`queue_adapter`, a dedicated `queue` Postgres database, `config/recurring.yml`,
+the Puma plugin behind `SOLID_QUEUE_IN_PUMA` — and nothing else in the app used
+Redis. Adopting Sidekiq would have meant adding a datastore, a Kamal accessory
+and a second process to run, to replace something already working. Redis has
+since been removed from `docker-compose.yml` and `config/deploy.yml`.
 
 Queues: `critical` (payment webhooks, order confirmation), `default` (Melhor
 Envio label purchase post-payment, mailers), `low` (report/cache warmers).
-Sidekiq Web UI mounted at `/admin/sidekiq`, behind the same Devise admin auth.
+`config/queue.yml` lists `"critical,*"` so workers poll payment work first.
+
+No jobs dashboard is mounted yet. If one is wanted later, Mission Control —
+Jobs is the Solid Queue equivalent of the Sidekiq Web UI the old plan
+described, and belongs behind the same Devise admin auth.
 
 ## Testing strategy
 
@@ -154,7 +228,12 @@ don't reinvent them). Capybara for checkout system specs. WebMock/VCR so tests
 **Mandatory coverage before merge, once those phases start:**
 1. `app/overrides/**/calculator/**` (import duty) — highest rigor.
 2. `app/overrides/**/payment_method/**` + webhooks — every state transition,
-   idempotent duplicate-webhook handling.
+   idempotent duplicate-webhook handling. **Partly done:**
+   `spec/requests/stripe_webhooks_spec.rb` (verify-in-request, work-in-job,
+   400 on bad/stale signature) and
+   `spec/jobs/process_stripe_webhook_event_job_spec.rb` (publishes, records,
+   idempotent on redelivery, unprocessed after a raise). Still missing: the
+   per-payment-method checkout system specs in item 5.
 3. `app/overrides/**/shipping_calculator/**` — stubbed carrier responses,
    including the timeout/fallback path.
 4. Anything touching `Spree::StockItem`/`Spree::StockLocation` — no
@@ -171,9 +250,11 @@ agent-written code.
 | Service | Role |
 |---|---|
 | `web` | Puma (store+admin+API), behind `kamal-proxy` (automatic Let's Encrypt TLS, zero-downtime deploys) |
-| `worker` | same image, `cmd: bundle exec sidekiq` |
 | `db` (accessory) | Postgres 18, persistent volume |
-| `redis` (accessory) | Redis, persistent volume |
+
+No separate `worker` service: Solid Queue's supervisor runs inside Puma via
+`SOLID_QUEUE_IN_PUMA` (already set in `config/deploy.yml`). Split jobs onto
+their own machine before adding a second web server, not before.
 
 One VPS (4vCPU/8GB is plenty for a niche store) — scale vertically before
 considering multiple servers. Config already scaffolded in
@@ -221,7 +302,41 @@ reasons — worth understanding before changing them:
   `lib/sassc/native.rb`, but Bundler's extension cache (used because gems are
   vendored into `vendor/bundle` via `bundle config set --local path`) builds it
   under `vendor/bundle/.../extensions/` instead. Without this copy, anything
-  touching `solidus_backend`'s Sprockets/Sass admin assets fails to boot.
+  touching `solidus_backend`'s Sprockets/Sass admin assets fails to boot —
+  a fresh clone dies at `bin/rails db:prepare` with a
+  `Bundler::GemRequireError` on `sassc/libsass.so`. (This step was silently a
+  no-op until 2026-09-25: it globbed the *destination file*, which by
+  definition doesn't exist yet, so the copy never ran. It globs the
+  destination directory now.)
+
+- **`config/importmap.rb` is load-bearing; the storefront has two JS
+  pipelines.** Sprockets (`javascript_include_tag 'solidus_starter_frontend'`)
+  serves the legacy `utils`/`checkout`/`product` scripts; importmap +
+  Propshaft serve everything under `app/javascript` — every Stimulus
+  controller, including checkout payment and the Stripe ones. They're
+  complementary, not alternatives. Without `config/importmap.rb` the map
+  resolves to `{"imports":{}}` and *all* Stimulus controllers become dead code
+  in the browser with no error anywhere in Rails. Assets under
+  `vendor/javascript` (where `bin/importmap pin --download` puts packages)
+  must also be declared in
+  `app/assets/config/solidus_starter_frontend_manifest.js`, because
+  sprockets-rails — not Propshaft — resolves the digest paths in this app.
+
+- **Engine-copied migrations are excluded from rubocop** (`db/migrate/*.*.rb`
+  in `.rubocop.yml`). Files named `<timestamp>_<name>.<engine>.rb` are verbatim
+  copies made by `railties:install:migrations` and must stay byte-identical to
+  the engine's own — same rationale as `db/schema.rb`.
+
+- **`config/credentials.yml.enc` can't be decrypted right now.** It's committed
+  but `config/master.key` isn't (correctly — it's gitignored), and no copy is
+  available on the current machine, so `Rails.application.credentials` reads
+  back as empty rather than raising. Anything that needs a secret currently
+  goes through ENV; the Stripe initializer supports both. Resolving this is a
+  prerequisite for Fase 5 (`RAILS_MASTER_KEY` is already listed in
+  `config/deploy.yml`'s secrets). Either recover the key or regenerate the
+  credentials pair — regenerating discards whatever the current file holds
+  (probably just `secret_key_base`, but that can't be confirmed without the
+  key).
 - **`config.assets.css_compressor = nil` in `config/application.rb`.**
   `sassc-rails` auto-sets this to `:sass` in any non-development environment,
   which makes Sprockets try to run our already-built Tailwind v4 CSS through
@@ -263,7 +378,7 @@ reasons — worth understanding before changing them:
 ## Phase status
 
 - ✅ **Fase 0 — Foundation.** Rails 8 + Solidus 4.7.1 + starter frontend
-  installed, Postgres/Redis via Docker locally, RSpec/FactoryBot/CI working,
+  installed, Postgres via Docker locally, RSpec/FactoryBot/CI working,
   Kamal config scaffolded (not yet deployed anywhere real), brand fonts
   installed (Vintage license pending), repo public on GitHub with CI green.
 - ✅ **Fase 1 — Catalog & visual identity.** Tailwind migrated to native
@@ -271,8 +386,16 @@ reasons — worth understanding before changing them:
   community branding removed, catalog data model seeded (option
   types/properties/Set taxonomy/8 sample products), Set-based nav and a new
   condition filter implemented, currency fixed to BRL throughout.
-- ⬜ **Fase 2 — Checkout & payment.** `solidus_stripe` + Pix/Boleto subclasses,
-  webhook processing via Sidekiq, payment system specs.
+- 🟡 **Fase 2 — Checkout & payment (in progress).**
+  Done: `solidus_stripe` installed (pinned to a `main` SHA) and mounted,
+  storefront checkout UI hand-wired, payment method seeded with
+  authorize-then-capture, webhook processing moved off the request into
+  `ProcessStripeWebhookEventJob` with exactly-once delivery guaranteed by a
+  unique index, request + job specs green.
+  Left: real Stripe credentials (nothing can transact without them — see the
+  credentials gotcha), registering the webhook endpoint in the Stripe
+  dashboard, Pix/Boleto payment method subclasses, and the end-to-end checkout
+  system specs (blocked on browser driver setup).
 - ⬜ **Fase 3 — Freight & import duty.** Melhor Envio calculator,
   `ImportDutyRate` + calculator + adjustment, end-to-end order-total specs.
 - ⬜ **Fase 4 — Admin & monetary reporting.** Cash-flow dashboard, import duty
