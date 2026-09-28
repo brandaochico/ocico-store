@@ -274,15 +274,34 @@ below).
 
 ## Visual identity (storefront only — admin keeps Solidus's default skin)
 
-- **Typography:** headings/product names → **Modak** (Ek Type, OFL —
-  commercial use granted), `--font-heading`. This replaced the original
-  "Vintage" pick from dafont, which is licensed for personal use only and so
-  was never wired in; the Georgia placeholder that stood in for it is now just
-  the fallback. Only the latin and latin-ext subsets are self-hosted (Google
-  also publishes devanagari, which this store has no use for).
-  **Modak ships a single weight (400)** — don't pair `font-heading` with
+- **Typography:** headings/product names → **Vintage** (dafont), the owner's
+  pick, `--font-heading`. Two things about it are load-bearing and were decided
+  with the tradeoffs on the table, not overlooked:
+
+  - **Licence.** dafont distributes Vintage as free for *personal* use, and this
+    is a commercial store. The owner chose it anyway, knowing that. What the
+    repo does *not* do is redistribute it: the binary is gitignored, because
+    this repo is public and publishing the file is a separate act from using it.
+    Each machine places `app/assets/fonts/vintage/Vintage-Regular.ttf` by hand —
+    see the README there.
+  - **It doesn't cover Portuguese.** Vintage maps 134 characters and lacks
+    `à â ã ç ê ô õ`, `À Â Ã Ê Ô Õ` and the em dash. It carries no tilde or
+    circumflex mark either, so the missing glyphs can't be composed from what's
+    in the file. Portuguese headings fall through per glyph to the next font in
+    the stack.
+
+  That is why **Modak** (Ek Type, OFL) stays in the tree as the fallback:
+  `--font-heading: Vintage, Modak, Georgia, serif`. Modak is in the same
+  register — heavy round display — so `Condição` mixes two display faces rather
+  than a display face and a book serif, which is markedly less jarring (there's
+  a rendered comparison in the commit that introduced it). Modak also means a
+  fresh clone and CI, which have no Vintage binary, still render headings in a
+  display face instead of Georgia.
+
+  **Both faces are single-weight** — don't pair `font-heading` with
   `font-semibold`/`font-bold`, or the browser synthesises a fake bold on an
-  already very heavy display face.
+  already very heavy face.
+
   Descriptions/prices/specs → Compagnon (Velvetyne, OFL-style, commercial-safe,
   `--font-body`). General UI/footer → Courier Prime (Google Fonts, OFL,
   `--font-ui`). Font files live in `app/assets/fonts/`, one directory per

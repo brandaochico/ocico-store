@@ -30,12 +30,21 @@
   --color-accent-blue: #79c8e7;
   --color-gray-mid: #dad3c9;
 
-  /* ocico store brand fonts, @font-face rules below. Modak (Ek Type, OFL —
-     commercial use granted) replaced the "Vintage" display face, which dafont
-     licenses for personal use only. Modak ships a single weight: never pair
-     font-heading with font-semibold/font-bold, or the browser synthesises a
-     fake bold on an already very heavy face. */
-  --font-heading: Modak, Georgia, serif;
+  /* ocico store brand fonts, @font-face rules below.
+     font-heading is Vintage, the owner's pick. Two consequences the stack
+     encodes deliberately:
+       - Vintage maps only 134 characters and is missing à â ã ç ê ô õ / À Â Ã
+         Ê Ô Õ and the em dash, with no tilde or circumflex mark to compose
+         them from. Portuguese headings therefore fall through, per glyph, to
+         the next font. Modak is that next font rather than Georgia because
+         it's the same register (heavy round display), so "Condição" mixes two
+         display faces instead of a display face and a book serif.
+       - Vintage's binary is not committed (personal-use licence, public repo —
+         see app/assets/fonts/vintage/README.md), so a fresh clone and CI render
+         headings entirely in Modak. That's why Modak stays in the tree.
+     Both faces are single-weight: never pair font-heading with
+     font-semibold/font-bold or the browser synthesises a fake bold. */
+  --font-heading: Vintage, Modak, Georgia, serif;
   --font-body: Compagnon, ui-serif, serif;
   --font-ui: "Courier Prime", ui-monospace, monospace;
   --font-sans-md: "Inter Medium", system-ui, sans-serif;
@@ -138,7 +147,16 @@
   font-display: swap;
 }
 
-/* Modak (headings). Only the latin and latin-ext subsets are self-hosted —
+@font-face {
+  font-family: "Vintage";
+  src: url("/assets/vintage/Vintage-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Modak — the fallback behind Vintage, not the brand face. Only the latin and
+   latin-ext subsets are self-hosted —
    Google also publishes a devanagari subset this store has no use for. The
    unicode-range declarations are copied from Google's own stylesheet so the
    browser only downloads latin-ext when a page actually needs it. */

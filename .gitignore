@@ -43,3 +43,8 @@ app/assets/builds/solidus_admin/
 
 # RSpec run-history artifact (spec/examples.txt), not meaningful to commit.
 /spec/examples.txt
+
+# Vintage is "free for personal use only" (dafont) and this repo is public, so
+# committing the binary would be redistribution. Keep it local; see the README
+# in that directory for how to place it.
+/app/assets/fonts/vintage/*.ttf
