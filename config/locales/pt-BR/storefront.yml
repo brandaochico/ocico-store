@@ -7,8 +7,16 @@
       new_arrivals: "Chegaram Agora"
       cta_headline: "Direto do Japão e dos EUA para sua coleção."
       cta_label: "Ver Catálogo"
+      shop_all: "Ver Tudo"
     product:
       shop_now: "Comprar"
       you_may_also_like: "Você Também Pode Gostar"
+      badge_new: "Novo"
+    search:
+      see_all_results: "Ver todos os resultados"
+      no_results: "Nenhum resultado"
+    navigation:
+      open_menu: "Abrir menu principal"
+      close_menu: "Fechar menu principal"
     footer:
       tagline: "Cartas e produtos selados de Pokémon TCG, avulsos e importados."

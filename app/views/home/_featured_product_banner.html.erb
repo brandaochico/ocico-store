@@ -6,9 +6,9 @@
       class: 'w-full object-cover aspect-square md:aspect-auto'
     )) %>
     <div class="absolute bottom-0 left-0 right-0 text-center pb-14">
-      <span class="rounded-full px-3 py-1 bg-white text-sm text-black mb-2">New</span>
+      <span class="rounded-full px-3 py-1 bg-white text-sm text-black mb-2"><%= t("storefront.product.badge_new") %></span>
       <div class="text-h3 font-heading mb-6 text-white md:mb-9 md:text-h2"><%= product.name %></div>
-      <%= render "shared/call_to_action", { label: "Shop Now", type: 'secondary', url: product } %>
+      <%= render "shared/call_to_action", { label: t("storefront.product.shop_now"), type: 'secondary', url: product } %>
     </div>
   </div>
 </section>
