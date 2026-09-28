@@ -334,6 +334,23 @@ reasons — worth understanding before changing them:
   definition doesn't exist yet, so the copy never ran. It globs the
   destination directory now.)
 
+- **If specs fail inside `stylesheet_link_tag "tailwind"` with an
+  `ExecJS::RuntimeError`, the JS runtime is the problem, not the app.**
+  Rendering the storefront layout in the test environment makes Sprockets
+  reach for a JavaScript runtime, and ExecJS picks the first one it finds on
+  `PATH` — which on a machine with a `proto`/`mise` shim is Bun. If no Bun
+  version is pinned, that shim exits with
+  `proto::detect::failed` and every page render 500s.
+
+  It looks like flakiness because the compiled asset is cached: plain
+  `bundle exec rspec` passes on a warm cache, and only fails after something
+  rewrites `app/assets/builds/tailwind.css` — which `bin/ci` does in its
+  "Build assets" step, so `bin/ci` fails and a bare spec run doesn't, and a
+  different spec fails each time depending on which renders the layout first.
+  Confirm with `bundle exec ruby -e 'require "execjs"; puts ExecJS.runtime.name'`
+  and work around it with `EXECJS_RUNTIME=Node`. GitHub Actions is unaffected:
+  no proto shim there, so ExecJS finds Node.
+
 - **`@custom-variant dark (&:where(.dark, .dark *))` in the stylesheet is
   load-bearing.** The storefront's theme is class-based: an inline script in
   the layout reads `localStorage` and puts `light`/`dark` on `<html>`, and
