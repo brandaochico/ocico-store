@@ -211,7 +211,11 @@
     @apply w-fit py-3 px-7 rounded-full text-body-sm font-sans-md tracking-wider leading-none uppercase whitespace-nowrap transition-colors duration-200 bg-primary text-black hover:bg-primary-dark;
   }
 
-  .categories-menu ul {
+  /* Direct child only: this styles the nav's own list, and an unscoped
+     descendant selector also caught the dropdown panels' lists, whose
+     lg:items-center shrank each row to its content so justify-between had
+     nothing to spread. */
+  .categories-menu > ul {
     @apply flex flex-col lg:flex-row justify-center p-0 space-y-8 lg:space-y-0 lg:space-x-4 xl:space-x-6 font-medium text-body lg:items-center;
   }
 

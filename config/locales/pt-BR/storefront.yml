@@ -18,5 +18,13 @@
     navigation:
       open_menu: "Abrir menu principal"
       close_menu: "Fechar menu principal"
+      main: "Navegação principal"
+      countries: "País"
+      products: "Produtos"
+      collections: "Coleções"
+      see_all_collections: "Ver todas as coleções..."
     footer:
       tagline: "Cartas e produtos selados de Pokémon TCG, avulsos e importados."
+    collections:
+      title: "Todas as coleções"
+      empty: "Nenhuma coleção cadastrada."

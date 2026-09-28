@@ -23,5 +23,13 @@ en:
     navigation:
       open_menu: "Open main menu"
       close_menu: "Close main menu"
+      main: "Main navigation"
+      countries: "Country"
+      products: "Products"
+      collections: "Collections"
+      see_all_collections: "See all collections..."
     footer:
       tagline: "Pokémon TCG singles and sealed product, imported."
+    collections:
+      title: "All collections"
+      empty: "No collections yet."

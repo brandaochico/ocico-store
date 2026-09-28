@@ -1,5 +1,8 @@
 <header class="wrapper grid-container w-full pt-2.5 px-5 lg:px-6 2xl:px-0">
-  <div class="col-span-full flex items-center justify-center max-h-[70px] lg:justify-between lg:gap-x-6">
+  <%# On lg the row switches from flex to the same 12-column grid the page
+       content uses, so the logo can occupy the two columns the sidebar sits
+       under and the nav starts exactly where the page title does. %>
+  <div class="col-span-full flex items-center justify-center max-h-[70px] lg:grid lg:grid-cols-12 lg:gap-7 lg:items-center">
     <div class="flex items-center justify-center w-8 h-8 lg:py-2 lg:hidden">
       <button type="button" class="inline-flex flex-col gap-y-2 items-center p-2 w-10 h-10 justify-center rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500" aria-controls="navbar-default" aria-expanded="false" data-action="click->drawer#toggle">
         <span class="sr-only"><%= t("storefront.navigation.open_menu") %></span>
@@ -11,8 +14,7 @@
         </svg>
       </button>
     </div>
-    <div class="flex items-center gap-x-4 xl:gap-x-8 w-full justify-center lg:justify-start">
-      <%= link_to root_path, class: 'absolute lg:relative left-1/2 lg:left-0 lg:-translate-x-0 -translate-x-1/2 flex items-center space-x-3' do %>
+      <%= link_to root_path, class: 'absolute lg:relative left-1/2 lg:left-0 lg:-translate-x-0 -translate-x-1/2 flex items-center space-x-3 lg:col-span-2' do %>
         <%# The badge behind the wordmark is opaque white in the artwork, so the
             logo reads on both themes without a dark variant. The source file was
             a 500x500 square whose artwork filled only the middle 41% of the
@@ -26,8 +28,6 @@
               height: 207,
               class: "h-10 w-auto lg:h-14" %>
       <% end %>
-
-      <% categories = taxonomies.find { |t| t.name == "Set" } || taxonomies.first %>
       <% navMobileClasses = '
         categories-menu bg-white
         fixed top-0 left-0 z-40 w-[80%] max-w-[400px] min-w-[270px] h-full
@@ -43,7 +43,7 @@
         lg:p-0'
       %>
 
-      <nav class="<%= navMobileClasses + navDesktopClasses %> text-" data-drawer-target="drawer">
+      <nav class="<%= navMobileClasses + navDesktopClasses %> lg:col-span-6" data-drawer-target="drawer">
         <button type="button" class="w-8 h-8 self-start -ml-[5px] lg:hidden" aria-controls="navbar-default" aria-expanded="false" data-action="click->drawer#toggle">
           <span class="sr-only"><%= t("storefront.navigation.close_menu") %></span>
           <svg class='w-8 h-8 fill-gray-500'>
@@ -55,15 +55,9 @@
           <%= render 'shared/search/search_bar', taxons: taxons, taxon: taxon, :locals => { :additional_classes => 'lg:hidden', search_input_id: 'mobile-search-input-area', results_list_id: 'autocomplete-results-mobile' } %>
         </div>
 
-        <% cache [I18n.locale, categories, taxon] do %>
-          <%= render(TaxonsTreeComponent.new(
-            root_taxon: categories.root,
-            current_taxon: taxon,
-            max_level: 1,
-            item_classes: 'font-sans-md',
-            current_item_classes: 'text-primary',
-            )) if categories %>
-        <% end %>
+        <%# Origem, Cartas Avulsas, Produtos e Coleções —
+            ver app/helpers/main_navigation_helper.rb %>
+        <%= render "shared/navigation/main_nav" %>
 
         <div class="lg:hidden mt-auto">
         <div class="flex justify-between">
@@ -71,7 +65,8 @@
         </div>
         </div>
       </nav>
+    <div class="lg:col-span-4 flex items-center justify-end">
+      <%= render 'layouts/top_bar', taxons: taxons, taxon: taxon %>
     </div>
-    <%= render 'layouts/top_bar', taxons: taxons, taxon: taxon %>
   </div>
 </header>

@@ -1,0 +1,4 @@
+# English counterparts of the app-owned checkout strings.
+en:
+  checkout:
+    covered_by_store_credit: "Your order is fully covered by store credit; no additional payment method is required."

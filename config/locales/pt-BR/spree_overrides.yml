@@ -124,6 +124,15 @@
       one: "1 erro impediu que este registro fosse salvo"
       other: "%{count} erros impediram que este registro fosse salvo"
 
+    # Passos do checkout — aparecem na barra de progresso.
+    order_state:
+      address: "Endereço"
+      delivery: "Entrega"
+      payment: "Pagamento"
+      confirm: "Confirmação"
+      complete: "Concluído"
+      cart: "Carrinho"
+
     # Genéricos
     date: "Data"
     status: "Status"
