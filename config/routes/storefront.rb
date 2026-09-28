@@ -57,6 +57,10 @@ resource :cart, only: [ :show, :update ] do
   put "empty"
 end
 
+# Listed separately from the taxon routes because it is a page about the
+# collections themselves, not a product listing filtered by one.
+get "/colecoes", to: "collections#index", as: :collections
+
 # route globbing for pretty nested taxon and product paths
 get "/t/*id", to: "taxons#show", as: :nested_taxons
 

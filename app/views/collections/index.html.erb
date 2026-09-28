@@ -1,0 +1,24 @@
+<section class="wrapper grid-container my-8 lg:my-14">
+  <h1 class="col-span-full font-heading text-h4 lg:text-h3 mb-8"><%= t("storefront.collections.title") %></h1>
+
+  <% if @collections.empty? %>
+    <p class="col-span-full font-body"><%= t("storefront.collections.empty") %></p>
+  <% else %>
+    <ul class="col-span-full grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <% @collections.each do |collection| %>
+        <li class="rounded-xl border border-gray-mid p-5 transition-colors duration-150 hover:border-primary dark:border-gray-600">
+          <%= link_to taxon_seo_url(collection), class: "flex flex-col gap-y-1" do %>
+            <span class="font-heading text-h6"><%= collection.name %></span>
+            <%# description holds the set code (CBB6C, M6, ...) — see db/seeds/catalog.rb %>
+            <% if collection.description.present? %>
+              <span class="font-ui text-body-xs text-gray-500 dark:text-sand"><%= collection.description %></span>
+            <% end %>
+            <% if collection.released_on %>
+              <span class="font-body text-body-sm"><%= l(collection.released_on, format: :long) %></span>
+            <% end %>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+</section>
