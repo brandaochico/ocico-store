@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_25_201430) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_28_181045) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -1129,9 +1129,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_25_201430) do
     t.string "meta_description"
     t.string "meta_keywords"
     t.integer "depth"
+    t.date "released_on"
     t.index ["lft"], name: "index_spree_taxons_on_lft"
     t.index ["parent_id"], name: "index_taxons_on_parent_id"
     t.index ["permalink"], name: "index_taxons_on_permalink"
+    t.index ["released_on"], name: "index_spree_taxons_on_released_on"
     t.index ["rgt"], name: "index_spree_taxons_on_rgt"
     t.index ["taxonomy_id"], name: "index_taxons_on_taxonomy_id"
   end
