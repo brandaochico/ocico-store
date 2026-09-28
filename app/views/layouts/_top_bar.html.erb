@@ -6,7 +6,7 @@
       <%= render "shared/navigation/theme_switcher" %>
     </div>
     <div class='relative w-6 h-6'>
-      <svg class='w-6 h-6 fill-black'>
+      <svg class='w-6 h-6 fill-black dark:fill-white'>
         <use xlink:href="<%= image_path('remixicon.symbol.svg') %>#ri-shopping-cart-2-line"></use>
       </svg>
       <div id="link-to-cart" class="absolute top-0 left-0 w-full h-full" data-top-bar-target="cartLink">
@@ -18,7 +18,7 @@
 
     <div class="relative w-6 h-6">
       <%= link_to spree_current_user ? account_path : login_path, title: spree_current_user ? t('spree.account') : t('spree.login') do %>
-        <svg class='w-6 h-6 fill-black'>
+        <svg class='w-6 h-6 fill-black dark:fill-white'>
           <use xlink:href="<%= image_path('remixicon.symbol.svg') %>#ri-user-line"></use>
         </svg>
       <% end %>
