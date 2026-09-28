@@ -62,9 +62,6 @@ If specs fail inside `stylesheet_link_tag "tailwind"` with an `ExecJS::RuntimeEr
 with `EXECJS_RUNTIME=Node` — ExecJS otherwise picks a broken Bun shim off `PATH`. See
 `docs/ARCHITECTURE.md`, "Environment gotchas".
 
-```
-```
-
 Admin login (seeded): `admin@example.com` / `test123`.
 
 ## Brand name
