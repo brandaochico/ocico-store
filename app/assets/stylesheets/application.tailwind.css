@@ -241,6 +241,16 @@
     @apply dark:bg-gray-800 dark:border-gray-600 dark:text-sand dark:placeholder:text-gray-400;
   }
 
+  /* The locale panel is pure white in both themes, so what's inside it must
+     ignore the dark variants .select-input carries for its normal placement on
+     the page background — otherwise the label and the select would turn sand
+     on white in dark mode, which is the same invisible-text bug in reverse.
+     Two classes deep, so these win over .select-input's own rules. */
+  .locale-selector__panel .select-input,
+  .locale-selector__panel .select-input select {
+    @apply bg-white text-black border-gray-mid;
+  }
+
   .checkbox-input {
     @apply flex items-center gap-x-2
   }
