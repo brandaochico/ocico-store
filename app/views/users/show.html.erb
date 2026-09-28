@@ -9,7 +9,7 @@
     <div class="flex flex-wrap flex-auto gap-4">
       <%= @user.email %>
       <%= form_with(url: logout_path, method: Devise.sign_out_via, local: true) do %>
-        <%= button_tag(t("spree.logout"), class: 'transition-all duration-300 text-black hover:!text-red-500 dark:text-sand underline') %>
+        <%= button_tag(t("spree.logout"), class: 'transition-all duration-300 text-black hover:!text-primary dark:text-sand underline') %>
       <% end %>
     </div>
   </div>
@@ -35,7 +35,7 @@
             <tbody class="[&>tr:not(:last-child)]:border-b [&>tr:not(:last-child)]:border-gray-mid">
             <% @orders.each do |order| %>
               <tr>
-                <td class="<%= table_cells_classes %>"><%= link_to order.number, order_url(order), class: 'hover:text-red-500 transition-colors duration-200' %></td>
+                <td class="<%= table_cells_classes %>"><%= link_to order.number, order_url(order), class: 'hover:text-primary transition-colors duration-200' %></td>
                 <td class="<%= table_cells_classes %>"><%= l order.completed_at.to_date %></td>
                 <td class="<%= table_cells_classes %>">
                   <div class="badge badge-<%= I18n.t("spree.order_state.#{order.state}").downcase %>">

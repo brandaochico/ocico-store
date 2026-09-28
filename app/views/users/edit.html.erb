@@ -7,7 +7,7 @@
     <div class="flex flex-wrap flex-auto gap-4">
       <%= @user.email %>
       <%= form_with(url: logout_path, method: Devise.sign_out_via, local: true) do %>
-        <%= button_tag(t("spree.logout"), class: 'transition-all duration-300 text-black hover:!text-red-500 dark:text-sand underline') %>
+        <%= button_tag(t("spree.logout"), class: 'transition-all duration-300 text-black hover:!text-primary dark:text-sand underline') %>
       <% end %>
     </div>
   </div>
@@ -38,7 +38,7 @@
           <div class="">
             <%= f.button t("spree.update"),
               name: :commit,
-              class: 'w-fit py-3 px-7 rounded-full text-body-sm font-bold leading-none uppercase whitespace-nowrap transiton-colors duration-200 bg-red-500 text-white hover:bg-red-700'
+              class: 'button-primary'
             %>
           </div>
         <% end %>
