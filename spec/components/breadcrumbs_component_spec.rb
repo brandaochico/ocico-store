@@ -55,8 +55,8 @@ RSpec.describe BreadcrumbsComponent, type: :component do
 
         it 'renders a breadcrumb for the taxon and its ancestors' do
           expect(breadcrumb_items.size).to eq(4)
-          expect(breadcrumb_items[-4]).to eq('Home')
-          expect(breadcrumb_items[-3]).to eq('Products')
+          expect(breadcrumb_items[-4]).to eq(I18n.t("spree.home"))
+          expect(breadcrumb_items[-3]).to eq(I18n.t("spree.products"))
           expect(breadcrumb_items[-2]).to eq(taxon.parent.name) # default taxonomy taxon root
           expect(breadcrumb_items[-1]).to eq(taxon.name)
         end
@@ -69,8 +69,8 @@ RSpec.describe BreadcrumbsComponent, type: :component do
 
       it 'renders a breadcrumb for login page' do
         expect(breadcrumb_items.size).to eq(2)
-        expect(breadcrumb_items[-2]).to eq('Home')
-        expect(breadcrumb_items[-1]).to eq('Login')
+        expect(breadcrumb_items[-2]).to eq(I18n.t("spree.home"))
+        expect(breadcrumb_items[-1]).to eq(I18n.t("spree.login"))
       end
     end
 
@@ -80,8 +80,8 @@ RSpec.describe BreadcrumbsComponent, type: :component do
 
       it 'renders a breadcrumb for account page' do
         expect(breadcrumb_items.size).to eq(2)
-        expect(breadcrumb_items[-2]).to eq('Home')
-        expect(breadcrumb_items[-1]).to eq('Account')
+        expect(breadcrumb_items[-2]).to eq(I18n.t("spree.home"))
+        expect(breadcrumb_items[-1]).to eq(I18n.t("spree.account"))
       end
     end
 
@@ -91,9 +91,9 @@ RSpec.describe BreadcrumbsComponent, type: :component do
 
       it 'renders a breadcrumb for account edit page' do
         expect(breadcrumb_items.size).to eq(3)
-        expect(breadcrumb_items[-3]).to eq('Home')
-        expect(breadcrumb_items[-2]).to eq('Account')
-        expect(breadcrumb_items[-1]).to eq('Edit')
+        expect(breadcrumb_items[-3]).to eq(I18n.t("spree.home"))
+        expect(breadcrumb_items[-2]).to eq(I18n.t("spree.account"))
+        expect(breadcrumb_items[-1]).to eq(I18n.t("spree.actions.edit"))
       end
     end
 
@@ -103,8 +103,8 @@ RSpec.describe BreadcrumbsComponent, type: :component do
 
       it 'renders a breadcrumb for cart page' do
         expect(breadcrumb_items.size).to eq(2)
-        expect(breadcrumb_items[-2]).to eq('Home')
-        expect(breadcrumb_items[-1]).to eq('Cart')
+        expect(breadcrumb_items[-2]).to eq(I18n.t("spree.home"))
+        expect(breadcrumb_items[-1]).to eq(I18n.t("spree.cart"))
       end
     end
 
@@ -114,8 +114,8 @@ RSpec.describe BreadcrumbsComponent, type: :component do
 
       it 'renders a breadcrumb for sign up page' do
         expect(breadcrumb_items.size).to eq(2)
-        expect(breadcrumb_items[-2]).to eq('Home')
-        expect(breadcrumb_items[-1]).to eq('Sign Up')
+        expect(breadcrumb_items[-2]).to eq(I18n.t("spree.home"))
+        expect(breadcrumb_items[-1]).to eq(I18n.t("spree.sign_up"))
       end
     end
 
@@ -125,8 +125,8 @@ RSpec.describe BreadcrumbsComponent, type: :component do
 
       it 'renders a breadcrumb for password recovery page' do
         expect(breadcrumb_items.size).to eq(2)
-        expect(breadcrumb_items[-2]).to eq('Home')
-        expect(breadcrumb_items[-1]).to eq('Forgot Password?')
+        expect(breadcrumb_items[-2]).to eq(I18n.t("spree.home"))
+        expect(breadcrumb_items[-1]).to eq(I18n.t("spree.forgot_password"))
       end
     end
 
@@ -136,8 +136,8 @@ RSpec.describe BreadcrumbsComponent, type: :component do
 
       it 'renders a breadcrumb for product index page' do
         expect(breadcrumb_items.size).to eq(2)
-        expect(breadcrumb_items[-2]).to eq('Home')
-        expect(breadcrumb_items[-1]).to eq('Products')
+        expect(breadcrumb_items[-2]).to eq(I18n.t("spree.home"))
+        expect(breadcrumb_items[-1]).to eq(I18n.t("spree.products"))
       end
     end
 
@@ -147,8 +147,8 @@ RSpec.describe BreadcrumbsComponent, type: :component do
 
       it 'renders a breadcrumb for checkout page' do
         expect(breadcrumb_items.size).to eq(2)
-        expect(breadcrumb_items[-2]).to eq('Home')
-        expect(breadcrumb_items[-1]).to eq('Checkout')
+        expect(breadcrumb_items[-2]).to eq(I18n.t("spree.home"))
+        expect(breadcrumb_items[-1]).to eq(I18n.t("spree.checkout"))
       end
     end
 
@@ -158,8 +158,8 @@ RSpec.describe BreadcrumbsComponent, type: :component do
 
       it 'renders a breadcrumb for order show page' do
         expect(breadcrumb_items.size).to eq(3)
-        expect(breadcrumb_items[-3]).to eq('Home')
-        expect(breadcrumb_items[-2]).to eq('Orders')
+        expect(breadcrumb_items[-3]).to eq(I18n.t("spree.home"))
+        expect(breadcrumb_items[-2]).to eq(I18n.t("spree.orders"))
         expect(breadcrumb_items[-1]).to eq(order.number)
       end
     end

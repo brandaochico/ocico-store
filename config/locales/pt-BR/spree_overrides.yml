@@ -1,10 +1,144 @@
 # Overrides for specific Solidus-gem-owned keys (config/locales/pt-BR fallback
 # is :en per config/application.rb, so any key we don't override here shows in
 # English until someone notices and adds it — expected, not exhaustive by design).
+#
+# The `spree:` block below covers every gem key the storefront views actually
+# reference. It was built from that list, not guessed: a key that no view uses
+# is deliberately absent rather than translated speculatively.
 "pt-BR":
   spree:
     continue_shopping: "Continuar comprando"
     look_for_similar_items: "Veja também"
+
+    # Navegação e conta
+    home: "Início"
+    account: "Conta"
+    my_account: "Minha conta"
+    my_orders: "Meus pedidos"
+    orders: "Pedidos"
+    login: "Entrar"
+    logout: "Sair"
+    or: "ou"
+    create: "Criar"
+    create_a_new_account: "Criar uma conta"
+    login_as_existing: "Entrar com uma conta existente"
+    new_customer: "Novo cliente"
+    # `sign_up` não existe nem no en do Solidus: o BreadcrumbsComponent pede
+    # spree.sign_up e o Rails vinha humanizando a chave em "Sign Up".
+    sign_up: "Criar conta"
+    guest_user_account: "Comprar sem cadastro"
+    editing_user: "Editando usuário"
+    back_to_store: "Ver a loja"
+    categories: "Categorias"
+    products: "Produtos"
+    search: "Buscar"
+    search_results: "Resultados para '%{keywords}'"
+    no_products_found: "Nenhum produto encontrado"
+
+    # Credenciais
+    email: "E-mail"
+    password: "Senha"
+    confirm_password: "Confirmação de senha"
+    remember_me: "Lembrar de mim"
+    forgot_password: "Esqueceu a senha?"
+    change_my_password: "Alterar minha senha"
+    reset_password: "Redefinir minha senha"
+
+    # Catálogo
+    add_to_cart: "Adicionar ao carrinho"
+    out_of_stock: "Esgotado"
+    variants: "Variações"
+    properties: "Características"
+    promotion: "Promoção"
+    promotions: "Promoções"
+    product_has_no_description: "Este produto não tem descrição."
+    product_not_available_in_this_currency: "Este produto não está disponível na moeda selecionada."
+
+    # Carrinho
+    cart: "Carrinho"
+    shopping_cart: "Carrinho de compras"
+    your_cart_is_empty: "Seu carrinho está vazio"
+    coupon_code: "Cupom de desconto"
+    apply_code: "Aplicar cupom"
+    subtotal: "Subtotal"
+    item_total: "Total dos itens"
+    total: "Total"
+    order_total: "Total do pedido"
+    order_summary: "Resumo do pedido"
+    adjustment: "Ajuste"
+    tax: "Impostos"
+
+    # Checkout
+    checkout: "Finalizar compra"
+    confirm: "Confirmar"
+    continue: "Continuar"
+    save_and_continue: "Salvar e continuar"
+    place_order: "Finalizar pedido"
+    payment_information: "Dados de pagamento"
+    agree_to_terms_of_service: "Li e aceito os termos de serviço"
+    there_were_problems_with_the_following_fields: "Corrija os campos abaixo"
+    thank_you_for_your_order: "Obrigado pela sua compra. Guarde ou imprima esta página de confirmação para seus registros."
+
+    # Endereço — "zip" é o CEP, e "state" aqui é a unidade federativa, não um status
+    name: "Nome"
+    company: "Empresa"
+    street_address: "Endereço"
+    city: "Cidade"
+    state: "Estado"
+    country: "País"
+    zip: "CEP"
+    phone: "Telefone"
+    alternative_phone: "Telefone alternativo"
+    billing_address: "Endereço de cobrança"
+    shipping_address: "Endereço de entrega"
+    use_billing_address: "Usar o endereço de cobrança"
+    save_my_address: "Salvar meu endereço"
+
+    # Entrega
+    shipping: "Frete"
+    shipping_total: "Total do frete"
+    shipping_method: "Forma de envio"
+    shipping_instructions: "Instruções de entrega"
+    shipments: "Entregas"
+    shipment_state: "Status da entrega"
+    unshippable_items: "Itens indisponíveis para envio"
+    tracking: "Rastreamento"
+    package_from: "pacote de"
+
+    # Pagamento — `check` é o método manual do Solidus (admin baixa o pagamento
+    # à mão), não um cheque bancário; o nome literal confundiria o cliente.
+    check: "Pagamento manual"
+    card_number: "Número do cartão"
+    card_code: "Código de segurança"
+    name_on_card: "Nome impresso no cartão"
+    expiration: "Validade"
+    ending_in: "Final"
+    payment_state: "Status do pagamento"
+
+    # Plurais — o Solidus usa a forma pluralizada do I18n aqui, então o
+    # override precisa trazer one:/other:, não uma string única.
+    cart_subtotal:
+      one: "Subtotal (1 item)"
+      other: "Subtotal (%{count} itens)"
+    errors_prohibited_this_record_from_being_saved:
+      one: "1 erro impediu que este registro fosse salvo"
+      other: "%{count} erros impediram que este registro fosse salvo"
+
+    # Genéricos
+    date: "Data"
+    status: "Status"
+    edit: "Editar"
+    update: "Atualizar"
+    you_have_no_orders_yet: "Você ainda não fez nenhum pedido"
+
+    actions:
+      edit: "Editar"
+
+    store_credit:
+      store_credit: "Crédito na loja"
+
+    i18n:
+      language: "Idioma"
 
   solidus_stripe:
     loading: "Carregando..."
