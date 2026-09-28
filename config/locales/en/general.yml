@@ -1,0 +1,11 @@
+# English counterparts of the site-wide app-owned strings.
+# `spree.i18n.this_file_language` is deliberately absent: Solidus already ships
+# it for :en, and it's the label the language selector shows for each locale.
+en:
+  site:
+    # The brand name is lowercase in every language — see CLAUDE.md.
+    name: "ocico store"
+  common:
+    save: "Save"
+    cancel: "Cancel"
+    back: "Back"

@@ -1,0 +1,27 @@
+# English counterparts of the app-owned storefront strings.
+#
+# The store offers two locales (config/application.rb, and the store record's
+# available_locales), so the language selector in the header can switch to
+# English — and every key we own needs a value here or Rails falls back to
+# humanising the key, which is how "footer.tagline" rendered as "Tagline".
+# Gem-owned keys need nothing here: Solidus ships its own :en.
+en:
+  storefront:
+    home:
+      shop_collection: "Featured Cards"
+      new_arrivals: "New Arrivals"
+      cta_headline: "Straight from Japan and the US to your collection."
+      cta_label: "Browse the catalog"
+      shop_all: "See all"
+    product:
+      shop_now: "Buy now"
+      you_may_also_like: "You May Also Like"
+      badge_new: "New"
+    search:
+      see_all_results: "See all results"
+      no_results: "No results"
+    navigation:
+      open_menu: "Open main menu"
+      close_menu: "Close main menu"
+    footer:
+      tagline: "Pokémon TCG singles and sealed product, imported."
