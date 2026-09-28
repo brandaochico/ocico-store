@@ -226,6 +226,9 @@
 
   .select-input {
     @apply flex flex-col gap-y-0.5 text-black;
+    /* The <select> below already had its dark variant; its <label> didn't, so
+       the label was black on black in dark mode. */
+    @apply dark:text-sand;
   }
 
   .select-input select {
