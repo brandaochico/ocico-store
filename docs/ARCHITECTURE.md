@@ -334,6 +334,18 @@ reasons — worth understanding before changing them:
   definition doesn't exist yet, so the copy never ran. It globs the
   destination directory now.)
 
+- **`@custom-variant dark (&:where(.dark, .dark *))` in the stylesheet is
+  load-bearing.** The storefront's theme is class-based: an inline script in
+  the layout reads `localStorage` and puts `light`/`dark` on `<html>`, and
+  `theme_switcher_controller.js` flips it. Tailwind v4 defaults `dark:` to
+  `@media (prefers-color-scheme: dark)` instead, and the v3 config that
+  declared `darkMode: 'class'` was dropped in the v4 migration (2b09a98) with
+  nothing replacing it — so for a while anyone on a dark-themed OS got a black
+  storefront they could not turn off, and the toggle was inert because it only
+  touched a class no rule matched. Don't remove that line, and don't "simplify"
+  it back to the media query: the brand is a light one and the OS preference is
+  deliberately not consulted.
+
 - **`config/importmap.rb` is load-bearing; the storefront has two JS
   pipelines.** Sprockets (`javascript_include_tag 'solidus_starter_frontend'`)
   serves the legacy `utils`/`checkout`/`product` scripts; importmap +
@@ -411,6 +423,21 @@ reasons — worth understanding before changing them:
   community branding removed, catalog data model seeded (option
   types/properties/Set taxonomy/8 sample products), Set-based nav and a new
   condition filter implemented, currency fixed to BRL throughout.
+
+  **Re-verified in a browser afterwards, and it did not hold up the first
+  time.** The phase had been signed off while every Stimulus controller was
+  dead in the browser (see the importmap gotcha), so a lot of it had never
+  actually run. The sweep found and fixed: dark mode ignoring its own toggle;
+  headings rendering in Tailwind's default serif rather than the brand face;
+  `text-h2.5`, `text-body-20`, `text-body-2xs` and `lg:grid-container` silently
+  generating no rule at all (the home page's call-to-action headline was
+  rendering at 16px); Tailwind classes sitting in a `style` attribute; two
+  dark-mode contrast bugs; the accent colour still being Tailwind red rather
+  than the brand pink, with the CTA failing WCAG AA at 2.52:1; and 92 gem
+  translation keys plus 10 hardcoded strings still in English.
+
+  The lesson worth carrying: "the CSS is written" and "the page looks right"
+  are different claims, and only the second one matters. Check the second.
 - 🟡 **Fase 2 — Checkout & payment (in progress).**
   Done: `solidus_stripe` installed (pinned to a `main` SHA) and mounted,
   storefront checkout UI hand-wired, payment method seeded with
