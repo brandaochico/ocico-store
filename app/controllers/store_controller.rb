@@ -5,7 +5,10 @@ class StoreController < Spree::BaseController
   include Spree::Core::ControllerHelpers::Order
   include Taxonomies
 
-  etag { config_locale }
+  # Vary the cached response by the locale actually rendered. This runs at
+  # response time, after set_user_language has resolved I18n.locale, so it must
+  # read I18n.locale rather than config_locale — see the comment on that method.
+  etag { I18n.locale }
 
   layout "storefront"
 
@@ -30,8 +33,20 @@ class StoreController < Spree::BaseController
 
   private
 
+  # Solidus's set_user_language consults this before falling back to
+  # I18n.default_locale:
+  #
+  #   params[:locale] -> session[:locale] -> config_locale -> I18n.default_locale
+  #
+  # It has to answer "what locale is this store configured for", not "what
+  # locale is set right now". Returning I18n.locale made it the latter, and
+  # I18n.locale is thread-local and is not reset between requests — so a
+  # visitor who had never chosen a language inherited whatever the previous
+  # request on that Puma thread left behind, and set_user_language then wrote
+  # that into their session, making it stick. A Brazilian store served English
+  # to some visitors and Portuguese to others, by thread.
   def config_locale
-    I18n.locale
+    I18n.default_locale
   end
 
   def lock_order
