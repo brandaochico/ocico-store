@@ -9,7 +9,7 @@
   </aside>
   <section class="products_section col-span-full md:col-span-9 lg:col-span-10">
     <% if params[:keywords] && @products.empty? %>
-      <span class="font-serif text-h6 md:text-h5 lg:text-h3">
+      <span class="font-heading text-h6 md:text-h5 lg:text-h3">
         <%= t('spree.no_products_found') %>
       </span>
     <% else %>
