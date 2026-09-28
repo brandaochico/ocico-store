@@ -13,7 +13,18 @@
     </div>
     <div class="flex items-center gap-x-4 xl:gap-x-8 w-full justify-center lg:justify-start">
       <%= link_to root_path, class: 'absolute lg:relative left-1/2 lg:left-0 lg:-translate-x-0 -translate-x-1/2 flex items-center space-x-3' do %>
-        <span class="font-heading mb-0 dark:text-sand text-body lg:text-h6"><%= Spree::Store.default.name %></span>
+        <%# The badge behind the wordmark is opaque white in the artwork, so the
+            logo reads on both themes without a dark variant. The source file was
+            a 500x500 square whose artwork filled only the middle 41% of the
+            height; it's stored here trimmed to its own bounds, so the height
+            below is the wordmark's height rather than mostly empty space.
+            width/height are the intrinsic size, so the header doesn't reflow
+            once the PNG loads. %>
+        <%= image_tag "store-logo.png",
+              alt: Spree::Store.default.name,
+              width: 373,
+              height: 207,
+              class: "h-10 w-auto lg:h-14" %>
       <% end %>
 
       <% categories = taxonomies.find { |t| t.name == "Set" } || taxonomies.first %>
