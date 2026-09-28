@@ -7,6 +7,18 @@
    ocico store brand, authored natively in @theme instead of a JS config). */
 @import "tailwindcss";
 
+/* Dark mode is driven by a `dark` class on <html>, set from localStorage by the
+   inline script in layouts/storefront.html.erb and toggled by
+   theme_switcher_controller.js — NOT by the visitor's OS preference.
+   Tailwind v4 defaults `dark:` to @media (prefers-color-scheme: dark), and the
+   v3 config that declared `darkMode: 'class'` was dropped in the v4 migration
+   (commit 2b09a98) without a replacement. The result was that anyone on a
+   dark-themed OS got a black storefront they could not turn off, because the
+   toggle only ever touched a class the compiled CSS ignored. This restores the
+   class behaviour: off-white is the default for everyone, and the OS setting is
+   deliberately not consulted — the brand is a light one. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   /* Brand palette (see visual identity memory / architecture plan) */
   --color-sand: #f4eee8;
