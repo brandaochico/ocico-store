@@ -92,7 +92,9 @@
   --radius-2xl: 2rem;
 
   --width-1_col-3: 32%;
-  --width-collection-card: calc(33% - 12px);
+  /* Four cards per row in the home collection carousel: the three 24px gaps
+     from md:space-x-6 come out of the width. */
+  --width-collection-card: calc(25% - 18px);
   --height-1_col-3: 32%;
 }
 
