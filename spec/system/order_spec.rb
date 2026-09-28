@@ -35,7 +35,7 @@ RSpec.describe 'orders', type: :system do
     create(:payment, order: order)
     visit order_path(order)
     within '.payment-info' do
-      expect(page).to have_content "Ending in 1111"
+      expect(page).to have_content "#{I18n.t('spree.ending_in')} 1111"
     end
   end
 

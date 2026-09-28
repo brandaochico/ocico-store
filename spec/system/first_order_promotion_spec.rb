@@ -19,16 +19,16 @@ RSpec.describe 'First Order promotion', type: :system do
     product = FactoryBot.create(:product)
     visit products_path
     click_link product.name
-    click_button "Add To Cart"
+    click_button I18n.t("spree.add_to_cart")
   end
 
   it 'Adding first order promotion to cart and checking out as guest' do
-    fill_in "Coupon code", with: "FIRSTONEFREE"
-    click_button "Apply Code"
+    fill_in I18n.t("spree.coupon_code"), with: "FIRSTONEFREE"
+    click_button I18n.t("spree.apply_code")
     expect(page).to have_content("The coupon code was successfully applied to your order")
 
     within("#cart_adjustments") do
-      expect(page).to have_content("-$10.00")
+      expect(page).to have_content(Spree::Money.new(-10).to_s)
     end
   end
 
@@ -38,13 +38,13 @@ RSpec.describe 'First Order promotion', type: :system do
       email: "sam@tom.com"
     )
     _previous_order = create(:completed_order_with_totals, user: previous_user)
-    fill_in "Coupon code", with: "FIRSTONEFREE"
-    click_button "Apply Code"
+    fill_in I18n.t("spree.coupon_code"), with: "FIRSTONEFREE"
+    click_button I18n.t("spree.apply_code")
     expect(page).to have_content("The coupon code was successfully applied to your order")
     checkout_as_guest
     fill_in "Customer email", with: "sam@tom.com"
     fill_in_address
-    click_on "Save and Continue"
+    click_on I18n.t("spree.save_and_continue")
     expect(page).to_not have_content("#summary-order-charges")
   end
 

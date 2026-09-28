@@ -33,44 +33,44 @@ RSpec.feature 'Checkout', :js, type: :system do
   scenario 'leaving and returning to address step' do
     stub_spree_preferences(Spree::Auth::Config, registration_step: true)
     click_link 'Solidus hoodie'
-    click_button 'Add To Cart'
-    within('h1') { expect(page).to have_text 'Shopping Cart' }
-    click_button 'Checkout'
+    click_button I18n.t("spree.add_to_cart")
+    within('h1') { expect(page).to have_text I18n.t('spree.shopping_cart') }
+    click_button I18n.t("spree.checkout")
 
     within '#guest_checkout' do
-      fill_in 'Email', with: 'test@example.com'
+      fill_in I18n.t("spree.email"), with: 'test@example.com'
     end
-    click_on 'Continue'
+    click_on I18n.t("spree.continue")
 
-    click_on 'Cart'
+    click_on I18n.t("spree.cart")
 
-    click_on 'Checkout'
+    click_on I18n.t("spree.checkout")
 
-    expect(page).to have_content "Billing Address"
+    expect(page).to have_content I18n.t("spree.billing_address")
   end
 
   context 'without payment being required' do
     scenario 'allow a visitor to checkout as guest, without registration' do
       click_link 'Solidus hoodie'
-      click_button 'Add To Cart'
-      within('h1') { expect(page).to have_text 'Shopping Cart' }
-      click_button 'Checkout'
+      click_button I18n.t("spree.add_to_cart")
+      within('h1') { expect(page).to have_text I18n.t('spree.shopping_cart') }
+      click_button I18n.t("spree.checkout")
 
-      expect(page).to have_content(/Checkout as a Guest/i)
+      expect(page).to have_content(I18n.t("spree.guest_user_account"))
 
-      within('#guest_checkout') { fill_in 'Email', with: 'spree@test.com' }
-      click_button 'Continue'
+      within('#guest_checkout') { fill_in I18n.t("spree.email"), with: 'spree@test.com' }
+      click_button I18n.t("spree.continue")
 
-      expect(page).to have_text(/Billing Address/i)
+      expect(page).to have_text(I18n.t("spree.billing_address"))
       expect(page).to have_text(/Shipping Address/i)
 
       fill_addresses_fields_with(address)
-      click_button 'Save and Continue'
+      click_button I18n.t("spree.save_and_continue")
 
-      click_button 'Save and Continue'
-      click_button 'Save and Continue'
-      check 'Agree to Terms of Service'
-      click_button 'Place Order'
+      click_button I18n.t("spree.save_and_continue")
+      click_button I18n.t("spree.save_and_continue")
+      check I18n.t("spree.agree_to_terms_of_service")
+      click_button I18n.t("spree.place_order")
 
       expect(page).to have_text 'Your order has been processed successfully'
     end
@@ -78,26 +78,26 @@ RSpec.feature 'Checkout', :js, type: :system do
     scenario 'associate an uncompleted guest order with user after logging in' do
       user = create(:user, email: 'email@person.com', password: 'password', password_confirmation: 'password')
       click_link 'Solidus hoodie'
-      click_button 'Add To Cart'
+      click_button I18n.t("spree.add_to_cart")
 
       visit login_path
-      fill_in 'Email', with: user.email
-      fill_in 'Password:', with: user.password
-      click_button 'Login'
-      click_link 'Cart'
+      fill_in I18n.t("spree.email"), with: user.email
+      fill_in "#{I18n.t("spree.password")}:", with: user.password
+      click_button I18n.t("spree.login")
+      click_link I18n.t("spree.cart")
 
       expect(page).to have_text 'Solidus hoodie'
-      within('h1') { expect(page).to have_text 'Shopping Cart' }
+      within('h1') { expect(page).to have_text I18n.t('spree.shopping_cart') }
 
-      click_button 'Checkout'
+      click_button I18n.t("spree.checkout")
 
       fill_addresses_fields_with(address)
-      click_button 'Save and Continue'
+      click_button I18n.t("spree.save_and_continue")
 
-      click_button 'Save and Continue'
-      click_button 'Save and Continue'
-      check 'Agree to Terms of Service'
-      click_button 'Place Order'
+      click_button I18n.t("spree.save_and_continue")
+      click_button I18n.t("spree.save_and_continue")
+      check I18n.t("spree.agree_to_terms_of_service")
+      click_button I18n.t("spree.place_order")
 
       expect(page).to have_text 'Your order has been processed successfully'
       expect(Spree::Order.first.user).to eq user
@@ -107,12 +107,12 @@ RSpec.feature 'Checkout', :js, type: :system do
     scenario 'associate an incomplete guest order with user after successful password reset' do
       create(:user, email: 'email@person.com', password: 'password', password_confirmation: 'password')
       click_link 'Solidus hoodie'
-      click_button 'Add To Cart'
+      click_button I18n.t("spree.add_to_cart")
 
       visit login_path
-      click_link 'Forgot Password?'
+      click_link I18n.t("spree.forgot_password")
       fill_in 'spree_user_email', with: 'email@person.com'
-      click_button 'Reset my password'
+      click_button I18n.t("spree.reset_password")
 
       # Need to do this now because the token stored in the DB is the encrypted version
       # The 'plain-text' version is sent in the email and there's one way to get that!
@@ -121,42 +121,42 @@ RSpec.feature 'Checkout', :js, type: :system do
       token = token_url_regex.match(reset_password_email.body.to_s)[1]
 
       visit edit_spree_user_password_path(reset_password_token: token)
-      fill_in 'Password:', with: 'password'
-      fill_in 'Password Confirmation', with: 'password'
-      click_button 'Update'
+      fill_in "#{I18n.t("spree.password")}:", with: 'password'
+      fill_in I18n.t("spree.confirm_password"), with: 'password'
+      click_button I18n.t("spree.update")
 
-      click_link 'Cart'
-      click_button 'Checkout'
+      click_link I18n.t("spree.cart")
+      click_button I18n.t("spree.checkout")
 
       fill_addresses_fields_with(address)
-      click_button 'Save and Continue'
+      click_button I18n.t("spree.save_and_continue")
 
       expect(page).not_to have_text 'Email is invalid'
     end
 
     scenario 'allow a user to register during checkout' do
       click_link 'Solidus hoodie'
-      click_button 'Add To Cart'
-      click_button 'Checkout'
+      click_button I18n.t("spree.add_to_cart")
+      click_button I18n.t("spree.checkout")
 
       within '#existing-customer' do
-        click_link 'Create a new account'
+        click_link I18n.t("spree.create_a_new_account")
       end
 
-      fill_in 'Email', with: 'email@person.com'
-      fill_in 'Password:', with: 'spree123'
-      fill_in 'Password Confirmation', with: 'spree123'
-      click_button 'Create'
+      fill_in I18n.t("spree.email"), with: 'email@person.com'
+      fill_in "#{I18n.t("spree.password")}:", with: 'spree123'
+      fill_in I18n.t("spree.confirm_password"), with: 'spree123'
+      click_button I18n.t("spree.create")
 
-      expect(page).to have_text 'You have signed up successfully.'
+      expect(page).to have_text I18n.t('devise.user_registrations.signed_up')
 
       fill_addresses_fields_with(address)
-      click_button 'Save and Continue'
+      click_button I18n.t("spree.save_and_continue")
 
-      click_button 'Save and Continue'
-      click_button 'Save and Continue'
-      check 'Agree to Terms of Service'
-      click_button 'Place Order'
+      click_button I18n.t("spree.save_and_continue")
+      click_button I18n.t("spree.save_and_continue")
+      check I18n.t("spree.agree_to_terms_of_service")
+      click_button I18n.t("spree.place_order")
 
       expect(page).to have_text 'Your order has been processed successfully'
       expect(Spree::Order.first.user).to eq Spree::User.find_by(email: 'email@person.com')

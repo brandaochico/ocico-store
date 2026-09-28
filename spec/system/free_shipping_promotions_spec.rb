@@ -36,25 +36,25 @@ RSpec.describe 'Free shipping promotions', type: :system, js: true do
       click_button "add-to-cart-button"
       checkout_as_guest
       fill_in "order_email", with: "spree@example.com"
-      fill_in "Name", with: "John Smith"
-      fill_in 'Street Address:', with: '1 John Street'
-      fill_in "City", with: "City of John"
-      fill_in "Zip", with: "01337"
-      select country.name, from: "Country"
+      fill_in I18n.t("spree.name"), with: "John Smith"
+      fill_in "#{I18n.t("spree.street_address")}:", with: '1 John Street'
+      fill_in I18n.t("spree.city"), with: "City of John"
+      fill_in I18n.t("spree.zip"), with: "01337"
+      select country.name, from: I18n.t("spree.country")
       select state.name, from: "order[bill_address_attributes][state_id]"
-      fill_in "Phone", with: "555-555-5555"
+      fill_in I18n.t("spree.phone"), with: "555-555-5555"
 
       # To shipping method screen
-      click_button "Save and Continue"
+      click_button I18n.t("spree.save_and_continue")
       # To payment screen
-      click_button "Save and Continue"
+      click_button I18n.t("spree.save_and_continue")
     end
 
     # Regression test for https://github.com/spree/spree/issues/4428
     it "applies the free shipping promotion" do
       within("#checkout-summary") do
-        expect(page).to have_content("Shipping total: $10.00", normalize_ws: true)
-        expect(page).to have_content("Promotion (Free Shipping): -$10.00", normalize_ws: true)
+        expect(page).to have_content("#{I18n.t('spree.shipping_total')}: #{Spree::Money.new(10)}", normalize_ws: true)
+        expect(page).to have_content("#{I18n.t('spree.promotion')} (Free Shipping): #{Spree::Money.new(-10)}", normalize_ws: true)
       end
     end
   end

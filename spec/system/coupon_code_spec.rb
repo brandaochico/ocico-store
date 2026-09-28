@@ -46,31 +46,31 @@ RSpec.describe 'Coupon code promotions', type: :system, js: true do
           fill_addresses_fields_with(address)
 
           # To shipping method screen
-          click_button "Save and Continue"
+          click_button I18n.t("spree.save_and_continue")
           # To payment screen
-          click_button "Save and Continue"
+          click_button I18n.t("spree.save_and_continue")
         end
 
         it "informs about an invalid coupon code" do
           fill_in "order_coupon_code", with: "coupon_codes_rule_man"
-          click_button "Apply Code"
+          click_button I18n.t("spree.apply_code")
           expect(page).to have_content(I18n.t('spree.coupon_code_not_found'))
         end
 
         it "can enter an invalid coupon code, then a real one" do
           fill_in "order_coupon_code", with: "coupon_codes_rule_man"
-          click_button "Apply Code"
+          click_button I18n.t("spree.apply_code")
           expect(page).to have_content(I18n.t('spree.coupon_code_not_found'))
           fill_in "order_coupon_code", with: "onetwo"
-          click_button "Apply Code"
-          expect(page).to have_content("Promotion (Onetwo) -$10.00", normalize_ws: true)
+          click_button I18n.t("spree.apply_code")
+          expect(page).to have_content("Promotion (Onetwo) #{Spree::Money.new(-10)}", normalize_ws: true)
         end
 
         context "with a promotion" do
           it "applies a promotion to an order" do
             fill_in "order_coupon_code", with: "onetwo"
-            click_button "Apply Code"
-            expect(page).to have_content("Promotion (Onetwo) -$10.00", normalize_ws: true)
+            click_button I18n.t("spree.apply_code")
+            expect(page).to have_content("Promotion (Onetwo) #{Spree::Money.new(-10)}", normalize_ws: true)
           end
         end
       end
@@ -98,20 +98,20 @@ RSpec.describe 'Coupon code promotions', type: :system, js: true do
             click_link "Solidus mug set"
             click_button "add-to-cart-button"
             # To Cart
-            click_button "Checkout"
+            click_button I18n.t("spree.checkout")
             # To shipping method screen, address is auto-populated
             # with user's saved addresses
-            click_button "Save and Continue"
+            click_button I18n.t("spree.save_and_continue")
             # To payment screen
-            click_button "Save and Continue"
+            click_button I18n.t("spree.save_and_continue")
           end
 
           it "shows wallet payments on coupon code errors" do
             fill_in "order_coupon_code", with: "coupon_codes_rule_man"
-            click_button "Apply Code"
+            click_button I18n.t("spree.apply_code")
 
             expect(page).to have_content("The coupon code you entered doesn't exist. Please try again.")
-            expect(page).to have_content("Payment Information")
+            expect(page).to have_content(I18n.t("spree.payment_information"))
             expect(page).to have_content("Bogus Card")
           end
         end
@@ -128,13 +128,13 @@ RSpec.describe 'Coupon code promotions', type: :system, js: true do
 
       it "can enter a coupon code and receives success notification" do
         fill_in "coupon_code", with: "onetwo"
-        click_button "Apply Code"
+        click_button I18n.t("spree.apply_code")
         expect(page).to have_content(I18n.t('spree.coupon_code_applied'))
       end
 
       it "can enter a promotion code with both upper and lower case letters" do
         fill_in "coupon_code", with: "ONETwO"
-        click_button "Apply Code"
+        click_button I18n.t("spree.apply_code")
         expect(page).to have_content(I18n.t('spree.coupon_code_applied'))
       end
 
@@ -142,7 +142,7 @@ RSpec.describe 'Coupon code promotions', type: :system, js: true do
         expect_any_instance_of(Spree::Promotion).to receive(:usage_limit_exceeded?).and_return(true)
 
         fill_in "coupon_code", with: "onetwo"
-        click_button "Apply Code"
+        click_button I18n.t("spree.apply_code")
         expect(page).to have_content(I18n.t('spree.coupon_code_max_usage'))
       end
 
@@ -158,8 +158,8 @@ RSpec.describe 'Coupon code promotions', type: :system, js: true do
           visit cart_path
 
           fill_in "coupon_code", with: "onetwo"
-          click_button "Apply Code"
-          expect(page).to have_content(I18n.t(:item_total_less_than_or_equal, scope: [ :spree, :eligibility_errors, :messages ], amount: "$100.00"))
+          click_button I18n.t("spree.apply_code")
+          expect(page).to have_content(I18n.t(:item_total_less_than_or_equal, scope: [ :spree, :eligibility_errors, :messages ], amount: Spree::Money.new(100).to_s))
         end
       end
 
@@ -168,7 +168,7 @@ RSpec.describe 'Coupon code promotions', type: :system, js: true do
         promotion.starts_at = Date.today.beginning_of_week.advance(day: 3)
         promotion.save!
         fill_in "coupon_code", with: "onetwo"
-        click_button "Apply Code"
+        click_button I18n.t("spree.apply_code")
         expect(page).to have_content(I18n.t('spree.coupon_code_expired'))
       end
 
@@ -189,21 +189,21 @@ RSpec.describe 'Coupon code promotions', type: :system, js: true do
 
           visit cart_path
           fill_in "coupon_code", with: "onetwo"
-          click_button "Apply Code"
+          click_button I18n.t("spree.apply_code")
 
           fill_in "order_line_items_attributes_0_quantity", with: 2
           fill_in "order_line_items_attributes_1_quantity", with: 2
-          click_button "Update"
+          click_button I18n.t("spree.update")
 
           within '#cart_adjustments' do
             # 20% of $40 = 8
             # 20% of $20 = 4
             # Therefore: promotion discount amount is $12.
-            expect(page).to have_content("Promotion (Onetwo) -$12.00", normalize_ws: true)
+            expect(page).to have_content("Promotion (Onetwo) #{Spree::Money.new(-12)}", normalize_ws: true)
           end
 
           within '.cart-footer__total' do
-            expect(page).to have_content("$48.00")
+            expect(page).to have_content(Spree::Money.new(48).to_s)
           end
         end
       end
@@ -231,30 +231,30 @@ RSpec.describe 'Coupon code promotions', type: :system, js: true do
           visit cart_path
 
           within '.cart-footer__total' do
-            expect(page).to have_content("$30.00")
+            expect(page).to have_content(Spree::Money.new(30).to_s)
           end
 
           fill_in "coupon_code", with: "onetwo"
-          click_button "Apply Code"
+          click_button I18n.t("spree.apply_code")
 
           within '#cart_adjustments' do
-            expect(page).to have_content("Promotion (Onetwo) -$30.00", normalize_ws: true)
+            expect(page).to have_content("Promotion (Onetwo) #{Spree::Money.new(-30)}", normalize_ws: true)
           end
 
           within '.cart-footer__total' do
-            expect(page).to have_content("$0.00")
+            expect(page).to have_content(Spree::Money.new(0).to_s)
           end
 
           fill_in "order_line_items_attributes_0_quantity", with: 2
           fill_in "order_line_items_attributes_1_quantity", with: 2
-          click_button "Update"
+          click_button I18n.t("spree.update")
 
           within '#cart_adjustments' do
-            expect(page).to have_content("Promotion (Onetwo) -$60.00", normalize_ws: true)
+            expect(page).to have_content("Promotion (Onetwo) #{Spree::Money.new(-60)}", normalize_ws: true)
           end
 
           within '.cart-footer__total' do
-            expect(page).to have_content("$0.00")
+            expect(page).to have_content(Spree::Money.new(0).to_s)
           end
         end
       end

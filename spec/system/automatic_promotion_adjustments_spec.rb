@@ -38,12 +38,12 @@ RSpec.describe 'Automatic promotions', type: :system, js: true do
 
     it "automatically applies the promotion once the order crosses the threshold" do
       fill_in "order_line_items_attributes_0_quantity", with: 6
-      click_button "Update"
-      expect(page).to have_content("Promotion ($10 off when you spend more than $100) -$10.00", normalize_ws: true)
+      click_button I18n.t("spree.update")
+      expect(page).to have_content("Promotion ($10 off when you spend more than $100) #{Spree::Money.new(-10)}", normalize_ws: true)
 
       fill_in "order_line_items_attributes_0_quantity", with: 5
-      click_button "Update"
-      expect(page).not_to have_content("Promotion ($10 off when you spend more than $100) -$10.00", normalize_ws: true)
+      click_button I18n.t("spree.update")
+      expect(page).not_to have_content("Promotion ($10 off when you spend more than $100) #{Spree::Money.new(-10)}", normalize_ws: true)
     end
   end
 end

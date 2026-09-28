@@ -35,7 +35,7 @@ RSpec.describe 'Cart', type: :system do
     click_button "Remove"
     expect(page).not_to have_content("Line items quantity must be an integer")
     expect(page).not_to have_content("Solidus mug set")
-    expect(page).to have_content("Your cart is empty")
+    expect(page).to have_content(I18n.t("spree.your_cart_is_empty"))
 
     within "#link-to-cart" do
       expect(page.text).to eq('')
@@ -50,7 +50,7 @@ RSpec.describe 'Cart', type: :system do
 
     expect(page).to have_content("Solidus mug set")
     click_on "Empty Cart"
-    expect(page).to have_content("Your cart is empty")
+    expect(page).to have_content(I18n.t("spree.your_cart_is_empty"))
 
     within "#link-to-cart" do
       expect(page.text).to eq('')

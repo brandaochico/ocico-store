@@ -16,7 +16,7 @@ RSpec.describe 'Checkout', :js, type: :system do
       before do
         add_mug_to_cart
         Spree::Order.last.update_column(:email, "test@example.com")
-        click_button "Checkout"
+        click_button I18n.t("spree.checkout")
       end
 
       it 'should default checkbox to checked', js: true do
@@ -33,7 +33,7 @@ RSpec.describe 'Checkout', :js, type: :system do
     context "persists state when on address page" do
       before do
         add_mug_to_cart
-        click_button "Checkout"
+        click_button I18n.t("spree.checkout")
       end
 
       it 'goes to address state', js: true do
@@ -57,10 +57,10 @@ RSpec.describe 'Checkout', :js, type: :system do
         fill_in "order_email", with: "test@example.com"
         fill_in_address
 
-        click_button "Save and Continue"
+        click_button I18n.t("spree.save_and_continue")
         expect(page).not_to have_content("undefined method `promotion'")
-        click_button "Save and Continue"
-        expect(page).to have_content("Shipping total:\n$10.00")
+        click_button I18n.t("spree.save_and_continue")
+        expect(page).to have_content("#{I18n.t('spree.shipping_total')}:\n#{Spree::Money.new(10)}")
       end
     end
 
@@ -109,7 +109,7 @@ RSpec.describe 'Checkout', :js, type: :system do
         allow_any_instance_of(CartLineItemsController).to receive_messages(spree_current_user: user)
 
         add_mug_to_cart
-        click_button "Checkout"
+        click_button I18n.t("spree.checkout")
         # We need an order reload here to get newly associated addresses.
         # Then we go back to address where we are supposed to be redirected.
         order.reload
@@ -122,11 +122,11 @@ RSpec.describe 'Checkout', :js, type: :system do
 
         it 'shows the saved addresses', js: true do
           within("#billing") do
-            expect(find_field('Name').value).to eq 'Bill Gates'
+            expect(find_field(I18n.t("spree.name")).value).to eq 'Bill Gates'
           end
 
           within("#shipping") do
-            expect(find_field('Name').value).to eq 'Steve Jobs'
+            expect(find_field(I18n.t("spree.name")).value).to eq 'Steve Jobs'
           end
         end
       end
@@ -137,7 +137,7 @@ RSpec.describe 'Checkout', :js, type: :system do
 
         it 'shows an empty address', js: true do
           within("#billing") do
-            expect(find_field('Name').value).to be_blank
+            expect(find_field(I18n.t("spree.name")).value).to be_blank
           end
 
           within("#shipping") do
@@ -154,7 +154,7 @@ RSpec.describe 'Checkout', :js, type: :system do
           checkout_as_guest
 
           within("#billing") do
-            expect(find_field('Name').value).to be_blank
+            expect(find_field(I18n.t("spree.name")).value).to be_blank
           end
 
           within("#shipping") do
@@ -170,7 +170,7 @@ RSpec.describe 'Checkout', :js, type: :system do
 
         before do
           add_mug_to_cart
-          click_button "Checkout"
+          click_button I18n.t("spree.checkout")
 
           # Simulate user login
           Spree::Order.last.associate_user!(user)
@@ -187,7 +187,7 @@ RSpec.describe 'Checkout', :js, type: :system do
 
           it 'shows empty addresses', js: true do
             within("#billing") do
-              expect(find_field('Name').value).to be_blank
+              expect(find_field(I18n.t("spree.name")).value).to be_blank
             end
 
             within("#shipping") do
@@ -203,11 +203,11 @@ RSpec.describe 'Checkout', :js, type: :system do
 
           it 'shows empty addresses', js: true do
             within("#billing") do
-              expect(find_field('Name').value).to eq 'Bill Gates'
+              expect(find_field(I18n.t("spree.name")).value).to eq 'Bill Gates'
             end
 
             within("#shipping") do
-              expect(find_field('Name').value).to eq 'Steve Jobs'
+              expect(find_field(I18n.t("spree.name")).value).to eq 'Steve Jobs'
             end
           end
         end
@@ -230,8 +230,8 @@ RSpec.describe 'Checkout', :js, type: :system do
     it "does not allow successful order submission" do
       visit checkout_path
       order.payments.first.update state: :void
-      check 'Agree to Terms of Service'
-      click_button 'Place Order'
+      check I18n.t("spree.agree_to_terms_of_service")
+      click_button I18n.t("spree.place_order")
       expect(page).to have_current_path checkout_state_path(:payment)
     end
   end
@@ -252,14 +252,14 @@ RSpec.describe 'Checkout', :js, type: :system do
 
     it "redirects to payment page" do
       visit checkout_state_path(:delivery)
-      click_button "Save and Continue"
+      click_button I18n.t("spree.save_and_continue")
       choose "Credit Card"
-      fill_in "Card Number", with: '123'
-      fill_in "Expiration", with: '04 / 20'
-      fill_in "Card Code", with: '123'
-      click_button "Save and Continue"
-      check 'Agree to Terms of Service'
-      click_button "Place Order"
+      fill_in I18n.t("spree.card_number"), with: '123'
+      fill_in I18n.t("spree.expiration"), with: '04 / 20'
+      fill_in I18n.t("spree.card_code"), with: '123'
+      click_button I18n.t("spree.save_and_continue")
+      check I18n.t("spree.agree_to_terms_of_service")
+      click_button I18n.t("spree.place_order")
       expect(page).to have_content("Bogus Gateway: Forced failure")
       expect(page.current_url).to include("/checkout/payment")
     end
@@ -290,7 +290,7 @@ RSpec.describe 'Checkout', :js, type: :system do
       page.execute_script("document.getElementById('checkout_form_payment').onsubmit = function(){return false;}")
 
       expect(page).not_to have_selector('button[disabled]')
-      click_button "Save and Continue"
+      click_button I18n.t("spree.save_and_continue")
       expect(page).to have_selector('button[disabled]')
     end
 
@@ -299,13 +299,13 @@ RSpec.describe 'Checkout', :js, type: :system do
       visit checkout_state_path(:confirm)
 
       # Test TOS not checked alert
-      accept_alert('Please review and accept the Terms of Service') { click_button "Place Order" }
+      accept_alert('Please review and accept the Terms of Service') { click_button I18n.t("spree.place_order") }
 
       # prevent form submit to verify button is disabled
       page.execute_script("document.getElementById('checkout_form_confirm').onsubmit = function(){return false;}")
 
-      check 'Agree to Terms of Service'
-      click_button "Place Order"
+      check I18n.t("spree.agree_to_terms_of_service")
+      click_button I18n.t("spree.place_order")
       button = find('button.button-primary')
       expect(button).to be_disabled
     end
@@ -329,15 +329,15 @@ RSpec.describe 'Checkout', :js, type: :system do
     it "allows the user to complete checkout using only store credit as the payment source" do
       visit checkout_state_path(:payment)
 
-      expect(page).to have_content("Your order is fully covered by store credits, no additional payment method is required.")
+      expect(page).to have_content(I18n.t("checkout.covered_by_store_credit"))
       expect(page).not_to match(/\bCheck\b/)
       expect(page).not_to match(/\bCredit Card\b/)
 
-      click_button "Save and Continue"
-      expect(page).to have_content("Confirm")
+      click_button I18n.t("spree.save_and_continue")
+      expect(page).to have_content(I18n.t("spree.confirm"))
 
-      check "Agree to Terms of Service"
-      click_on "Place Order"
+      check I18n.t("spree.agree_to_terms_of_service")
+      click_on I18n.t("spree.place_order")
       expect(page).to have_content(I18n.t('spree.order_processed_successfully'))
     end
   end
@@ -399,26 +399,26 @@ RSpec.describe 'Checkout', :js, type: :system do
     it "selects first source available and customer moves on" do
       expect(find_existing_payment_radio(wallet_source.id)).to be_checked
 
-      click_on "Save and Continue"
-      check 'Agree to Terms of Service'
-      click_on "Place Order"
+      click_on I18n.t("spree.save_and_continue")
+      check I18n.t("spree.agree_to_terms_of_service")
+      click_on I18n.t("spree.place_order")
 
       order = Spree::Order.last
       expect(page).to have_current_path(order_path(order))
-      expect(page).to have_content("Ending in #{credit_card.last_digits}")
+      expect(page).to have_content("#{I18n.t('spree.ending_in')} #{credit_card.last_digits}")
     end
 
     it "allows user to enter a new source" do
       find_payment_radio(bogus.id).click
       fill_in_credit_card
 
-      click_on "Save and Continue"
-      check 'Agree to Terms of Service'
-      click_on "Place Order"
+      click_on I18n.t("spree.save_and_continue")
+      check I18n.t("spree.agree_to_terms_of_service")
+      click_on I18n.t("spree.place_order")
 
       order = Spree::Order.last
       expect(page).to have_current_path(order_path(order))
-      expect(page).to have_content('Ending in 1111')
+      expect(page).to have_content("#{I18n.t('spree.ending_in')} 1111")
     end
   end
 
@@ -431,22 +431,22 @@ RSpec.describe 'Checkout', :js, type: :system do
       checkout_as_guest
       fill_in "order_email", with: "test@example.com"
       fill_in_address
-      click_on "Save and Continue"
-      click_on "Save and Continue"
+      click_on I18n.t("spree.save_and_continue")
+      click_on I18n.t("spree.save_and_continue")
       expect(page).to have_current_path(checkout_state_path("payment"))
 
       visit products_path
       click_link bag.name
       click_button "add-to-cart-button"
 
-      click_on "Checkout"
+      click_on I18n.t("spree.checkout")
       # edit an address field
       fill_in "order_bill_address_attributes_name", with: "Ryann"
-      click_on "Save and Continue"
-      click_on "Save and Continue"
-      click_on "Save and Continue"
-      check 'Agree to Terms of Service'
-      click_on "Place Order"
+      click_on I18n.t("spree.save_and_continue")
+      click_on I18n.t("spree.save_and_continue")
+      click_on I18n.t("spree.save_and_continue")
+      check I18n.t("spree.agree_to_terms_of_service")
+      click_on I18n.t("spree.place_order")
 
       order = Spree::Order.last
       expect(page).to have_current_path(token_order_path(order, order.guest_token))
@@ -459,8 +459,8 @@ RSpec.describe 'Checkout', :js, type: :system do
       checkout_as_guest
       fill_in "order_email", with: "test@example.com"
       fill_in_address
-      click_on "Save and Continue"
-      click_on "Save and Continue"
+      click_on I18n.t("spree.save_and_continue")
+      click_on I18n.t("spree.save_and_continue")
       expect(page).to have_current_path(checkout_state_path("payment"))
     end
 
@@ -472,7 +472,7 @@ RSpec.describe 'Checkout', :js, type: :system do
           fill_in "order_line_items_attributes_0_quantity", with: 3
         end
 
-        click_on "Update"
+        click_on I18n.t("spree.update")
       end
 
       it "redirects user back to address step" do
@@ -482,8 +482,8 @@ RSpec.describe 'Checkout', :js, type: :system do
 
       it "updates shipments properly through step address -> delivery transitions" do
         visit checkout_state_path("payment")
-        click_on "Save and Continue"
-        click_on "Save and Continue"
+        click_on I18n.t("spree.save_and_continue")
+        click_on I18n.t("spree.save_and_continue")
 
         expect(Spree::InventoryUnit.count).to eq 3
       end
@@ -505,8 +505,8 @@ RSpec.describe 'Checkout', :js, type: :system do
 
       it "updates shipments properly through step address -> delivery transitions" do
         visit checkout_state_path("payment")
-        click_on "Save and Continue"
-        click_on "Save and Continue"
+        click_on I18n.t("spree.save_and_continue")
+        click_on I18n.t("spree.save_and_continue")
 
         expect(Spree::InventoryUnit.count).to eq 2
       end
@@ -526,24 +526,24 @@ RSpec.describe 'Checkout', :js, type: :system do
 
       fill_in "order_email", with: "test@example.com"
       fill_in_address
-      click_on "Save and Continue"
+      click_on I18n.t("spree.save_and_continue")
 
-      click_on "Save and Continue"
+      click_on I18n.t("spree.save_and_continue")
       expect(page).to have_current_path(checkout_state_path("payment"))
     end
 
     it "applies them & refreshes the page on user clicking the Apply Code button" do
       fill_in "order_coupon_code", with: promotion.codes.first.value
-      click_on "Apply Code"
+      click_on I18n.t("spree.apply_code")
 
       expect(page).to have_content(promotion.name)
-      expect(page).to have_content("-$2.00")
+      expect(page).to have_content(Spree::Money.new(-2).to_s)
     end
 
     context "with invalid coupon" do
       it "doesnt apply the promotion" do
         fill_in "order_coupon_code", with: 'invalid'
-        click_on "Apply Code"
+        click_on I18n.t("spree.apply_code")
 
         expect(page).to have_content(I18n.t('spree.coupon_code_not_found'))
       end
@@ -551,7 +551,7 @@ RSpec.describe 'Checkout', :js, type: :system do
 
     context "doesn't fill in coupon code input" do
       it "advances just fine" do
-        click_on "Save and Continue"
+        click_on I18n.t("spree.save_and_continue")
         expect(page).to have_current_path(checkout_state_path("confirm"))
       end
     end
@@ -571,7 +571,7 @@ RSpec.describe 'Checkout', :js, type: :system do
       allow_any_instance_of(Spree::Order).to receive_messages email: "spree@commerce.com"
 
       add_mug_to_cart
-      click_on "Checkout"
+      click_on I18n.t("spree.checkout")
     end
 
     after do
@@ -583,11 +583,11 @@ RSpec.describe 'Checkout', :js, type: :system do
 
       choose "Credit Card"
       fill_in_credit_card
-      click_button "Save and Continue"
+      click_button I18n.t("spree.save_and_continue")
 
       expect(current_path).to eq checkout_state_path('confirm')
-      check 'Agree to Terms of Service'
-      click_button "Place Order"
+      check I18n.t("spree.agree_to_terms_of_service")
+      click_button I18n.t("spree.place_order")
     end
   end
 
@@ -600,7 +600,7 @@ RSpec.describe 'Checkout', :js, type: :system do
     context 'as a guest' do
       before do
         Spree::Order.last.update_column(:email, "test@example.com")
-        click_button "Checkout"
+        click_button I18n.t("spree.checkout")
       end
 
       it 'should not be displayed', js: true do
@@ -615,7 +615,7 @@ RSpec.describe 'Checkout', :js, type: :system do
         allow_any_instance_of(CartsController).to receive_messages(spree_current_user: user)
         allow_any_instance_of(OrdersController).to receive_messages(spree_current_user: user)
         allow_any_instance_of(CheckoutsController).to receive_messages(spree_current_user: user)
-        click_button "Checkout"
+        click_button I18n.t("spree.checkout")
       end
 
       it 'should be displayed', js: true do
@@ -635,10 +635,10 @@ RSpec.describe 'Checkout', :js, type: :system do
       allow_any_instance_of(CartLineItemsController).to receive_messages(spree_current_user: user)
 
       visit checkout_state_path(:delivery)
-      click_button "Save and Continue"
-      click_button "Save and Continue"
-      check 'Agree to Terms of Service'
-      click_button "Place Order"
+      click_button I18n.t("spree.save_and_continue")
+      click_button I18n.t("spree.save_and_continue")
+      check I18n.t("spree.agree_to_terms_of_service")
+      click_button I18n.t("spree.place_order")
     end
 
     it "displays a thank you message" do
@@ -673,9 +673,9 @@ RSpec.describe 'Checkout', :js, type: :system do
         # https://github.com/solidusio/solidus_starter_frontend/pull/172/files#r683067589
         # for more details.
         within '#existing-customer' do
-          fill_in 'Email:', with: user.email
-          fill_in 'Password:', with: user.password
-          click_button 'Login'
+          fill_in "#{I18n.t("spree.email")}:", with: user.email
+          fill_in "#{I18n.t("spree.password")}:", with: user.password
+          click_button I18n.t("spree.login")
         end
 
         fill_in_address
@@ -685,9 +685,9 @@ RSpec.describe 'Checkout', :js, type: :system do
 
         select "Canada", from: "order_bill_address_attributes_country_id"
         fill_in state_name_css, with: xss_string
-        fill_in "Zip", with: "H0H0H0"
+        fill_in I18n.t("spree.zip"), with: "H0H0H0"
 
-        click_on 'Save and Continue'
+        click_on I18n.t("spree.save_and_continue")
         visit checkout_state_path(:address)
 
         expect(page).to have_field(state_name_css, with: xss_string)
@@ -713,11 +713,11 @@ RSpec.describe 'Checkout', :js, type: :system do
       checkout_as_guest
       fill_in "order_email", with: "test@example.com"
       fill_in_address
-      click_on "Save and Continue"
-      click_on "Save and Continue"
+      click_on I18n.t("spree.save_and_continue")
+      click_on I18n.t("spree.save_and_continue")
 
       fill_in_credit_card(number: "1")
-      click_on "Save and Continue"
+      click_on I18n.t("spree.save_and_continue")
 
       expect(page).to have_current_path("/checkout/confirm")
     end
@@ -728,21 +728,21 @@ RSpec.describe 'Checkout', :js, type: :system do
       checkout_as_guest
       fill_in "order_email", with: "test@example.com"
       fill_in_address
-      click_on "Save and Continue"
-      click_on "Save and Continue"
+      click_on I18n.t("spree.save_and_continue")
+      click_on I18n.t("spree.save_and_continue")
 
       fill_in_credit_card
-      click_on "Save and Continue"
+      click_on I18n.t("spree.save_and_continue")
 
       expect(page).to have_current_path("/checkout/confirm")
     end
   end
 
   def fill_in_credit_card(number: "4111 1111 1111 1111")
-    fill_in "Name on card", with: 'Mary Doe'
-    fill_in_with_force "Card Number", with: number
-    fill_in_with_force "Expiration", with: "12 / 24"
-    fill_in "Card Code", with: "123"
+    fill_in I18n.t("spree.name_on_card"), with: 'Mary Doe'
+    fill_in_with_force I18n.t("spree.card_number"), with: number
+    fill_in_with_force I18n.t("spree.expiration"), with: "12 / 24"
+    fill_in I18n.t("spree.card_code"), with: "123"
   end
 
   def fill_in_address

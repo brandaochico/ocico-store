@@ -16,6 +16,13 @@ RSpec.configure do |config|
     screen_size = example.metadata[:screen_size] || [ 1800, 1400 ]
     driven_by(:selenium, using: :headless_chrome, screen_size: screen_size) do |capabilities|
       capabilities.add_argument("--disable-search-engine-choice-screen")
+
+      # Selenium picks whichever Chrome it finds first, which fails with
+      # "session not created: This version of ChromeDriver only supports Chrome
+      # version N" when the machine has a chromedriver newer than its Chrome.
+      # CI has a matched pair and needs nothing; set CHROME_BIN locally to point
+      # at the build your chromedriver actually supports (e.g. /usr/bin/chromium).
+      capabilities.binary = ENV["CHROME_BIN"] if ENV["CHROME_BIN"].present?
     end
   end
 end

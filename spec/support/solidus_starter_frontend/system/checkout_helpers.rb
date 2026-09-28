@@ -30,13 +30,13 @@ module SolidusStarterFrontend
       # Authentication
       #
       def checkout_as_guest
-        click_button "Checkout"
+        click_button I18n.t("spree.checkout")
 
         within '#guest_checkout' do
-          fill_in 'Email', with: 'test@example.com'
+          fill_in I18n.t("spree.email"), with: 'test@example.com'
         end
 
-        click_on 'Continue'
+        click_on I18n.t("spree.continue")
       end
 
       #
