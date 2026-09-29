@@ -46,7 +46,7 @@ bin/rails server -p 3000              # dev server — storefront at /, admin at
 bin/rails tailwindcss:build           # rebuild storefront CSS (also solidus_admin:tailwindcss:build for admin)
 
 bundle exec rspec                                          # full suite
-bundle exec rspec --exclude-pattern 'spec/system/**/*_spec.rb'  # excludes system specs (no browser driver set up yet)
+bundle exec rspec --exclude-pattern 'spec/system/**/*_spec.rb'  # skips system specs (~7min); they do run, see below
 bundle exec rspec spec/path/to/foo_spec.rb                  # single file
 bundle exec rspec spec/path/to/foo_spec.rb:42               # single example by line
 
@@ -58,9 +58,21 @@ bin/importmap audit  # JS pins (config/importmap.rb) — don't delete that file,
 RAILS_ENV=test bin/ci   # runs the exact same steps as CI (config/ci.rb), locally
 ```
 
-If specs fail inside `stylesheet_link_tag "tailwind"` with an `ExecJS::RuntimeError`, prefix the command
-with `EXECJS_RUNTIME=Node` — ExecJS otherwise picks a broken Bun shim off `PATH`. See
-`docs/ARCHITECTURE.md`, "Environment gotchas".
+Two environment variables are needed on this machine and on no other. Both are local problems, not the
+app's — CI is green without either (verified), and `docs/ARCHITECTURE.md`, "Environment gotchas" explains
+both in full:
+
+```
+EXECJS_RUNTIME=Node             # ExecJS otherwise picks a broken Bun shim off PATH. Needed by the
+                                # dev server too, not just specs: without it any asset recompile
+                                # turns every page into a 500.
+CHROME_BIN=/usr/bin/chromium    # only for system specs — this machine's chromedriver is ahead of
+                                # its google-chrome, so Selenium can't open a session
+```
+
+So in practice: `EXECJS_RUNTIME=Node bin/dev` to run the app, and
+`EXECJS_RUNTIME=Node CHROME_BIN=/usr/bin/chromium bundle exec rspec` to run everything including the
+system specs.
 
 Admin login (seeded): `admin@example.com` / `test123`.
 

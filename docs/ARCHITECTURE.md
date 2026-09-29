@@ -51,21 +51,72 @@ an agent is less likely to get a well-known API wrong than a bespoke schema.
 | Concept | Solidus mechanism |
 |---|---|
 | Card / product | `Spree::Product` (one product per card or sealed item) |
-| Set | `Spree::Taxonomy` "Set" + one `Spree::Taxon` per set |
+| **Origem** (country of origin *and* language) | `Spree::Taxonomy` "Origem" + one taxon per country, flag emoji after the name |
+| **Tipo** (Booster Box, ETB, …, Cartas Avulsas) | `Spree::Taxonomy` "Tipo" + one taxon per format |
+| **Coleções** (the set) | `Spree::Taxonomy` "Coleções" + one taxon per set, ordered by `released_on` |
 | Rarity, card number | `Spree::Property` + `Spree::ProductProperty` (`rarity`, `card_number`) |
 | Condition (NM/LP/MP/HP/DMG) | `Spree::OptionType` "condition" — a real variant axis (distinct SKU/price/stock) |
-| Language (EN/JP/PT-BR) | `Spree::OptionType` "language" — variant axis when it affects SKU |
 | Grading (future: PSA/BGS) | `Spree::OptionType` "grading" — modeled since Fase 1, not yet used on any product |
 | SKU | `Spree::Variant#sku` |
-| Country of origin (import duty) | `country_of_origin` column on `spree_products` — **product-level, not variant-level** (a whole set/print run shares one origin) |
+| Country of origin (import duty) | `country_of_origin` column on `spree_products`, **derived from the Origem taxon** — product-level, not variant-level |
+
+Those three taxonomies are the whole navigation: the header lists them (see
+"Storefront navigation" below) and the search sidebar filters by them.
+
+**Two things here replaced an earlier model and should not be reintroduced:**
+
+- There is no `language` option type any more. In the TCG the printing origin
+  decides the language, so keeping both meant two places to get the same fact
+  wrong; Origem is the single source, and `country_of_origin` derives from it
+  rather than being entered separately.
+- There is no "Set" taxonomy. It was renamed to "Coleções" in place, so
+  existing taxon/product links survived.
+
+`spree_taxons` gained a nullable `released_on` date. Taxons otherwise carry
+only a manual position, and the header needs "the seven most recent
+collections" to mean something real. It is meaningless for the Origem and Tipo
+taxonomies, hence nullable.
 
 Stock: native `Spree::StockLocation`/`Spree::StockItem` are enough for a
 single-warehouse operation.
 
-Seeded via `db/seeds/catalog.rb` (idempotent, safe to re-run) — currently 8
-illustrative sample products across 3 real sets (Obsidian Flames, 151, Paldea
-Evolved). **This is demo/dev data, not a real catalog** — replace with a real
-import when the business has one.
+Seeded via `db/seeds/catalog.rb` (idempotent, safe to re-run): the six origins,
+the seven types, and thirteen collections — the ten actually stocked, plus
+Paldea Evolved, Obsidian Flames and 151, which are kept only because the eight
+sample products are real cards from them and remapping them would mean
+inventing card numbers. **All of that last group is demo data** and goes
+together when a real catalog import lands.
+
+## Storefront navigation
+
+The header carries four entries, and the search sidebar the same three
+dimensions as combinable checkbox filters:
+
+    País ▾ · Cartas Avulsas · Produtos ▾ · Coleções ▾
+
+- **País, Produtos, Coleções** are dropdowns: hover opens them, a click *pins*
+  one open until a click lands outside. That pinning is the whole reason
+  `nav_dropdown_controller.js` keeps a `pinned` flag — otherwise moving the
+  pointer away would close a menu the user deliberately clicked open.
+- **Cartas Avulsas** is a plain link and closes the row: it is a product type
+  like the others in the data, but a single destination rather than a group.
+- **Coleções** lists the seven most recent by `released_on` and ends in "Ver
+  todas as coleções...", which goes to `/colecoes` — a page about the
+  collections themselves, routed outside the taxon glob for that reason.
+
+All three are dropdowns rather than flat links because six country names
+written out in the bar overflowed into the search field at every width from
+1280px up; the nav alone wanted ~940px. On `lg` the header row switches from
+flex to the same twelve-column grid the page content uses, so the logo occupies
+the two columns the sidebar sits under and the nav starts exactly where the
+page title does.
+
+The queries behind all of this live in `app/helpers/main_navigation_helper.rb`,
+shared by header and sidebar. The sidebar's filters are in
+`app/overrides/taxonomy_product_filters.rb` and use a **subquery, not a join**:
+chaining two scopes onto one `joins(:taxons)` asks a single joined row to match
+two different taxons at once, so combining any two filters silently returned
+nothing — a failure that surfaces as "no products found" rather than an error.
 
 ## Payment (Fase 2 — card flow in place, Pix/Boleto not started)
 
@@ -143,8 +194,9 @@ Registering the endpoint with Stripe is still to do: production URL is
   own checkout partials — additive, doesn't touch `solidus_stripe` internals.
   Note the pinned gem depends on `stripe ~> 8.0` (SDK from 2023); confirm that
   SDK version can create Pix/Boleto intents before committing to the approach.
-- System specs for the full card checkout (blocked on browser driver setup,
-  see "Environment gotchas").
+- System specs for the full card checkout. No longer blocked: the browser
+  driver works and the cart/checkout suite was rescued — what's missing is a
+  spec that drives a Stripe payment, which needs test credentials.
 - **Revisit only if data justifies it:** if Pix/Boleto dominate volume (likely
   in Brazil) and Stripe's BR fees become a real problem, consider a custom
   Pagar.me/Mercado Pago gateway as a Fase 6+ initiative — don't build both
@@ -243,7 +295,15 @@ don't reinvent them). Capybara for checkout system specs. WebMock/VCR so tests
 
 CI (GitHub Actions, `.github/workflows/ci.yml` running `bin/ci`) is the quality
 gate — green is the practical substitute for manual line-by-line review of
-agent-written code.
+agent-written code. It does **not** run the system specs; see the gotcha about
+them for what that costs and what it would take to include them.
+
+The system suite itself was cut down deliberately: the fifteen specs that
+exercised solidus_starter_frontend's sample storefront were deleted rather than
+repaired, because they test a catalogue this store doesn't have. The thirteen
+covering cart, checkout, order and the money adjustments applied along the way
+were kept and fixed. New specs for this store's own flows — condition filter,
+the three navigation axes, Stripe checkout — are still to write.
 
 ## Deploy — Kamal 2, single VPS (Fase 5 — not started)
 
@@ -406,10 +466,26 @@ reasons — worth understanding before changing them:
   rather than relying on whatever Rake-task enhancement builds it for local
   `bundle exec rspec` runs — that enhancement didn't fire reliably on a fresh
   CI checkout (`app/assets/builds/tailwind.css` is gitignored build output).
-- **System specs (`spec/system/**`) are excluded from CI** — no browser driver
-  is set up yet, and their `before(:suite)` hook also hits the sassc/libsass
-  issue via `Rails.application.precompiled_assets`. Real setup work for a
-  later phase, not fixed yet.
+- **System specs (`spec/system/**`) are excluded from CI, but they do run.**
+  The old claim that no browser driver was set up was wrong: the headless
+  Chrome config in `spec/support/solidus_starter_frontend/capybara.rb` was
+  complete all along. What actually stopped them was the ExecJS/Bun problem
+  below, reached through their `before(:suite)` hook
+  (`Rails.application.precompiled_assets`).
+
+  Run them with `bundle exec rspec spec/system`. They take about seven minutes
+  and four of them fail for reasons that predate the rescue (store-credit
+  checkout, a `render_template` assertion that drifted from solidus_core 4.7.1,
+  and two order-flow ones), so putting them in `bin/ci` means fixing those
+  first. They are worth it: they caught two customer-visible bugs in one pass
+  that manual checking had missed.
+
+- **`CHROME_BIN` selects the browser Capybara drives.** Selenium takes the
+  first Chrome on `PATH`, which fails with "session not created: This version
+  of ChromeDriver only supports Chrome version N" on a machine whose
+  chromedriver is ahead of its google-chrome. CI has a matched pair and needs
+  nothing; locally, point it at the build your driver supports, e.g.
+  `CHROME_BIN=/usr/bin/chromium`.
 - **`config.i18n.fallbacks` is an explicit hash (`{"pt-BR" => [:en]}`), not
   `true`.** `true` would fall back to `default_locale`, which *is* pt-BR here
   — a no-op. Also, `Spree.i18n_available_locales` (solidus_core) filters
@@ -455,6 +531,12 @@ reasons — worth understanding before changing them:
 
   The lesson worth carrying: "the CSS is written" and "the page looks right"
   are different claims, and only the second one matters. Check the second.
+
+  **Then reopened again** to rebuild the catalog around three axes instead of
+  one — see "Data model" and "Storefront navigation". The old single "Set"
+  taxonomy is gone, the `language` option type with it, and the search sidebar
+  filters by country, type and collection. The eight sample products and the
+  three collections they belong to are still demo data.
 - 🟡 **Fase 2 — Checkout & payment (in progress).**
   Done: `solidus_stripe` installed (pinned to a `main` SHA) and mounted,
   storefront checkout UI hand-wired, payment method seeded with
@@ -463,8 +545,8 @@ reasons — worth understanding before changing them:
   unique index, request + job specs green.
   Left: real Stripe credentials (nothing can transact without them — see the
   credentials gotcha), registering the webhook endpoint in the Stripe
-  dashboard, Pix/Boleto payment method subclasses, and the end-to-end checkout
-  system specs (blocked on browser driver setup).
+  dashboard, Pix/Boleto payment method subclasses, and an end-to-end checkout
+  system spec that actually pays with Stripe.
 - ⬜ **Fase 3 — Freight & import duty.** Melhor Envio calculator,
   `ImportDutyRate` + calculator + adjustment, end-to-end order-total specs.
 - ⬜ **Fase 4 — Admin & monetary reporting.** Cash-flow dashboard, import duty
