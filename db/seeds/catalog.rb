@@ -32,6 +32,7 @@ module OcicoStore
       collections = seed_collections_taxonomy
       seed_products(option_types:, origins:, types:, collections:)
       retire_language_option_type
+      retire_demo_products
     end
 
     def update_store!
@@ -259,6 +260,25 @@ module OcicoStore
 
       option_type.option_values.destroy_all
       option_type.destroy!
+    end
+
+    # `solidus:install`'s sample-data step (spree_sample:load) seeded a dozen
+    # generic mugs/hoodies/totes once, as part of the installer, not this file —
+    # a fresh `db:seed` never creates them. But any local database that went
+    # through the original installer still has them, and HomeController takes
+    # an unscoped first page of all products with no ordering guarantee, so
+    # whichever products happen to sort first can crowd the real catalog off
+    # the home page entirely. Soft-delete them by name if present so this fixes
+    # itself the next time anyone (re-)runs db:seed, instead of needing a
+    # one-off console command per affected machine.
+    def retire_demo_products
+      demo_names = [
+        "Solidus Water Bottle", "Solidus tote", "Solidus hoodie", "Solidus mug set",
+        "Solidus winter hat", "Solidus circle sticker", "Solidus notebook",
+        "Solidus t-shirt", "Solidus long sleeve tee", "Solidus dark tee",
+        "Solidus canvas tote bag", "Solidus cap"
+      ]
+      Spree::Product.where(name: demo_names).find_each(&:discard)
     end
 
     def create_single!(attrs, tax_category:, shipping_category:, taxons:)
