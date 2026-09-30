@@ -15,12 +15,15 @@ RSpec.describe FilterComponent, type: :component do
 
     it 'renders a list of checkboxes for the filter labels' do
       expect(inputs).to_not be_empty
-      expect(inputs.first[:id]).to eq('Faixa_de_Pre_o_At__R_100.00')
+      # Comma decimal (R$100,00), not a period — Solidus's own price_filter
+      # labels go through number_to_currency under whatever locale is active,
+      # and pt-BR is that locale here (see the rails-i18n gem).
+      expect(inputs.first[:id]).to eq('Faixa_de_Pre_o_At__R_100_00')
     end
 
     context 'when a filter list item was checked' do
       let(:search_params) do
-        { price_range_any: [ "Até R$100.00" ] }
+        { price_range_any: [ "Até R$100,00" ] }
       end
 
       it 'renders as checked' do

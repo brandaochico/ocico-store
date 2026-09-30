@@ -44,6 +44,11 @@ gem "thruster", require: false
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 gem "image_processing", "~> 1.2"
 
+# Locale data (date/time/number formats) Rails itself doesn't ship — without
+# this, `l(date, format: :long)` silently renders in English even though
+# pt-BR is the only active locale. See config/locales/pt-BR/general.yml.
+gem "rails-i18n"
+
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
