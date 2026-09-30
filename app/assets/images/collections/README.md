@@ -30,11 +30,11 @@ that pack's own numbering.
 | `perfect-order.png` | [kiriaura — Mega Zygarde Sprite](https://www.deviantart.com/kiriaura/art/Mega-Zygarde-Sprite-1255400241) | kiriaura |
 | `ascended-heroes.png` | [kiriaura — Mega Dragonite Sprite](https://www.deviantart.com/kiriaura/art/Mega-Dragonite-Sprite-1221861010) | kiriaura |
 | `phantasmal-flames.png` | GSC pack `006m.png` — that file is itself [Eli-eli76 — Mega Charizard X (GSC Style)](https://www.deviantart.com/eli-eli76/art/Mega-Charizard-X-(GSC-Style)-790800391) | Eli-eli76 |
-| `mega-symphonia.png` | GSC pack `282m.png` — that file is itself [PomPomKing — "Let me in, I'm a fairy"](https://www.deviantart.com/pompomking/art/Let-me-in%2C-I'm-a-fairy-786260058) | PomPomKing |
+| `mega-symphonia.png` | [PokéAPI/sprites, gen-v black-white `10051.png`](https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/10051.png) | PokéAPI |
 | `destined-rivals.png` | GSC pack `150.png` (Mewtwo) | Pokémon GSC Essencials |
 | `151.png` | GSC pack `151.png` (Mew) | Pokémon GSC Essencials |
 | `obsidian-flames.png` | GSC pack `006s.png` (Charizard, shiny) | Pokémon GSC Essencials |
-| `paldea-evolved.png` | GSC pack `126.png` (Magmar) | Pokémon GSC Essencials |
+| `paldea-evolved.png` | GSC pack `129.png` (Magikarp) | Pokémon GSC Essencials |
 
 To restore on a fresh machine: copy each GSC-pack file from the owner's pack
 (or re-fetch each linked URL) and re-run, e.g.:

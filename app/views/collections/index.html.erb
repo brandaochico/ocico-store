@@ -8,8 +8,8 @@
       <% @collections.each do |collection| %>
         <% sprite = collection_sprite_for(collection) %>
         <li>
-          <div class="relative rounded-xl border border-gray-mid p-5 transition-colors duration-150 hover:border-primary dark:border-gray-600">
-            <%= link_to taxon_seo_url(collection), class: "flex flex-col gap-y-1 pr-14" do %>
+          <div class="relative min-h-32 rounded-xl border border-gray-mid p-5 transition-colors duration-150 hover:border-primary dark:border-gray-600">
+            <%= link_to taxon_seo_url(collection), class: "flex flex-col gap-y-1 pr-20" do %>
               <span class="font-heading text-h6"><%= collection.name %></span>
               <%# description holds the set code (CBB6C, M6, ...) — see db/seeds/catalog.rb %>
               <% if collection.description.present? %>
@@ -20,13 +20,14 @@
               <% end %>
             <% end %>
 
-            <%# Brand motif: tripled/stacked 13px, see the .sprite-stack
-                comment in application.tailwind.css. Sized/positioned here
-                (not in the shared class) since that's specific to sitting
-                right-aligned across this card's three label lines without
-                changing the card's own size. %>
+            <%# Brand motif, see the .sprite-stack comment in
+                application.tailwind.css. Sized/positioned here (not in the
+                shared class) since that's specific to sitting right-aligned
+                across this card's three label lines. min-h-32 above keeps
+                every card the same height regardless of label length, so a
+                sprite this size never has to overflow a shorter card. %>
             <% if sprite %>
-              <div class="sprite-stack top-1/2 right-5 -translate-y-1/2 w-10 h-10" aria-hidden="true">
+              <div class="sprite-stack top-1/2 right-5 -translate-y-1/2 w-16 h-16" aria-hidden="true">
                 <% 3.times do %>
                   <%= image_tag "collections/#{sprite[:file]}", class: "sprite-stack__layer", alt: "" %>
                 <% end %>
