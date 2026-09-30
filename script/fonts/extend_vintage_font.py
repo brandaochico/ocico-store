@@ -11,17 +11,37 @@ The font (134 glyphs) already has 'tilde', 'acute' and a cedilla shape
 lowercase letters. It has no grave or circumflex mark at all, upper or
 lowercase, so those two are drawn from scratch here (grave as a mirror of
 the existing acute; circumflex as a plain two-legged chevron) rather than
-extracted from anything. Safe to re-run: skips any glyph that already
-exists, so re-running after a font update won't duplicate work.
+extracted from anything.
+
+Every new letter is built as a SIMPLE glyph (base contours + mark contours
+merged into one glyph), not a composite referencing components. Two
+reasons: (1) it's what this font's own Ccedilla already does, rather than
+a pattern invented here, and (2) a first version built as composites (the
+same structural pattern the font's own aacute/eacute/ntilde use) rendered
+a visible dark blob in place of the tilde on some real-world combinations
+at small sizes — root cause not fully pinned down (thin-mark hinting
+collapse under absent instructions is the leading theory), so this favors
+the more universally-supported simple-glyph path plus the OVERLAP_SIMPLE
+flag rather than relying on composite/component-transform correctness.
+Marks also sit with more vertical clearance above the base letter than a
+literal copy of the font's own aacute/ntilde offsets would give, as a
+safety margin against exactly that kind of collapse.
+
+Safe to re-run: skips any glyph that already exists, so re-running after
+a font update won't duplicate work.
 """
-import copy
 import sys
 
 from fontTools.pens.recordingPen import RecordingPen
 from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib import TTFont
+from fontTools.ttLib.tables._g_l_y_f import flagOverlapSimple
 
-NEW_MARKS = ["grave", "circumflex"]
+# Extra vertical clearance (in font units, 1000/em) added on top of a
+# center-to-center offset, so thin marks don't sit close enough to the
+# base letter to risk merging into it once hinting/rounding gets involved.
+CLEARANCE_Y = 40
+
 NEW_LETTERS = [
     ("atilde", "a", "tilde"),
     ("otilde", "o", "tilde"),
@@ -51,27 +71,40 @@ def center_x(b):
     return (b[0] + b[2]) / 2
 
 
+def replay_translated(pen, glyphset, name, dx=0, dy=0):
+    """Redraw `name`'s contours into `pen`, offset by (dx, dy)."""
+    src = RecordingPen()
+    glyphset[name].draw(src)
+    for op, args in src.value:
+        if op == "closePath":
+            pen.closePath()
+        else:
+            pen_method = getattr(pen, op)
+            pen_method(*[(x + dx, y + dy) for x, y in args])
+
+
 def build_grave(f):
-    """Mirror 'acute' horizontally about its own bounding-box center."""
+    """Mirror 'acute' horizontally about its own bbox center. A plain
+    coordinate mirror flips the contour's winding direction along with its
+    shape, so the point order is also reversed here to keep it matching the
+    font's own CW-outer convention (every other outer contour in this font,
+    including 'acute' and the hand-drawn 'circumflex' below, winds CW —
+    an early version of this script skipped the reversal and left grave the
+    only CCW outer contour in the font)."""
     glyf = f["glyf"]
     gs = f.getGlyphSet()
     xmin, _, xmax, _ = bbox(glyf, "acute")
     mirror_c = xmin + xmax
     src = RecordingPen()
     gs["acute"].draw(src)
+    segments = [seg for seg in src.value if seg[0] != "closePath"]
+    mirrored = [(op, ((mirror_c - args[0][0], args[0][1]),)) for op, args in segments]
     pen = TTGlyphPen(glyf)
-    for op, args in src.value:
-        if op == "moveTo":
-            (x, y), = args
-            pen.moveTo((mirror_c - x, y))
-        elif op == "lineTo":
-            (x, y), = args
-            pen.lineTo((mirror_c - x, y))
-        elif op == "closePath":
-            pen.closePath()
-        else:
-            raise ValueError(f"'acute' has an unexpected '{op}' segment — "
-                              "extend this mirroring branch to handle it")
+    first_op, first_args = mirrored[-1]
+    pen.moveTo(first_args[0])
+    for op, args in reversed(mirrored[:-1]):
+        pen.lineTo(args[0])
+    pen.closePath()
     glyph = pen.glyph()
     glyph.recalcBounds(glyf)
     return glyph, f["hmtx"]["acute"]
@@ -81,7 +114,9 @@ def build_circumflex(f):
     """A plain two-legged chevron (^) with a notch — no source to draw from."""
     glyf = f["glyf"]
     half_width, leg_width = 150, 70
-    base_y, peak_y, notch_y = 535, 700, 620
+    base_y = 535 + CLEARANCE_Y
+    peak_y = base_y + 165
+    notch_y = base_y + 85
     pen = TTGlyphPen(glyf)
     pen.moveTo((-half_width, base_y))
     pen.lineTo((0, peak_y))
@@ -98,7 +133,9 @@ def build_circumflex(f):
 def build_cedilla(f):
     """Extract the cedilla tail from Ccedilla: the one contour it has that
     plain 'C' doesn't. The standalone 'cedilla' glyph ships in the font but
-    empty (reserved name, no outline) — this fills it in for real."""
+    empty (reserved name, no outline) — this fills it in for real. No
+    clearance concerns here: cedilla hangs below the baseline, not close to
+    anything above it."""
     glyf = f["glyf"]
     gs = f.getGlyphSet()
 
@@ -126,20 +163,31 @@ def build_cedilla(f):
 
     pen = TTGlyphPen(glyf)
     for op, args in tail:
-        getattr(pen, op)(*args) if op != "closePath" else pen.closePath()
+        if op == "closePath":
+            pen.closePath()
+        else:
+            getattr(pen, op)(*args)
     glyph = pen.glyph()
     glyph.recalcBounds(glyf)
     return glyph, f["hmtx"]["cedilla"]
 
 
-def make_composite(glyf, base_name, mark_name, offset_x):
-    """Clone 'ntilde' (base+tilde, an existing composite) as a structural
-    template and repoint its two components — keeps the exact component flag
-    layout the font already uses instead of guessing at it."""
-    g = copy.deepcopy(glyf["ntilde"])
-    g.components[0].glyphName, g.components[0].x, g.components[0].y = base_name, 0, 0
-    g.components[1].glyphName, g.components[1].x, g.components[1].y = mark_name, offset_x, 0
-    return g
+def build_letter(f, base_name, mark_name):
+    """Merge base + mark into one simple glyph (contours concatenated, mark
+    translated into place) rather than a composite — see module docstring."""
+    glyf = f["glyf"]
+    gs = f.getGlyphSet()
+    base_bbox = bbox(glyf, base_name)
+    mark_bbox = bbox(glyf, mark_name)
+    offset_x = round(center_x(base_bbox) - center_x(mark_bbox))
+
+    pen = TTGlyphPen(glyf)
+    replay_translated(pen, gs, base_name)
+    replay_translated(pen, gs, mark_name, dx=offset_x)
+    glyph = pen.glyph()
+    glyph.recalcBounds(glyf)
+    glyph.flags[0] |= flagOverlapSimple
+    return glyph
 
 
 def main(path):
@@ -158,13 +206,12 @@ def main(path):
     for name, base, mark in NEW_LETTERS:
         if name in order:
             continue
-        offset = round(center_x(bbox(glyf, base)) - center_x(bbox(glyf, mark)))
-        glyf[name] = make_composite(glyf, base, mark, offset)
+        glyf[name] = build_letter(f, base, mark)
         hmtx[name] = hmtx[base]
         added.append(name)
 
     order = f.getGlyphOrder()
-    for name in [*NEW_MARKS, *(n for n, _, _ in NEW_LETTERS)]:
+    for name in ["grave", "circumflex", *(n for n, _, _ in NEW_LETTERS)]:
         if name not in order:
             order.append(name)
     f.setGlyphOrder(order)
