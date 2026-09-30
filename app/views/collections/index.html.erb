@@ -6,16 +6,43 @@
   <% else %>
     <ul class="col-span-full grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       <% @collections.each do |collection| %>
-        <li class="rounded-xl border border-gray-mid p-5 transition-colors duration-150 hover:border-primary dark:border-gray-600">
-          <%= link_to taxon_seo_url(collection), class: "flex flex-col gap-y-1" do %>
-            <span class="font-heading text-h6"><%= collection.name %></span>
-            <%# description holds the set code (CBB6C, M6, ...) — see db/seeds/catalog.rb %>
-            <% if collection.description.present? %>
-              <span class="font-ui text-body-xs text-gray-500 dark:text-sand"><%= collection.description %></span>
+        <% sprite = collection_sprite_for(collection) %>
+        <li>
+          <div class="relative rounded-xl border border-gray-mid p-5 transition-colors duration-150 hover:border-primary dark:border-gray-600">
+            <%= link_to taxon_seo_url(collection), class: "flex flex-col gap-y-1 pr-14" do %>
+              <span class="font-heading text-h6"><%= collection.name %></span>
+              <%# description holds the set code (CBB6C, M6, ...) — see db/seeds/catalog.rb %>
+              <% if collection.description.present? %>
+                <span class="font-ui text-body-xs text-gray-500 dark:text-sand"><%= collection.description %></span>
+              <% end %>
+              <% if collection.released_on %>
+                <span class="font-body text-body-sm"><%= l(collection.released_on, format: :long) %></span>
+              <% end %>
             <% end %>
-            <% if collection.released_on %>
-              <span class="font-body text-body-sm"><%= l(collection.released_on, format: :long) %></span>
+
+            <%# Brand motif: tripled/stacked 13px, see the .sprite-stack
+                comment in application.tailwind.css. Sized/positioned here
+                (not in the shared class) since that's specific to sitting
+                right-aligned across this card's three label lines without
+                changing the card's own size. %>
+            <% if sprite %>
+              <div class="sprite-stack top-1/2 right-5 -translate-y-1/2 w-10 h-10" aria-hidden="true">
+                <% 3.times do %>
+                  <%= image_tag "collections/#{sprite[:file]}", class: "sprite-stack__layer", alt: "" %>
+                <% end %>
+              </div>
             <% end %>
+          </div>
+
+          <% if sprite %>
+            <p class="mt-1.5 px-1 text-body-xs text-gray-500 dark:text-sand">
+              <%= t("storefront.collections.sprite_credit") %>
+              <% if sprite[:credit_url] %>
+                <%= link_to sprite[:credit_name], sprite[:credit_url], class: "text-accent-blue cursor-pointer hover:underline", target: "_blank", rel: "noopener" %>
+              <% else %>
+                <%= sprite[:credit_name] %>
+              <% end %>
+            </p>
           <% end %>
         </li>
       <% end %>

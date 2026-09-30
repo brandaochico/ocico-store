@@ -49,5 +49,10 @@ app/assets/builds/solidus_admin/
 # in that directory for how to place it.
 /app/assets/fonts/vintage/*.ttf
 
+# Per-collection sprite art (official and fan-made Pokémon franchise images,
+# no redistribution licence) — see the README in that directory for sources
+# and how to restore them locally.
+/app/assets/images/collections/*.png
+
 # Python bytecode cache from script/fonts/*.py.
 __pycache__/

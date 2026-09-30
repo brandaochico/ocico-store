@@ -31,3 +31,4 @@
     collections:
       title: "Todas as coleções"
       empty: "Nenhuma coleção cadastrada."
+      sprite_credit: "Sprite:"

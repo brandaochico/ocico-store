@@ -485,4 +485,35 @@
   .login-or-guest > .grid-container {
     @apply grid-cols-none;
   }
+
+  /* Brand graphic motif (see visual identity memory): any logo/banner-style
+     graphic is tripled and stacked, offset 13px on both axes — first real
+     use of it is the per-collection sprite on /colecoes. The outline itself
+     is baked into each sprite file (script/collections/add_sprite_outline.py),
+     not drawn here; this class only does the stacking + per-layer shadow.
+     Sized/positioned per use (see collections/index.html.erb) — this only
+     holds the parts that don't change between uses. image-rendering:pixelated
+     keeps pixel art crisp when the browser scales these sprites up from
+     their tiny native size instead of blurring them. */
+  .sprite-stack {
+    @apply absolute pointer-events-none;
+  }
+  .sprite-stack__layer {
+    @apply absolute inset-0 w-full h-full;
+    image-rendering: pixelated;
+    filter: drop-shadow(0 2px 3px rgb(21 20 19 / 0.25));
+  }
+  .sprite-stack__layer:nth-child(1) {
+    z-index: 1;
+  }
+  .sprite-stack__layer:nth-child(2) {
+    z-index: 2;
+    top: 13px;
+    left: 13px;
+  }
+  .sprite-stack__layer:nth-child(3) {
+    z-index: 3;
+    top: 26px;
+    left: 26px;
+  }
 }
