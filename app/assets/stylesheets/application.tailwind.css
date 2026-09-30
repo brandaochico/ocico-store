@@ -285,7 +285,15 @@
 
   .shop-header__content {
     @apply relative;
-    z-index: 10;
+    /* position + z-index together make this a stacking context, which traps
+       the mobile categories drawer's own z-40 (shared/navigation/_header,
+       the <nav data-drawer-target>) — z-index only competes against siblings
+       within the same context, so no z-index on the drawer itself could ever
+       outrank the page-level #overlay div (z-30, storefront.html.erb)
+       otherwise. This context's OWN z-index has to clear the overlay's 30
+       instead, so the whole drawer paints (and hit-tests) above it rather
+       than the overlay silently winning clicks meant for the drawer. */
+    z-index: 50;
     padding-top: 4rem;
   }
 
