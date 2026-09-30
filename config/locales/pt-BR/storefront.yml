@@ -15,6 +15,9 @@
     search:
       see_all_results: "Ver todos os resultados"
       no_results: "Nenhum resultado"
+    filters:
+      title: "Filtros"
+      clear: "Limpar Filtros"
     navigation:
       open_menu: "Abrir menu principal"
       close_menu: "Fechar menu principal"

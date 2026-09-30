@@ -1,12 +1,8 @@
-<div class="products wrapper grid-container gap-7 mt-8 mb-20">
-  <aside class="col-span-full m-0 md:col-span-3 lg:col-span-2">
-    <% if "products" == params[:controller] && @taxon %>
-      <%= render 'shared/search/filters', taxon: @taxon %>
-    <% else %>
-        <%= render 'shared/search/filters', taxon: @taxon %>
-    <% end %>
-  </aside>
-  <section class="products_section col-span-full md:col-span-9 lg:col-span-10">
+<div class="products wrapper mt-8 mb-20">
+  <div class="mb-6">
+    <%= render 'shared/search/filters', taxon: @taxon %>
+  </div>
+  <section class="products_section">
     <% if params[:keywords] && @products.empty? %>
       <span class="font-heading text-h6 md:text-h5 lg:text-h3">
         <%= t('spree.no_products_found') %>

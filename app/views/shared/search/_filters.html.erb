@@ -1,13 +1,56 @@
 <% filters = applicable_filters_for(taxon) %>
 
 <% unless filters.empty? %>
-  <%= form_tag '', method: :get, id: 'sidebar_products_search', class: "mt-8" do %>
-    <%= hidden_field_tag 'per_page', params[:per_page] %>
+  <%# Collapsed by default on every device — nav-dropdown (shared/navigation/_main_nav)
+      already does exactly this (click to pin open, click outside/Esc to close), reused
+      here as-is rather than writing a second controller for the same behaviour. Hover
+      is deliberately not wired: it's fine for a nav link, but not for a panel with a
+      form and a scroll area inside it. %>
+  <div
+    class="relative inline-block"
+    data-controller="nav-dropdown"
+    data-action="click@window->nav-dropdown#closeOnOutsideClick keydown.esc@window->nav-dropdown#unpinAndClose"
+  >
+    <button
+      type="button"
+      class="flex items-center gap-x-2 font-sans-md cursor-pointer border border-gray-mid rounded-full px-5 py-2.5 hover:border-primary transition-colors duration-150"
+      aria-haspopup="true"
+      aria-expanded="false"
+      data-nav-dropdown-target="button"
+      data-action="nav-dropdown#toggle"
+    >
+      <%= t("storefront.filters.title") %>
+      <svg class="w-4 h-4 fill-current" aria-hidden="true">
+        <use xlink:href="<%= image_path('remixicon.symbol.svg') %>#ri-arrow-down-s-line"></use>
+      </svg>
+    </button>
 
-    <% filters.each do |filter| %>
-      <%= render(FilterComponent.new(filter: filter, search_params: params[:search])) %>
-    <% end %>
+    <%# Fixed height + its own scroll, not a menu that grows with the filter
+        list — a store with many option values (condition, rarity, etc.) would
+        otherwise push the search/clear buttons an unpredictable distance down,
+        or off-screen on short viewports. Clear/Buscar stay put; only the
+        filter list in the middle scrolls (min-h-0 is required for that: a
+        flex child won't shrink below its content's height without it). %>
+    <div
+      class="hidden absolute left-0 top-full z-20 mt-2 w-80 h-[26rem] flex flex-col rounded-xl bg-white shadow-lg"
+      data-nav-dropdown-target="menu"
+    >
+      <%= form_tag '', method: :get, id: 'sidebar_products_search', class: "flex flex-col h-full min-h-0" do %>
+        <%= hidden_field_tag 'per_page', params[:per_page] %>
 
-    <%= button_tag t("spree.search"), class: 'button-primary button-primary--full-width mt-6' %>
-  <% end %>
+        <%= link_to t("storefront.filters.clear"), request.path,
+              class: "shrink-0 px-4 pt-4 pb-3 text-left text-body-sm text-gray-500 cursor-pointer hover:text-gray-700 border-b border-gray-mid" %>
+
+        <div class="flex-1 min-h-0 overflow-y-auto px-4">
+          <% filters.each do |filter| %>
+            <%= render(FilterComponent.new(filter: filter, search_params: params[:search])) %>
+          <% end %>
+        </div>
+
+        <div class="shrink-0 p-4 border-t border-gray-mid">
+          <%= button_tag t("spree.search"), class: 'button-primary button-primary--full-width' %>
+        </div>
+      <% end %>
+    </div>
+  </div>
 <% end %>
