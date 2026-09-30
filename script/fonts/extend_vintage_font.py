@@ -169,7 +169,17 @@ def build_cedilla(f):
             getattr(pen, op)(*args)
     glyph = pen.glyph()
     glyph.recalcBounds(glyf)
-    return glyph, f["hmtx"]["cedilla"]
+    # The empty placeholder's hmtx entry (833, 0) has an lsb of 0, left over
+    # from having no outline at all. Left as-is, that lsb no longer matches
+    # this glyph's real xMin (216) — and fontTools' higher-level glyphset
+    # drawing API (used by build_letter below to read this glyph back out)
+    # trusts lsb over the stored outline, silently re-translating the whole
+    # contour by (lsb - xMin) to reconcile them. That shifted the cedilla
+    # tail under every letter it was composed onto. advance width is kept
+    # as-is (this glyph is only ever used as a mark, never advanced past on
+    # its own); only the lsb half of the pair needs to track xMin.
+    advance_width, _stale_lsb = f["hmtx"]["cedilla"]
+    return glyph, (advance_width, glyph.xMin)
 
 
 def build_letter(f, base_name, mark_name):
