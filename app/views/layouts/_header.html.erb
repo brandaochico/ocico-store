@@ -7,7 +7,8 @@
   <%# On lg the row switches from flex to the same 12-column grid the page
        content uses, so the logo can occupy the two columns the sidebar sits
        under and the nav starts exactly where the page title does. %>
-  <div class="col-span-full flex items-center justify-center max-h-[70px] lg:grid lg:grid-cols-12 lg:gap-7 lg:items-center">
+  <div class="col-span-full flex items-center justify-between max-h-[70px] lg:grid lg:grid-cols-12 lg:gap-7 lg:items-center">
+    <div class="flex items-center gap-x-3 lg:contents">
     <div class="flex items-center justify-center w-8 h-8 lg:py-2 lg:hidden">
       <button type="button" class="inline-flex flex-col gap-y-2 items-center p-2 w-10 h-10 justify-center rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500" aria-controls="navbar-default" aria-expanded="false" data-action="click->drawer#toggle">
         <span class="sr-only"><%= t("storefront.navigation.open_menu") %></span>
@@ -19,7 +20,7 @@
         </svg>
       </button>
     </div>
-      <%= link_to root_path, class: 'absolute lg:relative left-1/2 lg:left-0 lg:-translate-x-0 -translate-x-1/2 flex items-center space-x-3 lg:col-span-2' do %>
+      <%= link_to root_path, class: 'flex items-center space-x-3 lg:col-span-2' do %>
         <%# The badge behind the wordmark is opaque white in the artwork, so the
             logo reads on both themes without a dark variant. The source file was
             a 500x500 square whose artwork filled only the middle 41% of the
@@ -33,6 +34,7 @@
               height: 207,
               class: "h-10 w-auto lg:h-14" %>
       <% end %>
+    </div>
       <% navMobileClasses = '
         categories-menu bg-white
         fixed top-0 left-0 z-40 w-[80%] max-w-[400px] min-w-[270px] h-full
@@ -64,10 +66,11 @@
             ver app/helpers/main_navigation_helper.rb %>
         <%= render "shared/navigation/main_nav" %>
 
-        <div class="lg:hidden mt-auto">
-        <div class="flex justify-between">
+        <%# Language and theme live in the drawer on mobile, not the persistent
+            top row — kept off the header row itself; see shared/layouts/_top_bar. %>
+        <div class="lg:hidden mt-auto flex items-center justify-between">
+          <%= render "shared/navigation/locale_selector" %>
           <%= render "shared/navigation/theme_switcher" %>
-        </div>
         </div>
       </nav>
     <div class="lg:col-span-4 flex items-center justify-end">

@@ -1,7 +1,18 @@
 <div class="relative flex items-center" data-controller="top-bar">
-  <div class="flex items-center gap-x-6">
-    <%= render "shared/navigation/locale_selector" %>
+  <div class="flex items-center gap-x-4 lg:gap-x-6">
+    <div class="hidden lg:flex">
+      <%= render "shared/navigation/locale_selector" %>
+    </div>
+    <%# Full search input only fits from lg up — below that it's just an icon
+        that opens the categories drawer, where the mobile search input
+        already lives (rendered in shared/navigation/_header.html.erb). %>
     <%= render 'shared/search/search_bar', taxons: taxons, taxon: taxon, :locals => { :additional_classes => 'hidden lg:flex' } %>
+    <button type="button" class="flex items-center justify-center w-6 h-6 lg:hidden" title="<%= t('spree.search') %>" data-action="click->drawer#toggle">
+      <span class="sr-only"><%= t('spree.search') %></span>
+      <svg class='w-6 h-6 fill-black dark:fill-white'>
+        <use xlink:href="<%= image_path('remixicon.symbol.svg') %>#ri-search-2-line"></use>
+      </svg>
+    </button>
     <div class="hidden lg:flex">
       <%= render "shared/navigation/theme_switcher" %>
     </div>

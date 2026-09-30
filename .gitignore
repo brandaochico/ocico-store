@@ -48,3 +48,6 @@ app/assets/builds/solidus_admin/
 # committing the binary would be redistribution. Keep it local; see the README
 # in that directory for how to place it.
 /app/assets/fonts/vintage/*.ttf
+
+# Python bytecode cache from script/fonts/*.py.
+__pycache__/
