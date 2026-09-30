@@ -192,6 +192,97 @@
 }
 
 @layer components {
+  /* Shop-front header shell: a rounded, shadowed "object" that sits wider than
+     .wrapper's content width but never spans the full viewport, so it reads as
+     a storefront frame floating over the page background rather than a flat
+     bar. Only the top edge is dressed up as a striped awning; the header's
+     own body stays a plain off-white so the awning band reads as a distinct
+     piece attached above it. Split into three layers because the header's
+     own nav dropdowns (shared/navigation/_main_nav.html.erb) open with
+     `lg:absolute lg:top-full` and must be free to overflow below the header —
+     overflow:hidden lives on the __chrome background layer only, never on
+     .shop-header itself, or the dropdown panels would be clipped invisible.
+       .shop-header         position:relative + border-radius + box-shadow.
+                             No overflow rule, so descendants can overflow it.
+       .shop-header__chrome absolute inset-0, plain off-white fill. Also what
+                             clips the awning's corners into the rounded
+                             shape. z-index below the content.
+       .shop-header__awning the striped scalloped band, pinned to the top
+                             edge only.
+       .shop-header__content the actual logo/nav/search/cart, in normal flow,
+                              z-index above the chrome, padded down to clear
+                              the awning band. */
+  .shop-header {
+    @apply relative rounded-[1.75rem];
+    margin: 0.75rem 1rem 0;
+    box-shadow: 0 16px 32px -12px rgb(21 20 19 / 0.2);
+  }
+  @media (min-width: 768px) {
+    .shop-header {
+      @apply rounded-[2rem];
+      margin-inline: auto;
+      margin-top: 1.25rem;
+      /* `width` (not just `max-width`) so there's always a real inset from the
+         viewport edge — a bare max-width does nothing once the viewport is
+         narrower than it (e.g. 1440px was narrower than the old
+         breakpoint-2xl + 5rem ≈ 1466px cap, so the header silently filled
+         100% there with no visible margin at all). max-width still caps how
+         wide the header gets relative to .wrapper's 1386px content column on
+         very large screens. */
+      width: calc(100% - 2rem);
+      max-width: calc(var(--breakpoint-2xl) + 2rem);
+    }
+  }
+
+  .shop-header__chrome {
+    @apply absolute inset-0 overflow-hidden bg-sand dark:bg-black;
+    z-index: 0;
+    border-radius: inherit;
+  }
+
+  /* Each mask tile is one full stripe width (8rem = the repeating-gradient's
+     one primary stripe + one white stripe — white rather than the chrome's
+     own off-white background, so both colors of scallop stay visible against
+     it instead of one blending away). Wide tiles so each scallop reads as a
+     broad rounded dome rather than a tall stretched spike now that the band
+     itself is fairly tall (45% of the header). Each tile's opaque area is the
+     lower half of an ellipse centered at the tile's TOP-middle, sized 4rem
+     (half the stripe width) horizontally and 100% of the band's own height
+     vertically: full width at y=0, narrowing to a point at y=100%. That draws
+     a hanging scallop (dome shape) rather than a bite taken out of one —
+     adjacent tiles' domes meet exactly at each shared seam, and the dome
+     stretches to fill whatever height the band is given (an ellipse rather
+     than a circle, since the band's height is a % of the header and so isn't
+     known up front). The mask tiles independently of the header's width, so
+     this never needs a fixed-size image asset regardless of viewport.
+     filter: drop-shadow (not box-shadow) because box-shadow follows the
+     element's rectangular border box, ignoring the mask — it would draw a
+     shadow behind the transparent notches between scallops. drop-shadow
+     follows the actual masked (scalloped) silhouette. */
+  .shop-header__awning {
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 45%;
+    background-image: repeating-linear-gradient(
+      90deg,
+      var(--color-primary) 0 8rem,
+      var(--color-white) 8rem 16rem
+    );
+    -webkit-mask-image: radial-gradient(ellipse 4rem 100% at 4rem top, black 98%, transparent 100%);
+    mask-image: radial-gradient(ellipse 4rem 100% at 4rem top, black 98%, transparent 100%);
+    -webkit-mask-size: 8rem 100%;
+    mask-size: 8rem 100%;
+    -webkit-mask-repeat: repeat-x;
+    mask-repeat: repeat-x;
+    filter: drop-shadow(0 3px 4px rgb(21 20 19 / 0.12));
+  }
+
+  .shop-header__content {
+    @apply relative;
+    z-index: 10;
+    padding-top: 4rem;
+  }
+
   .wrapper {
     @apply my-0 mx-auto py-0 px-5;
     @apply md:px-6 md:max-w-screen-2xl 2xl:px-0;
