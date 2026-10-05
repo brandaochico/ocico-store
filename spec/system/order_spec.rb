@@ -27,7 +27,8 @@ RSpec.describe 'orders', type: :system do
 
     # Tests view spree/shared/_order_details
     within '.order-item__price-single' do
-      expect(page).to have_content "19.00"
+      # pt-BR currency format (rails-i18n): comma decimal separator.
+      expect(page).to have_content "19,00"
     end
   end
 

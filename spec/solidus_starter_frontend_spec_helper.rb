@@ -53,6 +53,12 @@ RSpec.configure do |config|
 
   config.before do
     ActiveJob::Base.queue_adapter = :test
+
+    # The app defaults to BR, but this suite (inherited from Solidus) builds a
+    # US world: factories default to US addresses, stock locations take
+    # Spree::Country.first, specs create the US country themselves. With BR as
+    # default, Spree::Country.default (a find_by!) raises on the address step.
+    stub_spree_preferences(default_country_iso: "US")
   end
 
   config.after(:suite) do
