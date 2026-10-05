@@ -12,6 +12,15 @@
       this_file_language: "Português (Brasil)"
   site:
     name: "ocico store"
+  # state_machines-activerecord ships these in English only, and because they
+  # live under activerecord.errors they win over rails-i18n's errors.messages —
+  # without them every "invalid" validation error renders in English.
+  activerecord:
+    errors:
+      messages:
+        invalid: "não é válido"
+        invalid_event: "não pode mudar de estado quando %{state}"
+        invalid_transition: "não pode mudar de estado via %{event}"
   common:
     save: "Salvar"
     cancel: "Cancelar"
