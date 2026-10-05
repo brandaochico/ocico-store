@@ -4,6 +4,7 @@ Rails.application.routes.draw do
     req.params["solidus_admin"] != "false"
   }
   mount SolidusStripe::Engine, at: "/solidus_stripe"
+  post "webhooks/mercado_pago", to: "mercado_pago_webhooks#create", as: :mercado_pago_webhooks
   scope(path: "/") { draw :storefront }
   # This line mounts Solidus's routes at the root of your application.
   #
