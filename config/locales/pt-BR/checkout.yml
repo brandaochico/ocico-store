@@ -2,6 +2,9 @@
 "pt-BR":
   checkout:
     covered_by_store_credit: "Seu pedido está totalmente coberto por crédito na loja; não é preciso outra forma de pagamento."
+    address:
+      cep_not_found: "CEP não encontrado. Confira o número ou preencha o endereço manualmente."
+      complement_placeholder: "Apto, bloco, sala… (opcional)"
     mercado_pago:
       pix:
         instructions: "Ao confirmar o pedido, você recebe um QR Code Pix. Ele vale por 4 horas, e até lá os itens ficam reservados para você."

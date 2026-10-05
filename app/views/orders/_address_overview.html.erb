@@ -16,15 +16,15 @@
     <% unless address.company.blank? %>
       <li><%= address.company %></li>
     <% end %>
-    <li><%= address.address1 %></li>
-    <% unless address.address2.blank? %>
-      <li><%= address.address2 %></li>
-    <% end %>
     <li>
-      <%= address.city %>
-      <%= address.state_text %>
-      <%= address.zipcode %>
+      <%= [address.address1, address.street_number].compact_blank.join(", ") %>
+      <% if address.address2.present? %>— <%= address.address2 %><% end %>
     </li>
+    <% if address.neighborhood.present? %>
+      <li><%= address.neighborhood %></li>
+    <% end %>
+    <li><%= [address.city, address.state_text].compact_blank.join(" - ") %></li>
+    <li><%= t('spree.zip') %> <%= address.zipcode %></li>
     <li><%= address.country.try(:name) %></li>
     <% unless address.phone.blank? %>
       <li>

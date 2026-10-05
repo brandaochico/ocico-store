@@ -1,12 +1,19 @@
 <%
   base_classes = 'flex flex-col gap-y-3 border-b-[1px] pb-6 border-b-gray-mid md:gap-y-6'
   classes = defined?(additional_classes) && additional_classes.present? ? "#{base_classes} #{additional_classes}" : base_classes
+  brazil = Spree::Country.find_by(iso: "BR")
 %>
 
-<div class="address-inputs <%= classes %>">
+<%# Brazilian field order: CEP first, so the lookup can fill street,
+    neighbourhood, city and state before the customer gets to them. %>
+<div class="address-inputs <%= classes %>"
+     data-controller="address-lookup"
+     data-address-lookup-brazil-id-value="<%= brazil&.id %>"
+     data-address-lookup-states-value="<%= (brazil ? brazil.states.pluck(:abbr, :id).to_h : {}).to_json %>"
+     data-address-lookup-not-found-value="<%= t("checkout.address.cep_not_found") %>">
   <div class="text-input">
     <%= form.label :name, "#{I18n.t("spree.name")}:" %>
-    <%= form.text_field :name, required: true, autofocus: true, autocomplete: "#{address_type} given-name" %>
+    <%= form.text_field :name, required: true, autofocus: true, autocomplete: "#{address_type} name" %>
   </div>
 
   <% if Spree::Config[:company] %>
@@ -16,36 +23,68 @@
     </div>
   <% end %>
 
+  <div class="select-input w-full">
+    <%= form.label :country_id, "#{I18n.t("spree.country")}:" %>
+
+    <%= form.collection_select(
+      :country_id,
+      available_countries,
+      :id,
+      :name,
+      {},
+      autocomplete: "#{address_type} country-name",
+      class: 'js-trigger-state-change w-full',
+      required: true,
+      "data-state-container": "##{address_type} .js-address-fields",
+      "data-address-lookup-target": "country",
+      "data-action": "change->address-lookup#countryChanged"
+    ) %>
+  </div>
+
+  <div class="text-input md:max-w-xs">
+    <%= form.label :zipcode, "#{I18n.t("spree.zip")}:" %>
+
+    <%= form.text_field :zipcode,
+      required: address.require_zipcode?,
+      autocomplete: "#{address_type} postal-code",
+      inputmode: "numeric",
+      "data-address-lookup-target": "zipcode",
+      "data-action": "input->address-lookup#zipcodeChanged"
+    %>
+    <p class="hidden text-body-xs text-red-600 dark:text-red-400" data-address-lookup-target="message" role="status"></p>
+  </div>
+
   <div class="text-input">
     <%= form.label :address1, "#{I18n.t("spree.street_address")}:" %>
-    <%= form.text_field :address1, required: true, autocomplete: "#{address_type} address-line1" %>
-  </div>
-
-  <div class="text-input">
-    <%= form.label :address2, "#{I18n.t("spree.street_address_2")}:" %>
-    <%= form.text_field :address2, autocomplete: "#{address_type} address-line2" %>
-  </div>
-
-  <div class="text-input">
-    <%= form.label :city, "#{I18n.t("spree.city")}:" %>
-    <%= form.text_field :city, required: true, autocomplete: "#{address_type} address-level2" %>
+    <%= form.text_field :address1, required: true, autocomplete: "#{address_type} address-line1",
+          "data-address-lookup-target": "street" %>
   </div>
 
   <div class="flex flex-col gap-3 md:gap-6 md:flex-row">
-    <div class="select-input w-full">
-      <%= form.label :country_id, "#{I18n.t("spree.country")}:" %>
+    <div class="text-input md:w-40 md:shrink-0">
+      <%= form.label :street_number, "#{Spree::Address.human_attribute_name(:street_number)}:" %>
+      <%= form.text_field :street_number, autocomplete: "off",
+            "data-address-lookup-target": "number" %>
+    </div>
 
-      <%= form.collection_select(
-        :country_id,
-        available_countries,
-        :id,
-        :name,
-        {},
-        autocomplete: "#{address_type} country-name",
-        class: 'js-trigger-state-change w-full',
-        required: true,
-        "data-state-container": "##{address_type} .js-address-fields"
-      ) %>
+    <div class="text-input w-full">
+      <%= form.label :address2, "#{I18n.t("spree.street_address_2")}:" %>
+      <%= form.text_field :address2, autocomplete: "#{address_type} address-line2",
+            placeholder: t("checkout.address.complement_placeholder") %>
+    </div>
+  </div>
+
+  <div class="text-input">
+    <%= form.label :neighborhood, "#{Spree::Address.human_attribute_name(:neighborhood)}:" %>
+    <%= form.text_field :neighborhood, autocomplete: "#{address_type} address-level3",
+          "data-address-lookup-target": "neighborhood" %>
+  </div>
+
+  <div class="flex flex-col gap-3 md:gap-6 md:flex-row">
+    <div class="text-input w-full">
+      <%= form.label :city, "#{I18n.t("spree.city")}:" %>
+      <%= form.text_field :city, required: true, autocomplete: "#{address_type} address-level2",
+            "data-address-lookup-target": "city" %>
     </div>
 
     <% if Spree::Config[:address_requires_state] %>
@@ -64,7 +103,8 @@
             autocomplete: "#{address_type} address-level1",
             class: 'required w-full',
             disabled: !have_states,
-            required: false
+            required: false,
+            "data-address-lookup-target": "state"
           ) %>
         </div>
 
@@ -85,15 +125,6 @@
         ) %>
       </noscript>
     <% end %>
-  </div>
-
-  <div class="text-input">
-    <%= form.label :zipcode, "#{I18n.t("spree.zip")}:" %>
-
-    <%= form.text_field :zipcode,
-      required: address.require_zipcode?,
-      autocomplete: "#{address_type} postal-code"
-    %>
   </div>
 
   <div class="text-input">

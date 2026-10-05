@@ -1,0 +1,58 @@
+<fieldset class="<%= stimulus_id %>"
+  data-controller="<%= stimulus_id %>"
+  <%= :disabled if @disabled %>
+>
+  <div class="<%= stimulus_id %>--address-form flex flex-wrap gap-4 pb-4">
+    <%= render component("ui/forms/field").text_field(@name, :name, object: @address) %>
+    <%= render component("ui/forms/field").text_field(@name, :address1, object: @address) %>
+    <div class="flex gap-4 w-full">
+      <%= render component("ui/forms/field").text_field(@name, :street_number, object: @address) %>
+      <%= render component("ui/forms/field").text_field(@name, :address2, object: @address) %>
+    </div>
+    <%= render component("ui/forms/field").text_field(@name, :neighborhood, object: @address) %>
+    <div class="flex gap-4 w-full">
+      <%= render component("ui/forms/field").text_field(@name, :city, object: @address) %>
+      <%= render component("ui/forms/field").text_field(@name, :zipcode, object: @address) %>
+    </div>
+
+    <%= render component("ui/forms/field").select(
+      @name,
+      :country_id,
+      Spree::Country.all.map { |c| [c.name, c.id] },
+      object: @address,
+      value: @address.try(:country_id),
+      "data-#{stimulus_id}-target": "country",
+      "data-action": "change->#{stimulus_id}#loadStates"
+    ) %>
+
+    <%= content_tag(:div,
+      data: { "#{stimulus_id}-target": "stateNameWrapper" },
+      class: (@address.country&.states&.empty? ? "flex flex-col gap-2 w-full" : "hidden flex flex-col gap-2 w-full")
+        ) do %>
+      <%= render component("ui/forms/field").text_field(
+        @name,
+        :state_name,
+        object: @address,
+        value: @address.try(:state_name),
+        "data-#{stimulus_id}-target": "stateName"
+      ) %>
+    <% end %>
+    <input autocomplete="off" type="hidden" name=<%= "#{@name}[state_id]" %>>
+
+    <%= content_tag(:div,
+      data: { "#{stimulus_id}-target": "stateWrapper" },
+      class: (@address.country&.states&.empty? ? "hidden flex flex-col gap-2 w-full" : "flex flex-col gap-2 w-full")
+        ) do %>
+      <%= render component("ui/forms/field").select(
+        @name,
+        :state_id,
+        state_options,
+        object: @address,
+        value: @address.try(:state_id),
+        "data-#{stimulus_id}-target": "state"
+      ) %>
+    <% end %>
+
+    <%= render component("ui/forms/field").text_field(@name, :phone,  object: @address) %>
+  </div>
+</fieldset>

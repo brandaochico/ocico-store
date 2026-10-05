@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_05_013849) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_05_025027) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -147,6 +147,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_05_013849) do
     t.string "vat_id"
     t.string "email"
     t.integer "reverse_charge_status", default: 0, null: false, comment: "Enum values: 0 = disabled, 1 = enabled, 2 = not_validated"
+    t.string "street_number"
+    t.string "neighborhood"
     t.index ["country_id"], name: "index_spree_addresses_on_country_id"
     t.index ["firstname"], name: "index_addresses_on_firstname"
     t.index ["lastname"], name: "index_addresses_on_lastname"

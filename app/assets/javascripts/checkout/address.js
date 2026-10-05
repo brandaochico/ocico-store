@@ -112,7 +112,9 @@ window.addEventListener('DOMContentLoaded', () => {
         inputs.forEach(input => input.setAttribute('disabled', true));
         selects.forEach(sel => sel.setAttribute('disabled', true));
       } else {
-        addressInputs.forEach(addressInput => addressInput.style.display = 'block');
+        // '' rather than 'block': the wrapper is a flex column, and 'block'
+        // collapsed its gaps.
+        addressInputs.forEach(addressInput => addressInput.style.display = '');
         inputs.forEach(input => input.removeAttribute('disabled'));
         selects.forEach(sel => sel.removeAttribute('disabled'));
         document.querySelector('#shipping .js-trigger-state-change').dispatchEvent(new Event('change'));

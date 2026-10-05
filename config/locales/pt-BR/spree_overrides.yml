@@ -82,7 +82,8 @@
     # Endereço — "zip" é o CEP, e "state" aqui é a unidade federativa, não um status
     name: "Nome"
     company: "Empresa"
-    street_address: "Endereço"
+    street_address: "Rua / Avenida"
+    street_address_2: "Complemento"
     city: "Cidade"
     state: "Estado"
     country: "País"
@@ -173,3 +174,40 @@
     models:
       solidus_stripe/payment_source: "Fonte de pagamento Stripe"
       solidus_stripe/payment_method: "Forma de pagamento Stripe"
+    attributes:
+      # street_number/neighborhood are our own columns (app/overrides/brazilian_address.rb);
+      # the rest are Solidus' — used in validation messages and both admins' labels.
+      spree/address:
+        name: "Nome"
+        company: "Empresa"
+        address1: "Rua / Avenida"
+        address2: "Complemento"
+        street_number: "Número"
+        neighborhood: "Bairro"
+        city: "Cidade"
+        zipcode: "CEP"
+        state: "Estado"
+        state_name: "Estado"
+        country: "País"
+        phone: "Telefone"
+      # Errors from the order's nested addresses ("bill_address.street_number").
+      spree/order/bill_address:
+        name: "Nome (endereço de cobrança)"
+        address1: "Rua / Avenida (endereço de cobrança)"
+        street_number: "Número (endereço de cobrança)"
+        neighborhood: "Bairro (endereço de cobrança)"
+        city: "Cidade (endereço de cobrança)"
+        zipcode: "CEP (endereço de cobrança)"
+        state: "Estado (endereço de cobrança)"
+        country: "País (endereço de cobrança)"
+        phone: "Telefone (endereço de cobrança)"
+      spree/order/ship_address:
+        name: "Nome (endereço de entrega)"
+        address1: "Rua / Avenida (endereço de entrega)"
+        street_number: "Número (endereço de entrega)"
+        neighborhood: "Bairro (endereço de entrega)"
+        city: "Cidade (endereço de entrega)"
+        zipcode: "CEP (endereço de entrega)"
+        state: "Estado (endereço de entrega)"
+        country: "País (endereço de entrega)"
+        phone: "Telefone (endereço de entrega)"
