@@ -1,0 +1,32 @@
+<% source = payment.source %>
+
+<div class="flex flex-col gap-y-3">
+  <span><%= payment.payment_method.name %></span>
+
+  <% if payment.completed? %>
+    <p class="font-body text-body-sm"><%= t("checkout.mercado_pago.paid") %></p>
+  <% elsif payment.pending? && source&.charge_created? %>
+    <div class="flex max-w-md flex-col gap-y-4 rounded-xl border border-gray-mid bg-white p-5 text-black dark:border-gray-600 dark:bg-black dark:text-sand">
+      <h4 class="font-heading text-h6"><%= t("checkout.mercado_pago.boleto.title") %></h4>
+
+      <% if source.digitable_line.present? %>
+        <%= render "orders/payment_info/mercado_pago/copy_field",
+              label: t("checkout.mercado_pago.boleto.digitable_line_label"), value: source.digitable_line %>
+      <% end %>
+
+      <% if source.ticket_url.present? %>
+        <%= link_to t("checkout.mercado_pago.boleto.open"), source.ticket_url,
+              class: "button-primary self-start", target: "_blank", rel: "noopener" %>
+      <% end %>
+
+      <% if source.expires_at %>
+        <p class="font-ui text-body-xs text-gray-500 dark:text-sand">
+          <%= t("checkout.mercado_pago.boleto.due_on", date: l(source.expires_at.to_date, format: :long)) %>
+        </p>
+      <% end %>
+      <p class="font-body text-body-sm"><%= t("checkout.mercado_pago.awaiting_payment") %></p>
+    </div>
+  <% else %>
+    <p class="font-body text-body-sm"><%= t("checkout.mercado_pago.generated_on_confirm") %></p>
+  <% end %>
+</div>

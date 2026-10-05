@@ -1,0 +1,35 @@
+<% source = payment.source %>
+
+<fieldset data-hook="mercado_pago">
+  <legend align="center"><%= payment.payment_method.name %></legend>
+
+  <% if source&.charge_created? %>
+    <dl>
+      <dt><%= t("admin.mercado_pago.order_id") %>:</dt>
+      <dd><%= source.mp_order_id %></dd>
+
+      <dt><%= t("admin.mercado_pago.payment_id") %>:</dt>
+      <dd><%= source.mp_payment_id %></dd>
+
+      <% if source.payer_document.present? %>
+        <dt><%= t("admin.mercado_pago.payer_document") %>:</dt>
+        <dd><%= source.payer_document %></dd>
+      <% end %>
+
+      <% if source.expires_at %>
+        <dt><%= t("admin.mercado_pago.expires_at") %>:</dt>
+        <dd><%= l(source.expires_at, format: :long) %></dd>
+      <% end %>
+
+      <% if source.ticket_url.present? %>
+        <dt><%= t("admin.mercado_pago.ticket") %>:</dt>
+        <dd><%= link_to t("admin.mercado_pago.open_ticket"), source.ticket_url, target: "_blank", rel: "noopener" %></dd>
+      <% end %>
+
+      <dt><%= t("spree.status") %>:</dt>
+      <dd><span class="pill pill-<%= payment.state %>"><%= t(payment.state, scope: "spree.payment_states") %></span></dd>
+    </dl>
+  <% else %>
+    <p><%= t("admin.mercado_pago.not_created") %></p>
+  <% end %>
+</fieldset>

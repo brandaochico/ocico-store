@@ -3,4 +3,12 @@
 # via solidus_backend/solidus_admin — override specific keys under spree_overrides.yml
 # only when we need to change gem-owned copy, not here.
 "pt-BR":
-  admin: {}
+  admin:
+    mercado_pago:
+      order_id: "Order no Mercado Pago"
+      payment_id: "Pagamento no Mercado Pago"
+      payer_document: "CPF/CNPJ do pagador"
+      expires_at: "Vencimento"
+      ticket: "Página de pagamento"
+      open_ticket: "Abrir"
+      not_created: "Cobrança ainda não criada."

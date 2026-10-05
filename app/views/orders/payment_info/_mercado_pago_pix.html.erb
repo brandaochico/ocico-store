@@ -1,0 +1,32 @@
+<% source = payment.source %>
+
+<div class="flex flex-col gap-y-3">
+  <span><%= payment.payment_method.name %></span>
+
+  <% if payment.completed? %>
+    <p class="font-body text-body-sm"><%= t("checkout.mercado_pago.paid") %></p>
+  <% elsif payment.pending? && source&.charge_created? %>
+    <div class="flex max-w-md flex-col gap-y-4 rounded-xl border border-gray-mid bg-white p-5 text-black dark:border-gray-600 dark:bg-black dark:text-sand">
+      <h4 class="font-heading text-h6"><%= t("checkout.mercado_pago.pix.title") %></h4>
+      <p class="font-body text-body-sm"><%= t("checkout.mercado_pago.pix.scan") %></p>
+
+      <% if source.qr_code_base64.present? %>
+        <%= image_tag "data:image/png;base64,#{source.qr_code_base64}",
+              alt: t("checkout.mercado_pago.pix.qr_code_alt"),
+              class: "mx-auto h-56 w-56 rounded bg-white p-2" %>
+      <% end %>
+
+      <%= render "orders/payment_info/mercado_pago/copy_field",
+            label: t("checkout.mercado_pago.pix.code_label"), value: source.qr_code %>
+
+      <% if source.expires_at %>
+        <p class="font-ui text-body-xs text-gray-500 dark:text-sand">
+          <%= t("checkout.mercado_pago.pix.valid_until", time: l(source.expires_at, format: :short)) %>
+        </p>
+      <% end %>
+      <p class="font-body text-body-sm"><%= t("checkout.mercado_pago.awaiting_payment") %></p>
+    </div>
+  <% else %>
+    <p class="font-body text-body-sm"><%= t("checkout.mercado_pago.generated_on_confirm") %></p>
+  <% end %>
+</div>

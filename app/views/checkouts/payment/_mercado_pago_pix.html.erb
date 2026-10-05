@@ -1,0 +1,7 @@
+<div class="flex flex-col gap-y-3 font-body text-body-sm">
+  <p><%= t("checkout.mercado_pago.pix.instructions") %></p>
+
+  <%# Empty, but it's what makes Spree build the payment source the QR code is
+      stored on (Spree only builds one when source attributes are posted). %>
+  <%= hidden_field_tag "payment_source[#{payment_method.id}][payer_document]", "" %>
+</div>

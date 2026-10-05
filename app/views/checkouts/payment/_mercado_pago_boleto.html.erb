@@ -1,0 +1,19 @@
+<% field_id = "mercado_pago_payer_document_#{payment_method.id}" %>
+
+<div class="flex w-full flex-col gap-y-4 font-body text-body-sm">
+  <p><%= t("checkout.mercado_pago.boleto.instructions") %></p>
+
+  <div class="text-input w-full md:max-w-xs">
+    <%= label_tag field_id, "#{t("checkout.mercado_pago.boleto.document_label")}:" %>
+    <%= text_field_tag(
+      "payment_source[#{payment_method.id}][payer_document]",
+      nil,
+      id: field_id,
+      required: true,
+      inputmode: "numeric",
+      autocomplete: "off",
+      maxlength: 18,
+      placeholder: "000.000.000-00"
+    ) %>
+  </div>
+</div>

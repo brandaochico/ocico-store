@@ -1,0 +1,13 @@
+<div class="flex flex-col gap-y-1" data-controller="clipboard"
+     data-clipboard-copied-label-value="<%= t("checkout.mercado_pago.copied") %>">
+  <span class="font-ui text-body-xs text-gray-500 dark:text-sand"><%= label %></span>
+  <div class="flex items-stretch gap-x-2">
+    <input type="text" readonly value="<%= value %>" aria-label="<%= label %>"
+           class="min-w-0 flex-1 truncate rounded border border-gray-mid bg-white px-3 py-2 font-ui text-body-xs text-black dark:border-gray-600 dark:bg-gray-800 dark:text-sand"
+           data-clipboard-target="source">
+    <button type="button" class="button-primary shrink-0 cursor-pointer px-4"
+            data-clipboard-target="button" data-action="clipboard#copy">
+      <%= t("checkout.mercado_pago.copy") %>
+    </button>
+  </div>
+</div>

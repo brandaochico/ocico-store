@@ -2,3 +2,30 @@
 "pt-BR":
   checkout:
     covered_by_store_credit: "Seu pedido está totalmente coberto por crédito na loja; não é preciso outra forma de pagamento."
+    mercado_pago:
+      pix:
+        instructions: "Ao confirmar o pedido, você recebe um QR Code Pix. Ele vale por 4 horas, e até lá os itens ficam reservados para você."
+        title: "Pague com Pix"
+        scan: "Escaneie o QR Code com o app do seu banco, ou copie o código Pix abaixo."
+        qr_code_alt: "QR Code Pix do pedido"
+        code_label: "Pix Copia e Cola"
+        valid_until: "Válido até %{time}."
+      boleto:
+        instructions: "Ao confirmar o pedido, você poderá ver e imprimir o boleto. Ele vence em 3 dias, e o pagamento leva até 2 dias úteis para ser confirmado."
+        document_label: "CPF ou CNPJ do pagador"
+        title: "Pague o boleto"
+        digitable_line_label: "Linha digitável"
+        due_on: "Vence em %{date}."
+        open: "Ver ou imprimir boleto"
+      copy: "Copiar"
+      copied: "Copiado!"
+      generated_on_confirm: "O código para pagamento é gerado assim que você confirmar o pedido."
+      awaiting_payment: "Assim que o pagamento for confirmado, começamos a preparar seu pedido."
+      paid: "Pagamento confirmado."
+
+  activerecord:
+    models:
+      mercado_pago/payment_source: "Pagamento Mercado Pago"
+    attributes:
+      mercado_pago/payment_source:
+        payer_document: "CPF/CNPJ"
