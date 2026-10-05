@@ -80,6 +80,7 @@ group :test do
   gem "selenium-webdriver"
   gem "capybara-screenshot", "~> 1.0"
   gem "database_cleaner", "~> 2.0"
+  gem "webmock"
 end
 
 group :development, :test do
