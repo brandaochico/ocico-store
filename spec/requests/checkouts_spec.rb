@@ -349,6 +349,10 @@ RSpec.describe 'Checkouts', type: :request, with_signed_in_user: true do
         let(:order_update_attributes) { instance_double(Spree::OrderUpdateAttributes, apply: true) }
 
         before do
+          # Rendering the address step builds a blank address in the default
+          # country (Spree::Country.default is a find_by!). Seeds create it
+          # everywhere else; the test database only has what factories made.
+          create(:country, iso: Spree::Config.default_country_iso)
           order.update(state: 'address', ship_address: nil, bill_address: nil)
           allow(Spree::OrderUpdateAttributes).to receive(:new) { order_update_attributes }
         end

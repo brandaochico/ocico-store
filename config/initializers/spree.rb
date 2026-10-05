@@ -9,6 +9,9 @@ Spree.config do |config|
   # Default currency for new sites
   config.currency = "BRL"
 
+  # Pre-selected country in address forms.
+  config.default_country_iso = "BR"
+
   # Uncomment to stop tracking inventory levels in the application
   # config.track_inventory_levels = false
 

@@ -11,6 +11,7 @@ Spree::Core::Engine.load_seed
 Spree::Auth::Engine.load_seed
 
 load Rails.root.join("db/seeds/catalog.rb")
+load Rails.root.join("db/seeds/shipping.rb")
 
 # Creates the Spree::RefundReason that solidus_stripe attributes its refunds to.
 SolidusStripe::Engine.load_seed
