@@ -87,6 +87,32 @@ sample products are real cards from them and remapping them would mean
 inventing card numbers. **All of that last group is demo data** and goes
 together when a real catalog import lands.
 
+## Brazilian addresses
+
+Solidus' address is two free-form lines; Brazilian addresses (and Correios,
+Boleto, Melhor Envio) want street, **number** and **neighbourhood (bairro)**
+separately, plus an 8-digit **CEP**. So `spree_addresses` gained
+`street_number` and `neighborhood`; `address1` is the street, `address2` the
+optional complement.
+
+- Rules live in `app/overrides/brazilian_address.rb` and apply to **BR
+  addresses only**: number and neighbourhood required, CEP normalised to
+  `00000-000` and validated. Other countries keep Solidus' stock rules — the
+  inherited spec suite (and Solidus' factories) build US addresses.
+  Its callbacks are registered by method name on purpose: **deface loads every
+  file in `app/overrides` a second time**, and only symbol callbacks are
+  deduplicated (`validates ...` would register each rule twice).
+- Checkout form (`checkouts/steps/address_step/_address_inputs`) follows the
+  Brazilian order with CEP first; `address_lookup_controller.js` masks it and
+  fills street/neighbourhood/city/state from ViaCEP (called from the browser;
+  on failure the customer just types).
+- Both admins' address forms carry the two fields: the classic admin through
+  copies of `spree/admin/shared/_address_form` / `_address` in `app/views`,
+  solidus_admin through `OcicoAdmin::AddressFormComponent` registered in
+  `config/initializers/solidus_admin.rb`. Re-check both copies when bumping
+  solidus_backend/solidus_admin.
+- Permitted params: `config/initializers/brazilian_address.rb`.
+
 ## Storefront navigation
 
 The header carries four entries, and the search sidebar the same three
@@ -167,11 +193,11 @@ reconcile in Fase 4's cash-flow report.
   falls back to a refund). Refunds use `POST /v1/orders/:id/refund` with an
   explicit amount, so partial refunds work. All of the above was exercised
   against the real sandbox, not only stubs.
-- **Boleto needs a split street/number/neighbourhood address**, which
-  Solidus' two free-form lines don't have: the number is parsed from
-  "Rua X, 123" in line 1 (else `S/N`), line 2 is sent as the neighbourhood
-  (else `-`). Mercado Pago accepts that; a proper Brazilian address form (CEP,
-  número, bairro) would fix it and Fase 3's Melhor Envio will want one anyway.
+- **Boleto needs a split street/number/neighbourhood address** — sent from
+  the address's own `street_number`/`neighborhood` columns (see "Brazilian
+  addresses"). Addresses saved before those existed fall back to parsing
+  "Rua X, 123" from line 1 (else `S/N`) and line 2 as the neighbourhood (else
+  `-`); Mercado Pago accepts that.
 
 ### Done
 
