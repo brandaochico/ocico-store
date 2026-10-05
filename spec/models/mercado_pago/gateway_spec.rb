@@ -74,12 +74,16 @@ RSpec.describe MercadoPago::Gateway do
       let(:method_kind) { :boleto }
       let(:document) { "529.982.247-25" }
 
+      # Spree addresses are immutable — a changed address is a new record.
       before do
-        # Spree addresses are immutable — a changed address is a new record.
-        order.update!(bill_address: create(:address, name: "Ana Maria Silva", address1: "Av. Paulista, 1000", address2: "Bela Vista"))
+        order.update!(bill_address: create(
+          :address, country_iso_code: "BR", state_code: "SP", name: "Ana Maria Silva",
+                    address1: "Av. Paulista", street_number: "1000", address2: "Apto 5",
+                    neighborhood: "Bela Vista", city: "São Paulo", zipcode: "01310100"
+        ))
       end
 
-      it "sends the payer's CPF and address, and keeps the boleto line" do
+      it "sends the payer's CPF and the address's own number and neighbourhood fields" do
         payment.process!
 
         expect(
@@ -88,24 +92,41 @@ RSpec.describe MercadoPago::Gateway do
 
             payer["first_name"] == "Ana" && payer["last_name"] == "Maria Silva" &&
               payer["identification"] == { "type" => "CPF", "number" => "52998224725" } &&
-              payer["address"].slice("street_name", "street_number", "neighborhood") ==
-                { "street_name" => "Av. Paulista", "street_number" => "1000", "neighborhood" => "Bela Vista" }
+              payer["address"] == {
+                "zip_code" => "01310100", "street_name" => "Av. Paulista", "street_number" => "1000",
+                "neighborhood" => "Bela Vista", "city" => "São Paulo", "state" => "SP"
+              }
           end
         ).to have_been_made
         expect(source.reload.digitable_line).to eq("23793380296060104310602006333302615920000005000")
       end
 
-      it "falls back to S/N when the street line has no number" do
-        order.update!(bill_address: create(:address, address1: "Rua sem número", address2: nil))
+      context "with an address saved before number/neighbourhood had columns" do
+        it "reads the number from line 1 and the neighbourhood from line 2" do
+          order.update!(bill_address: create(:address, address1: "Av. Paulista, 1000", address2: "Bela Vista"))
 
-        payment.process!
+          payment.process!
 
-        expect(
-          a_request(:post, orders_url).with do |request|
-            JSON.parse(request.body).dig("payer", "address").slice("street_number", "neighborhood") ==
-              { "street_number" => "S/N", "neighborhood" => "-" }
-          end
-        ).to have_been_made
+          expect(
+            a_request(:post, orders_url).with do |request|
+              JSON.parse(request.body).dig("payer", "address").slice("street_name", "street_number", "neighborhood") ==
+                { "street_name" => "Av. Paulista", "street_number" => "1000", "neighborhood" => "Bela Vista" }
+            end
+          ).to have_been_made
+        end
+
+        it "falls back to S/N and '-' when there's nothing to read" do
+          order.update!(bill_address: create(:address, address1: "Rua sem número", address2: nil))
+
+          payment.process!
+
+          expect(
+            a_request(:post, orders_url).with do |request|
+              JSON.parse(request.body).dig("payer", "address").slice("street_number", "neighborhood") ==
+                { "street_number" => "S/N", "neighborhood" => "-" }
+            end
+          ).to have_been_made
+        end
       end
     end
 

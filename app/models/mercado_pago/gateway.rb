@@ -105,23 +105,33 @@ module MercadoPago
         }
       end
 
-      payer[:address] = boleto_address(address) if source.boleto?
+      payer[:address] = boleto_address(options) if source.boleto?
       payer
     end
 
-    # Boleto requires a split street/number/neighbourhood address, which
-    # Solidus' two free-form lines don't have. Best effort until the checkout
-    # collects a proper Brazilian address.
-    def boleto_address(address)
-      street, number = address[:address1].to_s.split(/,\s*(?=\d)/, 2)
+    # Boleto requires street, number and neighbourhood separately. Those come
+    # from the bill address's own columns (app/overrides/brazilian_address.rb);
+    # ActiveMerchant's address hash in options doesn't carry them.
+    def boleto_address(options)
+      address = options.fetch(:originator).order.bill_address
+      street = address.address1.to_s.strip
+      number = address.street_number.presence
+      neighborhood = address.neighborhood.presence
+
+      # Addresses saved before those columns existed: number after a comma in
+      # line 1, neighbourhood in line 2.
+      unless number
+        street, number = street.split(/,\s*(?=\d)/, 2).map(&:strip)
+        neighborhood ||= address.address2.presence
+      end
 
       {
-        zip_code: address[:zip].to_s.gsub(/\D/, ""),
-        street_name: street.to_s.strip,
-        street_number: number.to_s.strip.presence || "S/N",
-        neighborhood: address[:address2].to_s.strip.presence || "-",
-        city: address[:city],
-        state: address[:state]
+        zip_code: address.zipcode.to_s.gsub(/\D/, ""),
+        street_name: street,
+        street_number: number.presence || "S/N",
+        neighborhood: neighborhood || "-",
+        city: address.city,
+        state: address.state_text
       }
     end
 
