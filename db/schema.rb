@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_28_181045) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_05_013849) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -72,6 +72,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_28_181045) do
     t.index ["slug", "sluggable_type"], name: "index_friendly_id_slugs_on_slug_and_sluggable_type"
     t.index ["sluggable_id"], name: "index_friendly_id_slugs_on_sluggable_id"
     t.index ["sluggable_type"], name: "index_friendly_id_slugs_on_sluggable_type"
+  end
+
+  create_table "mercado_pago_payment_sources", force: :cascade do |t|
+    t.bigint "payment_method_id"
+    t.string "payer_document"
+    t.string "mp_order_id"
+    t.string "mp_payment_id"
+    t.datetime "expires_at"
+    t.text "qr_code"
+    t.text "qr_code_base64"
+    t.string "ticket_url", limit: 1024
+    t.string "digitable_line"
+    t.string "barcode_content"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["mp_order_id"], name: "index_mercado_pago_payment_sources_on_mp_order_id", unique: true
+    t.index ["payment_method_id"], name: "index_mercado_pago_payment_sources_on_payment_method_id"
   end
 
   create_table "solidus_stripe_customers", force: :cascade do |t|
@@ -1299,6 +1316,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_28_181045) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "mercado_pago_payment_sources", "spree_payment_methods", column: "payment_method_id"
   add_foreign_key "solidus_stripe_customers", "spree_payment_methods", column: "payment_method_id"
   add_foreign_key "solidus_stripe_payment_intents", "spree_orders", column: "order_id"
   add_foreign_key "solidus_stripe_payment_intents", "spree_payment_methods", column: "payment_method_id"

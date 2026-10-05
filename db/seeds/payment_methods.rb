@@ -21,8 +21,48 @@ module OcicoStore
       "solidus_stripe_env_credentials"
     end
 
+    def mercado_pago_preference_source
+      "mercado_pago_env_credentials"
+    end
+
     def call
       seed_stripe
+      seed_mercado_pago
+    end
+
+    # Pix and Boleto go through Mercado Pago rather than Stripe: Stripe's Pix
+    # is invite-only for Brazilian accounts and its Boleto can't be refunded.
+    # Not offered in the admin's "new payment" form — an admin can't scan a QR
+    # code on the customer's behalf.
+    def seed_mercado_pago
+      unless mercado_pago_credentials_configured?
+        # rubocop:disable Rails/Output
+        puts "Skipping Pix/Boleto payment methods: no Mercado Pago credentials configured " \
+             "(set credentials.mercado_pago.access_token or MERCADOPAGO_ACCESS_TOKEN)."
+        # rubocop:enable Rails/Output
+        return
+      end
+
+      {
+        MercadoPago::PixPaymentMethod => [ "Pix", "Pagamento instantâneo via Pix, processado pelo Mercado Pago." ],
+        MercadoPago::BoletoPaymentMethod => [ "Boleto", "Boleto bancário, processado pelo Mercado Pago." ]
+      }.map do |klass, (name, description)|
+        payment_method = klass.find_or_initialize_by(name: name)
+        payment_method.update!(
+          description: description,
+          preference_source: mercado_pago_preference_source,
+          active: true,
+          available_to_users: true,
+          available_to_admin: false
+        )
+        payment_method
+      end
+    end
+
+    def mercado_pago_credentials_configured?
+      [ MercadoPago::PixPaymentMethod, MercadoPago::BoletoPaymentMethod ].all? do |klass|
+        Spree::Config.static_model_preferences.for_class(klass).key?(mercado_pago_preference_source)
+      end
     end
 
     def seed_stripe
