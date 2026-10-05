@@ -118,14 +118,60 @@ chaining two scopes onto one `joins(:taxons)` asks a single joined row to match
 two different taxons at once, so combining any two filters silently returned
 nothing — a failure that surfaces as "no products found" rather than an error.
 
-## Payment (Fase 2 — card flow in place, Pix/Boleto not started)
+## Payment (Fase 2 — cards on Stripe, Pix/Boleto on Mercado Pago)
 
-**Decision: start with `solidus_stripe` (official gem, Payment Intents) for
-cards, add Pix/Boleto on top.** Do *not* build a custom Pagar.me/Mercado Pago
-gateway from scratch first — that's real payment-handling code (idempotency,
-webhook signatures, partial refunds) written by agents with no Solidus
-reference implementation to pattern-match against, exactly the kind of code
-most likely to have expensive bugs (double charges, webhook races).
+**Decision: cards on `solidus_stripe` (official gem, Payment Intents); Pix and
+Boleto on Mercado Pago's Orders API.** Do *not* build a custom *card* gateway
+— that's real payment-handling code (authorize/capture, chargebacks, partial
+refunds) with no Solidus reference implementation to pattern-match against,
+exactly the kind of code most likely to have expensive bugs.
+
+**Why Pix/Boleto are not on Stripe** (changed from the original plan, which
+had them as Stripe subclasses): verified 2026-10, Stripe's Pix for Brazilian
+accounts is **invite-only and requires 60 days of processing history**, which
+doesn't fit a launch timeline; Stripe's Boleto **can't be refunded at all**;
+and neither supports manual capture. Pix/Boleto are also far simpler than
+cards — create a charge, wait for "paid", no capture, no chargeback — so the
+custom-gateway risk that argued for Stripe mostly doesn't apply to them.
+Mercado Pago was picked over Asaas/Efí/Pagar.me for: HMAC-signed webhooks,
+mandatory idempotency keys, partial Pix refunds, instant Pix settlement, CPF
+accepted, and a sandbox that simulates Pix approval. Cost: two providers to
+reconcile in Fase 4's cash-flow report.
+
+### Pix/Boleto — how it works (`app/models/mercado_pago/`)
+
+- `MercadoPago::PixPaymentMethod` / `BoletoPaymentMethod` are ordinary
+  `Spree::PaymentMethod` subclasses (registered and given their static
+  credentials in `config/initializers/mercado_pago.rb`, seeded by
+  `db/seeds/payment_methods.rb`, never offered in the admin's "new payment"
+  form). `auto_capture?` is hard-wired `false`.
+- **Completing the order creates the charge** (Spree's authorize step →
+  `MercadoPago::Gateway#authorize` → `POST /v1/orders`) and leaves the payment
+  **pending**, `payment_state: balance_due`. The QR code / boleto line is kept
+  on `MercadoPago::PaymentSource` and shown on the order page. The Spree
+  payment's `gateway_order_id` is the idempotency key, so a retried request
+  can't create a second charge.
+- **`MercadoPago::PaymentSynchronizer` is the only thing that moves money
+  state.** It reads the order from the API (never trusts a webhook body) and,
+  under a row lock on the still-pending payment: `processed` → capture event +
+  `complete!`; `expired`/`canceled`/`failed` → `failure!` and **cancel the
+  Spree order, which restocks it** (agreed: stock is held while a Pix/Boleto is
+  unpaid — Pix expires in 4h, `Gateway::PIX_EXPIRATION`; Boleto in 3 days). A
+  paid amount below the payment's amount leaves it pending and logs an error.
+- Triggered by the webhook (`POST /webhooks/mercado_pago`: HMAC check, then
+  enqueue `MercadoPago::SyncPaymentJob`, `critical` queue) and by
+  `MercadoPago::SyncPendingPaymentsJob` every 15 minutes in production
+  (`config/recurring.yml`) — a missed webhook delays a transition, never loses
+  it.
+- Void cancels the Mercado Pago order (only works while unpaid; Spree then
+  falls back to a refund). Refunds use `POST /v1/orders/:id/refund` with an
+  explicit amount, so partial refunds work. All of the above was exercised
+  against the real sandbox, not only stubs.
+- **Boleto needs a split street/number/neighbourhood address**, which
+  Solidus' two free-form lines don't have: the number is parsed from
+  "Rua X, 123" in line 1 (else `S/N`), line 2 is sent as the neighbourhood
+  (else `-`). Mercado Pago accepts that; a proper Brazilian address form (CEP,
+  número, bairro) would fix it and Fase 3's Melhor Envio will want one anyway.
 
 ### Done
 
@@ -189,20 +235,25 @@ Registering the endpoint with Stripe is still to do: production URL is
 
 ### Not started
 
-- Pix/Boleto: no ready-made partial in Solidus. Build additional subclasses
-  reusing the same gateway logic with different `payment_method_types` + their
-  own checkout partials — additive, doesn't touch `solidus_stripe` internals.
-  Note the pinned gem depends on `stripe ~> 8.0` (SDK from 2023); confirm that
-  SDK version can create Pix/Boleto intents before committing to the approach.
 - System specs for the full card checkout. No longer blocked: the browser
   driver works and the cart/checkout suite was rescued — what's missing is a
   spec that drives a Stripe payment, which needs test credentials.
-- **Revisit only if data justifies it:** if Pix/Boleto dominate volume (likely
-  in Brazil) and Stripe's BR fees become a real problem, consider a custom
-  Pagar.me/Mercado Pago gateway as a Fase 6+ initiative — don't build both
-  paths upfront.
+- Registering the Mercado Pago webhook (application panel → Webhooks, topic
+  "Order", URL `https://<domain>/webhooks/mercado_pago`) and putting the
+  generated secret in `MERCADOPAGO_WEBHOOK_SECRET` / credentials. Until then
+  every notification is rejected with a 401 and only the 15-minute sweep
+  syncs payments.
+- **Revisit only if data justifies it:** if Stripe's BR card fees become a
+  real problem, Mercado Pago can take cards too — the client, webhook and
+  sync are already in place.
 
 ## Freight (Fase 3 — not started)
+
+**Interim:** `db/seeds/shipping.rb` creates a "Brasil" zone with one flat-rate
+method, "Frete fixo (provisório)", R$20 — Solidus' sample data only had North
+America/EU zones, so a Brazilian address couldn't get past checkout's address
+step at all. `Spree::Config.default_country_iso` is `"BR"`. The Melhor Envio
+calculator below replaces the flat rate; delete it then.
 
 No maintained gem exists for Correios/Melhor Envio on current Solidus (the
 Spree-era ones are stale). **Start with Melhor Envio only** (aggregates
@@ -504,6 +555,21 @@ reasons — worth understanding before changing them:
   image variant styles. If image rendering 500s locally with an
   `ImageProcessing::Error` or a glibc version mismatch from `vips
   --version`, that's a system package problem, not application code.
+- **Mercado Pago sandbox uses `APP_USR-...` credentials, not `TEST-...`.**
+  The Orders API rejects the classic test credentials ("Test credentials are
+  not supported, use test users with production credentials"). Create a
+  *test seller account* in the application panel, log in as it, create an
+  application there, and use that application's **production** credentials —
+  they only move fake money. Order ids in sandbox start with `ORDTST`.
+  A payer first name of `APRO` makes a sandbox Pix approve itself within
+  seconds; the sandbox also rejects a payer email that belongs to a real
+  Mercado Pago account (`MERCADOPAGO_TEST_PAYER_EMAIL` overrides it — never
+  set it in production).
+- **Pix/Boleto payments don't sync by themselves in development.** Dev runs
+  Active Job's async adapter, so the 15-minute sweep (Solid Queue recurring,
+  production only) never runs, and the webhook needs a public URL. After
+  paying in the sandbox, sync by hand:
+  `bin/rails runner MercadoPago::SyncPendingPaymentsJob.perform_now`.
 
 ## Phase status
 
@@ -543,10 +609,14 @@ reasons — worth understanding before changing them:
   authorize-then-capture, webhook processing moved off the request into
   `ProcessStripeWebhookEventJob` with exactly-once delivery guaranteed by a
   unique index, request + job specs green.
+  Pix and Boleto via Mercado Pago (see "Payment"): charge on order
+  completion, QR code / boleto on the order page, HMAC-verified webhook +
+  15-minute sweep syncing payment state, stock released on expiry, partial
+  refunds — verified end to end against the sandbox.
   Left: real Stripe credentials (nothing can transact without them — see the
-  credentials gotcha), registering the webhook endpoint in the Stripe
-  dashboard, Pix/Boleto payment method subclasses, and an end-to-end checkout
-  system spec that actually pays with Stripe.
+  credentials gotcha), registering both webhook endpoints (Stripe dashboard,
+  Mercado Pago panel), and an end-to-end checkout system spec that actually
+  pays with Stripe.
 - ⬜ **Fase 3 — Freight & import duty.** Melhor Envio calculator,
   `ImportDutyRate` + calculator + adjustment, end-to-end order-total specs.
 - ⬜ **Fase 4 — Admin & monetary reporting.** Cash-flow dashboard, import duty

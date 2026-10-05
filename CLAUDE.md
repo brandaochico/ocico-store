@@ -35,6 +35,18 @@ SOLIDUS_STRIPE_API_KEY=sk_test_... SOLIDUS_STRIPE_PUBLISHABLE_KEY=pk_test_... \
 stripe listen --forward-to http://localhost:3000/solidus_stripe/test/webhooks   # local webhook delivery
 ```
 
+Pix and Boleto go through Mercado Pago and follow the same rule: no credentials, no payment method. Locally
+they live in a gitignored `.env` (`MERCADOPAGO_ACCESS_TOKEN`, `MERCADOPAGO_PUBLIC_KEY`, optionally
+`MERCADOPAGO_WEBHOOK_SECRET`) — nothing loads that file automatically, so export it into the shell that runs
+the app or the seed. Sandbox credentials are `APP_USR-...` from a test seller account, not `TEST-...` (see
+"Environment gotchas"):
+
+```
+set -a; . ./.env; set +a
+bin/rails db:seed                                               # creates the "Pix" and "Boleto" payment methods
+bin/rails runner MercadoPago::SyncPendingPaymentsJob.perform_now  # dev has no recurring jobs: sync by hand
+```
+
 Local dev also requires the `libvips` **system package** (not a gem) — Solidus's product image variant styles
 need it. If image rendering 500s with `ImageProcessing::Error`, check `vips --version` for a glibc mismatch
 before assuming it's an application bug.
