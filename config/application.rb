@@ -55,7 +55,9 @@ module OcicoStore
     # These settings can be overridden in specific environments using the files
     # in config/environments, which are processed later.
     #
-    # config.time_zone = "Central Time (US & Canada)"
+    # Every customer is in Brazil; times shown to them (Pix/Boleto expiry,
+    # order dates) must read in their clock, not UTC. Storage stays UTC.
+    config.time_zone = "Brasilia"
     # config.eager_load_paths << Rails.root.join("extras")
 
     # Don't generate system test files.
