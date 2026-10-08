@@ -1,8 +1,9 @@
 <%
   dl_classes = 'flex items-center justify-between p-3 [&>dd]:font-sans-md'
-  # Freight is only known once the delivery step is done: before that the
-  # summary shows the items' value, never a total that would leave freight out.
-  shipping_chosen = order.passed_checkout_step?("delivery") && order.shipments.any?
+  # Freight exists from the delivery step on (a rate is pre-selected there):
+  # on the address step the summary shows the items' value only, never a total
+  # that would leave freight out.
+  shipping_chosen = order.state != "address" && order.shipments.any?
 %>
 
 <section class="checkout-summary info-card" id="checkout-summary">
@@ -56,7 +57,7 @@
       <% if shipping_chosen %>
         <div class="checkout-summary__entry <%= dl_classes %>" id="summary-shipping">
           <dt><%= t('checkout.summary.shipping') %>:</dt>
-          <dd><%= Spree::Money.new(order.shipments.to_a.sum(&:cost), currency: order.currency).to_html %></dd>
+          <dd data-shipping-summary-target="shipping"><%= Spree::Money.new(order.shipments.to_a.sum(&:cost), currency: order.currency).to_html %></dd>
         </div>
 
         <% if order.shipment_adjustments.nonzero.exists? %>
@@ -89,7 +90,7 @@
     <% if shipping_chosen %>
       <div class="checkout-summary__total <%= dl_classes %> pt-7">
         <dt class="text-body-md"><%= t('spree.order_total') %>:</dt>
-        <dd class="text-body-md"><%= order.display_order_total_after_store_credit.to_html %></dd>
+        <dd class="text-body-md" data-shipping-summary-target="total"><%= order.display_order_total_after_store_credit.to_html %></dd>
       </div>
     <% end %>
   </dl>
