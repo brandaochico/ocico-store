@@ -2,10 +2,15 @@
 
 <footer class="cart-footer">
   <%= render 'carts/cart_adjustments' %>
-  <p class="cart-footer__total flex justify-between mb-3 text-body-md p-2">
-    <%= t('spree.total') %>: <span class="font-sans-md"><%= order.display_total %></span>
-  </p>
-  <div class="cart-footer__primary-action">
+  <%# Freight isn't chosen yet, so there's no order total here — only when a
+      coupon or other adjustment changes the items' value is a total shown,
+      and it says it excludes freight. %>
+  <% if order.total != order.item_total %>
+    <p class="cart-footer__total flex justify-between border-t-[1px] border-t-gray-200 pt-3 px-3 text-body-md">
+      <%= t('storefront.cart.total_without_shipping') %>: <span class="font-sans-md"><%= order.display_total %></span>
+    </p>
+  <% end %>
+  <div class="cart-footer__primary-action mt-6">
     <%= order_form.button(
       I18n.t('spree.checkout'),
       class: 'button-primary w-full',

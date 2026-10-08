@@ -8,6 +8,8 @@
       cta_headline: "Direto do Japão e dos EUA para sua coleção."
       cta_label: "Ver Catálogo"
       shop_all: "Ver Tudo"
+    cart:
+      total_without_shipping: "Total (sem frete)"
     order:
       confirmed: "Confirmado"
       sections:

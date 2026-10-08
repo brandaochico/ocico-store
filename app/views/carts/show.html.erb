@@ -19,13 +19,17 @@
       </div>
     <% end %>
     
-    <div class="col-span-full flex flex-col justify-between gap-y-8 p-6 bg-gray-50 h-full text-black dark:bg-gray-800 dark:text-sand lg:flex-col lg:col-span-3 2xl:col-start-10">
-      <%= render 'orders/coupon_code' %>
-      <%= form_for @order, url: cart_path, html: {
-        id: 'checkout-button-form',
-      } do |order_form| %>
-        <%= render 'carts/cart_footer', order_form: order_form %>
-      <% end %>
+    <%# Same card as the checkout's order summary (checkouts/_checkout_summary). %>
+    <div class="col-span-full self-start lg:sticky lg:top-4 lg:col-span-3 2xl:col-start-10">
+      <section class="cart-summary info-card flex flex-col gap-y-6">
+        <h2 class="font-heading text-h6 md:text-h5"><%= t('spree.order_summary') %></h2>
+        <%= render 'orders/coupon_code' %>
+        <%= form_for @order, url: cart_path, html: {
+          id: 'checkout-button-form',
+        } do |order_form| %>
+          <%= render 'carts/cart_footer', order_form: order_form %>
+        <% end %>
+      </section>
     </div>
 
   <% end %>

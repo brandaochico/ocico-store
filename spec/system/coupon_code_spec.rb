@@ -230,7 +230,9 @@ RSpec.describe 'Coupon code promotions', type: :system, js: true do
 
           visit cart_path
 
-          within '.cart-footer__total' do
+          # No adjustment yet, so the cart shows only the items' value (a total
+          # appears once a coupon changes it — see carts/_cart_footer).
+          within '#cart_adjustments' do
             expect(page).to have_content(Spree::Money.new(30).to_s)
           end
 
