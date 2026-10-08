@@ -43,10 +43,12 @@ module OcicoStore
         return
       end
 
+      # Listed (and so offered) in this order, Pix first: the checkout's
+      # payment step pre-selects whichever method comes first.
       {
         MercadoPago::PixPaymentMethod => [ "Pix", "Pagamento instantâneo via Pix, processado pelo Mercado Pago." ],
         MercadoPago::BoletoPaymentMethod => [ "Boleto", "Boleto bancário, processado pelo Mercado Pago." ]
-      }.map do |klass, (name, description)|
+      }.each_with_index.map do |(klass, (name, description)), index|
         payment_method = klass.find_or_initialize_by(name: name)
         payment_method.update!(
           description: description,
@@ -55,6 +57,7 @@ module OcicoStore
           available_to_users: true,
           available_to_admin: false
         )
+        payment_method.insert_at(index + 1)
         payment_method
       end
     end

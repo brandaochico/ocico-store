@@ -136,6 +136,14 @@ RSpec.describe "db/seeds/payment_methods.rb" do
         )
       end
 
+      it "lists Pix first, so the payment step pre-selects it" do
+        create(:check_payment_method)
+
+        run_seed
+
+        expect(Spree::PaymentMethod.order(:position).first(2).map(&:name)).to eq(%w[Pix Boleto])
+      end
+
       it "never completes a payment before the customer pays" do
         run_seed
 
