@@ -1,7 +1,8 @@
 <div class="proposed-shipment">
   <h2 class="proposed-shipment__title font-heading mb-6 text-h5 md:text-h4">
-    <%= t('spree.package_from') %>
-    <%= ship_form.object.stock_location.name %>
+    <%# Not "package from <stock location>": the location's name ("default")
+        means nothing to a customer. %>
+    <%= t('checkout.delivery.items_title') %>
   </h2>
 
   <%= render "checkouts/steps/delivery_step/shipment_items", shipment_items: ship_form.object.manifest %>
