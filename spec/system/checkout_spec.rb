@@ -683,7 +683,7 @@ RSpec.describe 'Checkout', :js, type: :system do
 
         state_name_css = "order_bill_address_attributes_state_name"
 
-        select "Canada", from: "order_bill_address_attributes_country_id"
+        select canada.localized_name, from: "order_bill_address_attributes_country_id"
         fill_in state_name_css, with: xss_string
         fill_in I18n.t("spree.zip"), with: "H0H0H0"
 
@@ -750,7 +750,7 @@ RSpec.describe 'Checkout', :js, type: :system do
     fill_in "#{address}_name", with: "Ryan Bigg"
     fill_in "#{address}_address1", with: "143 Swan Street"
     fill_in "#{address}_city", with: "Richmond"
-    select "United States of America", from: "#{address}_country_id"
+    select Spree::Country.find_by!(iso: "US").localized_name, from: "#{address}_country_id"
     select "Alabama", from: "#{address}_state_id"
     fill_in "#{address}_zipcode", with: "12345"
     fill_in "#{address}_phone", with: "(555) 555-5555"

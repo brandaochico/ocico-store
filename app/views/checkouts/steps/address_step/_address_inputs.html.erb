@@ -28,9 +28,9 @@
 
     <%= form.collection_select(
       :country_id,
-      available_countries,
+      available_countries.sort_by { |country| I18n.transliterate(country.localized_name) },
       :id,
-      :name,
+      :localized_name,
       {},
       autocomplete: "#{address_type} country-name",
       class: 'js-trigger-state-change w-full',

@@ -69,7 +69,7 @@ RSpec.describe 'Checkout confirm page submission', :js, type: :system do
           expect(page).to have_current_path checkout_state_path(:confirm)
           check I18n.t("spree.agree_to_terms_of_service")
           click_button I18n.t("spree.place_order")
-          expect(page).to have_content 'Your order has been processed successfully'
+          expect(page).to have_content I18n.t('spree.order_processed_successfully')
         end
       end
     end

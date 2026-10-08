@@ -31,7 +31,7 @@ RSpec.describe 'Address', type: :system do
         checkout_as_guest
 
         within('#billing') do
-          select canada.name, from: I18n.t("spree.country")
+          select canada.localized_name, from: I18n.t("spree.country")
           expect(page).to have_no_css(@state_select_css)
           expect(page).to have_css("#{@state_name_css}.required")
         end
@@ -45,7 +45,7 @@ RSpec.describe 'Address', type: :system do
         checkout_as_guest
 
         within('#billing') do
-          select canada.name, from: I18n.t("spree.country")
+          select canada.localized_name, from: I18n.t("spree.country")
           expect(page).to have_no_css(@state_name_css)
           expect(page).to have_css("#{@state_select_css}.required")
         end
@@ -58,11 +58,11 @@ RSpec.describe 'Address', type: :system do
       it 'clears the state name' do
         checkout_as_guest
         within('#billing') do
-          select canada.name, from: I18n.t("spree.country")
+          select canada.localized_name, from: I18n.t("spree.country")
 
           page.find(@state_name_css).set('Toscana')
 
-          select france.name, from: I18n.t("spree.country")
+          select france.localized_name, from: I18n.t("spree.country")
         end
 
         expect(page).to have_no_css(@state_name_css)
@@ -78,7 +78,7 @@ RSpec.describe 'Address', type: :system do
       checkout_as_guest
 
       within('#billing') do
-        select france.name, from: I18n.t("spree.country")
+        select france.localized_name, from: I18n.t("spree.country")
 
         expect(page).to have_no_css(@state_name_css)
         expect(page).to have_css("#{@state_select_css}[disabled]", visible: false)

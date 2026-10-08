@@ -1,6 +1,6 @@
 <div class="address-overview">
   <div class="flex items-center gap-x-3 mb-6">
-    <h3 class="address-overview__title font-sans-md text-body lg:text-body-md">
+    <h3 class="address-overview__title font-heading text-h6">
       <%= title %>
     </h3>
     
@@ -25,7 +25,7 @@
     <% end %>
     <li><%= [address.city, address.state_text].compact_blank.join(" - ") %></li>
     <li><%= t('spree.zip') %> <%= address.zipcode %></li>
-    <li><%= address.country.try(:name) %></li>
+    <li><%= address.country&.localized_name %></li>
     <% unless address.phone.blank? %>
       <li>
         <%= t('spree.phone') %>

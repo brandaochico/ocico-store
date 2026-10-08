@@ -8,5 +8,5 @@
   <% if address.address2.present? %><%= address.address2 %><br><% end %>
   <% if address.neighborhood.present? %><%= address.neighborhood %><br><% end %>
   <%= "#{address.city}, #{address.state_text}, #{address.zipcode}" %><br>
-  <%= address.country.name %>
+  <%= address.country.localized_name %>
 </div>

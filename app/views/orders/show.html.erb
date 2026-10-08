@@ -1,6 +1,6 @@
 <div class="order-page wrapper">
   <h1 class="order-page__title font-heading my-6 text-h4 lg:text-h5">
-    <%= accurate_title %>
+    <%= accurate_title %><% if @order.paid? %> - <%= t("storefront.order.confirmed") %><% end %>
   </h1>
 
   <% if order_just_completed?(@order) %>

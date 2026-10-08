@@ -40,7 +40,7 @@ RSpec.describe 'Free shipping promotions', type: :system, js: true do
       fill_in "#{I18n.t("spree.street_address")}:", with: '1 John Street'
       fill_in I18n.t("spree.city"), with: "City of John"
       fill_in I18n.t("spree.zip"), with: "01337"
-      select country.name, from: I18n.t("spree.country")
+      select country.localized_name, from: I18n.t("spree.country")
       select state.name, from: "order[bill_address_attributes][state_id]"
       fill_in I18n.t("spree.phone"), with: "555-555-5555"
 

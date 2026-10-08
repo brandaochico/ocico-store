@@ -52,7 +52,7 @@ RSpec.describe 'orders', type: :system do
     visit order_path(order)
 
     within 'h1' do
-      expect(page).to have_content("#{I18n.t('spree.order')} #{order.number}")
+      expect(page).to have_content(I18n.t('spree.order_number', number: order.number))
     end
   end
 end

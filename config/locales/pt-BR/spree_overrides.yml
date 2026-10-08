@@ -78,6 +78,7 @@
     agree_to_terms_of_service: "Li e aceito os termos de serviço"
     there_were_problems_with_the_following_fields: "Corrija os campos abaixo"
     thank_you_for_your_order: "Obrigado pela sua compra. Guarde ou imprima esta página de confirmação para seus registros."
+    order_processed_successfully: "Seu pedido foi realizado com sucesso."
 
     # Endereço — "zip" é o CEP, e "state" aqui é a unidade federativa, não um status
     name: "Nome"
@@ -105,6 +106,20 @@
     unshippable_items: "Itens indisponíveis para envio"
     tracking: "Rastreamento"
     package_from: "pacote de"
+    # The stock location ("default") means nothing to a customer.
+    shipment_details: "%{shipping_method}"
+    order_number: "Pedido %{number}"
+    payment_states:
+      balance_due: "Aguardando pagamento"
+      checkout: "Em andamento"
+      completed: "Finalizado"
+      credit_owed: "Crédito a devolver"
+      failed: "Falhou"
+      invalid: "Inválido"
+      paid: "Pago"
+      pending: "Pendente"
+      processing: "Processando"
+      void: "Cancelado"
 
     # Pagamento — `check` é o método manual do Solidus (admin baixa o pagamento
     # à mão), não um cheque bancário; o nome literal confundiria o cliente.

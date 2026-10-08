@@ -8,6 +8,13 @@
       cta_headline: "Direto do Japão e dos EUA para sua coleção."
       cta_label: "Ver Catálogo"
       shop_all: "Ver Tudo"
+    order:
+      confirmed: "Confirmado"
+      sections:
+        billing: "Cobrança"
+        shipping: "Entrega"
+        shipments: "Envio"
+        payment: "Pagamento"
     product:
       shop_now: "Comprar"
       you_may_also_like: "Você Também Pode Gostar"

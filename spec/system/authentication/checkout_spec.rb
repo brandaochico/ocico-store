@@ -72,7 +72,7 @@ RSpec.feature 'Checkout', :js, type: :system do
       check I18n.t("spree.agree_to_terms_of_service")
       click_button I18n.t("spree.place_order")
 
-      expect(page).to have_text 'Your order has been processed successfully'
+      expect(page).to have_text I18n.t('spree.order_processed_successfully')
     end
 
     scenario 'associate an uncompleted guest order with user after logging in' do
@@ -99,7 +99,7 @@ RSpec.feature 'Checkout', :js, type: :system do
       check I18n.t("spree.agree_to_terms_of_service")
       click_button I18n.t("spree.place_order")
 
-      expect(page).to have_text 'Your order has been processed successfully'
+      expect(page).to have_text I18n.t('spree.order_processed_successfully')
       expect(Spree::Order.first.user).to eq user
     end
 
@@ -158,7 +158,7 @@ RSpec.feature 'Checkout', :js, type: :system do
       check I18n.t("spree.agree_to_terms_of_service")
       click_button I18n.t("spree.place_order")
 
-      expect(page).to have_text 'Your order has been processed successfully'
+      expect(page).to have_text I18n.t('spree.order_processed_successfully')
       expect(Spree::Order.first.user).to eq Spree::User.find_by(email: 'email@person.com')
     end
   end

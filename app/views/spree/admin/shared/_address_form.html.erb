@@ -47,7 +47,7 @@
   <div class="field <%= "#{type}-row" %>">
     <%= f.label :country_id, Spree::Country.model_name.human %>
     <span id="<%= s_or_b %>country">
-      <%= f.collection_select :country_id, available_countries, :id, :name, {}, {class: 'custom-select fullwidth js-country_id'} %>
+      <%= f.collection_select :country_id, available_countries.sort_by { |c| I18n.transliterate(c.localized_name) }, :id, :localized_name, {}, {class: 'custom-select fullwidth js-country_id'} %>
     </span>
   </div>
 
