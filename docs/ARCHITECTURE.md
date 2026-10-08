@@ -595,7 +595,8 @@ reasons — worth understanding before changing them:
   Active Job's async adapter, so the 15-minute sweep (Solid Queue recurring,
   production only) never runs, and the webhook needs a public URL. After
   paying in the sandbox, sync by hand:
-  `bin/rails runner MercadoPago::SyncPendingPaymentsJob.perform_now`.
+  `bin/rails mercado_pago:sync` (it runs the syncs inline — enqueueing from
+  `bin/rails runner` does nothing, the process exits before async jobs run).
 
 ## Phase status
 

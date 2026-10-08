@@ -8,13 +8,16 @@ module MercadoPago
   class SyncPendingPaymentsJob < ApplicationJob
     queue_as :low
 
-    def perform
+    def self.pending_mp_order_ids
       Spree::Payment.pending
                     .where(payment_method_id: PaymentMethod.unscoped.select(:id))
                     .where.not(response_code: [ nil, "" ])
                     .pluck(:response_code)
                     .uniq
-                    .each { |mp_order_id| SyncPaymentJob.perform_later(mp_order_id) }
+    end
+
+    def perform
+      self.class.pending_mp_order_ids.each { |mp_order_id| SyncPaymentJob.perform_later(mp_order_id) }
     end
   end
 end

@@ -44,7 +44,7 @@ the app or the seed. Sandbox credentials are `APP_USR-...` from a test seller ac
 ```
 set -a; . ./.env; set +a
 bin/rails db:seed                                               # creates the "Pix" and "Boleto" payment methods
-bin/rails runner MercadoPago::SyncPendingPaymentsJob.perform_now  # dev has no recurring jobs: sync by hand
+bin/rails mercado_pago:sync                                     # dev has no recurring jobs: sync by hand
 ```
 
 Local dev also requires the `libvips` **system package** (not a gem) — Solidus's product image variant styles
