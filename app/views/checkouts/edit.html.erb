@@ -8,7 +8,10 @@
     </section>
 
     <% if @order.state != "confirm" %>
-      <div class="checkout__summary col-span-full lg:col-span-4 xl:col-start-10 xl:col-span-3">
+      <%# self-start: a grid item stretches to the row's height by default,
+          which both made the card run to the bottom of the page and left
+          sticky nothing to travel within. %>
+      <div class="checkout__summary col-span-full self-start lg:sticky lg:top-4 lg:col-span-4 xl:col-start-10 xl:col-span-3">
         <%= render "checkout_summary", order: @order %>
       </div>
     <% end %>

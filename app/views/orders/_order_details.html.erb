@@ -1,37 +1,37 @@
 <div class="order-details">
-  <div class="order-details__info grid-container py-6 border-b-[1px] border-b-gray-200 dark:border-b-400">
+  <div class="order-details__info grid-container py-6">
     <% if order.has_checkout_step?("address") %>
-      <div class="col-span-full lg:col-span-3">
+      <div class="info-card col-span-full md:col-span-6 lg:col-span-3">
         <%= render(
           'orders/address_overview',
           address: order.bill_address,
-          title: t('spree.billing_address')
+          title: t('storefront.order.sections.billing')
         ) %>
       </div>
     <% end %>
     
     <% if order.has_checkout_step?("delivery") %>
-      <div class="col-span-full lg:col-span-3">
+      <div class="info-card col-span-full md:col-span-6 lg:col-span-3">
         <%= render(
           'orders/address_overview',
           address: order.ship_address,
-          title: t('spree.shipping_address')
+          title: t('storefront.order.sections.shipping')
         ) %>
       </div>
     <% end %>
 
     <% if order.has_checkout_step?("delivery") %>
-      <div class="col-span-full lg:col-span-3">
+      <div class="info-card col-span-full md:col-span-6 lg:col-span-3">
         <%= render(
           'orders/order_shipments',
           order: order,
-          title: t('spree.shipments')
+          title: t('storefront.order.sections.shipments')
         ) %>
       </div>
     <% end %>
 
     <% if order.has_checkout_step?("payment") %>
-      <div class="col-span-full lg:col-span-3">
+      <div class="info-card col-span-full md:col-span-6 lg:col-span-3">
         <%= render(
           'orders/payment_info',
           order: order

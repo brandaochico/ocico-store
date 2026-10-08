@@ -195,6 +195,22 @@
     @apply box-border max-w-full antialiased scroll-smooth bg-sand;
     @apply dark:bg-black dark:text-sand;
   }
+
+  /* Store rule: every button shows the pointer. Tailwind v4's preflight
+     resets buttons to the default arrow, so this can't be left to each
+     button's own classes. */
+  button,
+  [type="button"],
+  [type="submit"],
+  [type="reset"],
+  [role="button"] {
+    cursor: pointer;
+  }
+
+  button:disabled,
+  [type="submit"]:disabled {
+    cursor: not-allowed;
+  }
 }
 
 @layer components {
@@ -307,6 +323,13 @@
     @apply lg:px-[30px] md:max-w-screen-2xl 2xl:px-0;
   }
 
+  /* White panel on the sand background: order page sections, checkout
+     order summary. */
+  .info-card {
+    @apply rounded-xl bg-white p-6 text-black shadow-[0_4px_16px_-4px_rgb(21_20_19/0.12)];
+    @apply dark:bg-black dark:text-sand dark:border dark:border-gray-600;
+  }
+
   .grid-container {
     @apply grid grid-cols-4 gap-4;
     @apply md:grid-cols-12 md:gap-7;
@@ -329,8 +352,9 @@
   }
 
   /* Inputs */
+  /* Store rule: form fields are white, with a visible border, in light mode. */
   .text-input input {
-    @apply relative flex items-center justify-start border border-gray-mid rounded px-4 py-3 placeholder:text-gray-500 text-black w-full;
+    @apply relative flex items-center justify-start border border-gray-mid rounded px-4 py-3 bg-white placeholder:text-gray-500 text-black w-full;
     @apply hover:border-gray-400 focus:outline-none focus:ring focus:ring-offset-1 focus:ring-black/20 focus:border-gray-400;
     @apply dark:bg-gray-800 dark:border-gray-600 dark:text-sand dark:placeholder:text-gray-400 dark:focus:ring-white/30;
   }
@@ -346,8 +370,17 @@
     @apply dark:text-sand;
   }
 
+  /* Same label as .text-input's — it inherited the larger body size. */
+  .select-input label {
+    @apply text-body-sm font-normal mb-1;
+  }
+
+  /* `border` (the width) was missing: Tailwind v4's preflight zeroes form
+     borders and backgrounds, so border-gray-mid alone drew nothing. Fixed
+     height because Chrome ignores line-height on native selects — this is
+     .text-input's 24px line + py-3 + border, so the two line up side by side. */
   .select-input select {
-    @apply border-gray-mid rounded px-4 py-3 w-full cursor-pointer text-black;
+    @apply border border-gray-mid rounded px-4 py-3 w-full h-[3.125rem] cursor-pointer bg-white text-black;
     @apply hover:border-gray-400 focus:outline-none focus:ring focus:ring-black/20 focus:border-gray-400;
     @apply dark:bg-gray-800 dark:border-gray-600 dark:text-sand dark:placeholder:text-gray-400;
   }
