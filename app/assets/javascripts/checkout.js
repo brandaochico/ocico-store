@@ -4,7 +4,9 @@
 Solidus.disableSaveOnClick = () => {
   const form = document.querySelector('form.edit_order');
   form.addEventListener('submit', () => {
-    const elements = form.querySelectorAll('[type="submit"], [type="image"]');
+    // form.elements, not querySelectorAll: the submit button sits outside the
+    // form (in the order summary), tied to it by its form= attribute.
+    const elements = [...form.elements].filter(element => ['submit', 'image'].includes(element.type));
     elements.forEach(element => {
       element.setAttribute('disabled', true);
       element.classList.remove('primary');

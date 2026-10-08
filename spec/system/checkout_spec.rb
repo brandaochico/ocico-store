@@ -60,7 +60,7 @@ RSpec.describe 'Checkout', :js, type: :system do
         click_button I18n.t("spree.save_and_continue")
         expect(page).not_to have_content("undefined method `promotion'")
         click_button I18n.t("spree.save_and_continue")
-        expect(page).to have_content("#{I18n.t('spree.shipping_total')}:\n#{Spree::Money.new(10)}")
+        expect(page).to have_content("#{I18n.t('checkout.summary.shipping')}:\n#{Spree::Money.new(10)}")
       end
     end
 

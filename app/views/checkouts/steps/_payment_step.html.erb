@@ -74,13 +74,7 @@
     <% end %>
   </fieldset>
 
-  <div class="flex justify-end py-6">
-    <%= button_tag(
-      I18n.t("spree.save_and_continue"),
-      class: 'button-primary',
-      name: :commit
-    ) %>
-  </div>
+  <%# The submit button lives in the order summary (checkouts/_checkout_summary). %>
 </div>
 
 <script>

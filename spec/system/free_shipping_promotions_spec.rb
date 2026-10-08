@@ -53,7 +53,7 @@ RSpec.describe 'Free shipping promotions', type: :system, js: true do
     # Regression test for https://github.com/spree/spree/issues/4428
     it "applies the free shipping promotion" do
       within("#checkout-summary") do
-        expect(page).to have_content("#{I18n.t('spree.shipping_total')}: #{Spree::Money.new(10)}", normalize_ws: true)
+        expect(page).to have_content("#{I18n.t('checkout.summary.shipping')}: #{Spree::Money.new(10)}", normalize_ws: true)
         expect(page).to have_content("#{I18n.t('spree.promotion')} (Free Shipping): #{Spree::Money.new(-10)}", normalize_ws: true)
       end
     end

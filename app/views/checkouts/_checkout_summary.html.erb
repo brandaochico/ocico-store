@@ -1,20 +1,39 @@
-<% dl_classes = 'flex items-center justify-between p-3 [&>dd]:font-sans-md' %>
+<%
+  dl_classes = 'flex items-center justify-between p-3 [&>dd]:font-sans-md'
+  # Freight is only known once the delivery step is done: before that the
+  # summary shows the items' value, never a total that would leave freight out.
+  shipping_chosen = order.passed_checkout_step?("delivery") && order.shipments.any?
+%>
 
 <section class="checkout-summary info-card" id="checkout-summary">
   <h2 class="checkout-summary__title font-heading mb-6 text-h6 md:text-h5">
     <%= t('spree.order_summary') %>
   </h2>
 
-  <div class="mb-6">
-    <% if order.state == 'payment' %>
+  <% if order.state == 'payment' %>
+    <div class="mb-6">
       <%= render 'orders/coupon_code' %>
-    <% end %>
-  </div>
+    </div>
+  <% end %>
+
+  <% if order.state == 'address' %>
+    <ul class="checkout-summary__items flex flex-col gap-y-3 px-3 pb-6 mb-3 border-b-[1px] border-b-gray-200">
+      <% order.line_items.includes(variant: :product).each do |line_item| %>
+        <li class="flex items-start justify-between gap-x-4">
+          <div class="flex flex-col">
+            <span class="font-sans-md text-body-sm"><%= line_item.name %></span>
+            <span class="text-body-xs text-gray-500 dark:text-sand"><%= t('checkout.summary.quantity', count: line_item.quantity) %></span>
+          </div>
+          <span class="shrink-0 text-body-sm"><%= line_item.display_amount.to_html %></span>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
 
   <dl>
-    <div class="pb-7 border-b-[1px] border-b-gray-200">
+    <div class="<%= 'pb-7 border-b-[1px] border-b-gray-200' if shipping_chosen %>">
       <div class="checkout-summary__entry <%= dl_classes %>" id="item-total">
-        <dt><%= t('spree.item_total') %>:</dt>
+        <dt><%= t('checkout.summary.items_value') %>:</dt>
         <dd><%= order.display_item_total.to_html %></dd>
       </div>
 
@@ -34,9 +53,9 @@
         </div>
       <% end %>
 
-      <% if order.passed_checkout_step?("delivery") && order.shipments.any? %>
-        <div class="checkout-summary__entry <%= dl_classes %>">
-          <dt><%= t('spree.shipping_total') %>:</dt>
+      <% if shipping_chosen %>
+        <div class="checkout-summary__entry <%= dl_classes %>" id="summary-shipping">
+          <dt><%= t('checkout.summary.shipping') %>:</dt>
           <dd><%= Spree::Money.new(order.shipments.to_a.sum(&:cost), currency: order.currency).to_html %></dd>
         </div>
 
@@ -67,9 +86,21 @@
       <% end %>
     </div>
 
-    <div class="checkout-summary__total <%= dl_classes %> pt-7">
-      <dt class="text-body-md"><%= t('spree.order_total') %>:</dt>
-      <dd class="text-body-md"><%= order.display_order_total_after_store_credit.to_html %></dd>
-    </div>
+    <% if shipping_chosen %>
+      <div class="checkout-summary__total <%= dl_classes %> pt-7">
+        <dt class="text-body-md"><%= t('spree.order_total') %>:</dt>
+        <dd class="text-body-md"><%= order.display_order_total_after_store_credit.to_html %></dd>
+      </div>
+    <% end %>
   </dl>
+
+  <%# Submits the step's form from here (form= attribute) so the customer
+      reads the summary on the way to the button. %>
+  <%= button_tag(
+    I18n.t("spree.save_and_continue"),
+    type: :submit,
+    name: :commit,
+    form: "checkout_form_#{order.state}",
+    class: 'button-primary w-full mt-6'
+  ) %>
 </section>
