@@ -105,6 +105,7 @@ GEM
     benchmark (0.5.0)
     bigdecimal (4.1.3)
     bindex (0.8.1)
+    blueprinter (1.3.0)
     bootsnap (1.26.0)
       msgpack (~> 1.5)
     brakeman (8.1.0)
@@ -198,9 +199,6 @@ GEM
     fugit (1.14.0)
       et-orbi (~> 1.4)
       raabro (~> 1.4)
-    geared_pagination (1.2.0)
-      activesupport (>= 5.0)
-      addressable (>= 2.5.0)
     globalid (1.4.0)
       activesupport (>= 6.1)
     handlebars_assets (0.23.10)
@@ -213,7 +211,7 @@ GEM
     image_processing (1.14.0)
       mini_magick (>= 4.9.5, < 6)
       ruby-vips (>= 2.0.17, < 3)
-    importmap-rails (1.2.3)
+    importmap-rails (2.2.3)
       actionpack (>= 6.0.0)
       activesupport (>= 6.0.0)
       railties (>= 6.0.0)
@@ -230,7 +228,7 @@ GEM
       rails-dom-testing (>= 1, < 3)
       railties (>= 4.2.0)
       thor (>= 0.14, < 2.0)
-    json (3.0.2)
+    json (2.21.2)
     kamal (2.12.0)
       activesupport (>= 7.0)
       base64 (~> 0.2)
@@ -340,7 +338,7 @@ GEM
     polyglot (0.3.5)
     pp (0.6.4)
       prettyprint
-    prettyprint (0.2.0)
+    prettyprint (0.2.1)
     prism (1.9.0)
     propshaft (1.3.2)
       actionpack (>= 7.0.0)
@@ -409,7 +407,7 @@ GEM
       logger
       prism (>= 1.6.0)
       tsort
-    rdoc (8.0.0)
+    rdoc (8.1.0)
       erb
       prism (>= 1.6.0)
       rbs (>= 4.0.0)
@@ -520,11 +518,13 @@ GEM
       solidus_core (= 4.7.1)
       solidus_legacy_promotions (= 4.7.1)
       solidus_sample (= 4.7.1)
-    solidus_admin (0.4.0)
-      geared_pagination (~> 1.1)
-      importmap-rails (~> 1.2, >= 1.2.1)
+    solidus_admin (0.5.0)
+      blueprinter
+      importmap-rails (>= 2.0, < 3)
+      json (< 3)
+      kaminari (~> 1.1)
       solidus_backend
-      solidus_core (> 4.2)
+      solidus_core (>= 4.6)
       stimulus-rails (~> 1.2)
       turbo-rails (~> 2.0)
       view_component (~> 3.9)
@@ -639,7 +639,7 @@ GEM
     unicode-display_width (3.3.0)
       unicode-emoji (~> 4.3)
     unicode-emoji (4.3.0)
-    uri (1.1.1)
+    uri (1.1.2)
     useragent (0.16.11)
     view_component (3.27.0)
       activesupport (>= 5.2.0, < 8.2)
@@ -744,6 +744,7 @@ CHECKSUMS
   benchmark (0.5.0) sha256=465df122341aedcb81a2a24b4d3bd19b6c67c1530713fd533f3ff034e419236c
   bigdecimal (4.1.3) sha256=61ebe1e5e559bdc3cc6f2c0ee7f427321fc838f59611c294356eb04d6e21cf66
   bindex (0.8.1) sha256=7b1ecc9dc539ed8bccfc8cb4d2732046227b09d6f37582ff12e50a5047ceb17e
+  blueprinter (1.3.0) sha256=a89b68d97b8d7157e4657750c17aa1ab9f04af58a68b89257d127f973cf8720c
   bootsnap (1.26.0) sha256=ca96237015e6cd74a02963d5821cf00ac5ea134653b323e8cd6d702a7718bf1b
   brakeman (8.1.0) sha256=cfa9e5214e4925842f4bc849a64f8a7e6c5d0425fe98eac8d7b7bc60fdc17e07
   builder (3.3.0) sha256=497918d2f9dca528fdca4b88d84e4ef4387256d984b8154e9d5d3fe5a9c8835f
@@ -791,18 +792,17 @@ CHECKSUMS
   font-awesome-rails (4.7.0.9) sha256=b45044908fbf3178b8d84fbae415dae4b9bf847612bcb1170d88ed13842c8732
   friendly_id (5.7.0) sha256=b8994416ebaceebc7c60bc556e84ef32a3a663e2e582eb04c429216cc98de4c4
   fugit (1.14.0) sha256=e311a9cc85a54bb67649df45060e721282a1e2c8ebad40e41874a3a7d576f37e
-  geared_pagination (1.2.0) sha256=16dc25b28e9d6945df27e9bcc6ed298d66eb9493ba45bf987037010724120cc7
   globalid (1.4.0) sha256=037f12fbf1d9d7a014d501c2d5c77356fd4ddd96d7a7991d6700bba96706f427
   handlebars_assets (0.23.10) sha256=b95812d7a451e4429e49499bb78f30a9c035148a0819128861f7bbf51dbc82c0
   hashdiff (1.2.1) sha256=9c079dbc513dfc8833ab59c0c2d8f230fa28499cc5efb4b8dd276cf931457cd1
   i18n (1.15.2) sha256=00f9eb62412fe593b2a65a97daa75300d37abb8f7202ec748e94b6d46a9dd1b5
   image_processing (1.14.0) sha256=754cc169c9c262980889bec6bfd325ed1dafad34f85242b5a07b60af004742fb
-  importmap-rails (1.2.3) sha256=31f1d82efe03436f3d863626846d0cdfb64e143f2e63690913279e37354312d9
+  importmap-rails (2.2.3) sha256=7101be2a4dc97cf1558fb8f573a718404c5f6bcfe94f304bf1f39e444feeb16a
   io-console (0.9.4) sha256=a403304f32928ee85e56d457b4612ca43f2703b561a3258844992bd24085fbb1
   irb (1.18.0) sha256=de9454a0703a54704b9811a5ef31a60c86949fbf4013fcf244fabc7c775248e3
   jbuilder (2.15.1) sha256=2430bec28fb0cebacb5875b1009cf9d8bc3c303ccb810c4c8b062a4b51457637
   jquery-rails (4.6.1) sha256=619f3496cdcdeaae1fd6dafa52dbac3fc45b745d4e09712da4184a16b3a8d9c0
-  json (3.0.2) sha256=8e6d7e7b11384c21230430cef90b71f14849a34a1f4452796670f7c981bd19df
+  json (2.21.2) sha256=1f1d3b7cf2b3ba1a69beca0bb6db13d5438b80bff3cd54cdaaa620b9b07c1c6a
   kamal (2.12.0) sha256=c51d1ab085e515470f98d0c0f043637122b5ebf76e8b610cb1fbbed0b7f9b8fa
   kaminari (1.2.2) sha256=c4076ff9adccc6109408333f87b5c4abbda5e39dc464bd4c66d06d9f73442a3e
   kaminari-actionview (1.2.2) sha256=1330f6fc8b59a4a4ef6a549ff8a224797289ebf7a3a503e8c1652535287cc909
@@ -853,7 +853,7 @@ CHECKSUMS
   pg (1.6.3-x86_64-linux-musl) sha256=9c9c90d98c72f78eb04c0f55e9618fe55d1512128e411035fe229ff427864009
   polyglot (0.3.5) sha256=59d66ef5e3c166431c39cb8b7c1d02af419051352f27912f6a43981b3def16af
   pp (0.6.4) sha256=dfcb0fce700c41456265922884f9fe195d7fbb0674a3578e6c0f69588e82b570
-  prettyprint (0.2.0) sha256=2bc9e15581a94742064a3cc8b0fb9d45aae3d03a1baa6ef80922627a0766f193
+  prettyprint (0.2.1) sha256=d555d57ea6d7cf001d4774b693546a6bd88bec1e778ddffb5c60b68ceec4b7d4
   prism (1.9.0) sha256=7b530c6a9f92c24300014919c9dcbc055bf4cdf51ec30aed099b06cd6674ef85
   propshaft (1.3.2) sha256=1d56a3e56a92c21bfc29caf07406b5386b00d4c47ddf357cf989a5a234b1389e
   psych (5.5.0) sha256=4b245bbbd0f3238df8ccee766ebc1a6b062b10e4ee1d3284eb588739ba156a0a
@@ -875,7 +875,7 @@ CHECKSUMS
   rake (13.4.2) sha256=cb825b2bd5f1f8e91ca37bddb4b9aaf345551b4731da62949be002fa89283701
   ransack (4.4.3) sha256=c9a85304009eba4a4abe889fbdc23ff7e52e5428b7b9bc1e4ede4c13de4aaaf3
   rbs (4.2.0) sha256=51f7b886dcc05bc09e10b901daa6a81829f6adc03101d6ca9ea4aac6103e0674
-  rdoc (8.0.0) sha256=03bf8c08a9639658855a0cfd77c0abca8325c227693f7f33f82957811348c469
+  rdoc (8.1.0) sha256=befc37880a5cfd36dcb176c748b5fd5ee39dd3536a75e81824e4972ce230f60a
   regexp_parser (2.13.0) sha256=d105d95d2138954e73914d2fbfb3d0a8f8605a49a3e89864c32e78b9107cb770
   reline (0.7.0) sha256=5b012d8e55dbf9d450f12bde2cf7d15ff546ae80b3f8f3b30e570d431815583d
   responders (3.2.1) sha256=c2772970cbda654c0e772d852e5a851e82cd8e96f5fa958650861ba75b8ffa84
@@ -904,7 +904,7 @@ CHECKSUMS
   solid_cache (1.0.10) sha256=bc05a2fb3ac78a6f43cbb5946679cf9db67dd30d22939ededc385cb93e120d41
   solid_queue (1.7.0) sha256=6566b70b801d1c317c81bba7bcdd5677c019afac584a30374b4164002ca356d3
   solidus (4.7.1) sha256=29c03267f44500f53a02d0a3961cdc6a9a156ab81a9ca44d15e8e2b2169f9955
-  solidus_admin (0.4.0) sha256=e232f0c0ff20184eaeaab0867e958e0c1f73009b73ffb6bded8242e9ade432a3
+  solidus_admin (0.5.0) sha256=9417c0ecdf019f1904e9706626036ab174c2c3cef4c290333cd788e6a2e3185d
   solidus_api (4.7.1) sha256=e69c1826e54ec8b5d6ec5fe8d3b0bf3178e14452c0bbd948656321f67095cc99
   solidus_auth_devise (2.6.0) sha256=64b53595d47df5a867be589fd32977ec1147e0fd130c9a1ecfa0f2c6bd1a3bdf
   solidus_backend (4.7.1) sha256=51f980dc33781dc047bb54cc8abdeed89b72d134082e5920eb0139d00fb357b2
@@ -940,7 +940,7 @@ CHECKSUMS
   tzinfo (2.0.6) sha256=8daf828cc77bcf7d63b0e3bdb6caa47e2272dcfaf4fbfe46f8c3a9df087a829b
   unicode-display_width (3.3.0) sha256=4b7aa66a4b11db50f6f7e98411215cd0dd10eaecb665d36eec5bcacb3fa0b613
   unicode-emoji (4.3.0) sha256=11c02fa73290378c066bb0562cd4c87d8e1b706fbbe0059ca12746a4244de8ce
-  uri (1.1.1) sha256=379fa58d27ffb1387eaada68c749d1426738bd0f654d812fcc07e7568f5c57c6
+  uri (1.1.2) sha256=89292e98eabbef6248b0a0ed5e7e398e152f83f17560023a6d94a7f492b169fb
   useragent (0.16.11) sha256=700e6413ad4bb954bb63547fa098dddf7b0ebe75b40cc6f93b8d54255b173844
   view_component (3.27.0) sha256=a323ae2fbf7fe8ce1622ec3a19167863af23ac8e0fb4f9724375357823d6f4ff
   warden (1.2.9) sha256=46684f885d35a69dbb883deabf85a222c8e427a957804719e143005df7a1efd0
