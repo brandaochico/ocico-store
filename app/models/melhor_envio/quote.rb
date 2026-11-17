@@ -11,8 +11,8 @@ module MelhorEnvio
   # in-process cache rather than Rails.cache, because test runs a null store
   # and the quote has to be shared within a single estimate everywhere.
   #
-  # A failed call (timeout, 5xx, bad token, stock location without a CEP) is
-  # cached briefly too, so one estimate doesn't retry it once per carrier; the
+  # A failed call (timeout, 5xx, bad token, malformed response, stock location
+  # without a CEP) is cached briefly too, so one estimate doesn't retry it once per carrier; the
   # fallback flat rate shows up instead (MelhorEnvio::FallbackCalculator).
   class Quote
     Rate = Data.define(:service_id, :price, :min_days, :max_days)
@@ -72,7 +72,16 @@ module MelhorEnvio
       services = Client.from_config(config).calculate(**request)
       new(status: :ok, rates: parse(services))
     rescue Client::Error => error
-      Rails.logger.warn("[MelhorEnvio] quote failed: #{error.message}")
+      failed(error, request)
+    rescue StandardError => error
+      # A response we couldn't make sense of (an odd price, a malformed
+      # service entry). Freight must never turn the delivery step into a 500:
+      # report it and let the fallback flat rate keep checkout going.
+      failed(error, request)
+    end
+
+    def self.failed(error, request)
+      Rails.logger.warn("[MelhorEnvio] quote failed: #{error.class}: #{error.message}")
       Rails.error.report(error, handled: true, context: { cep: request[:to] })
       new(status: :failed)
     end
@@ -92,7 +101,7 @@ module MelhorEnvio
       end.index_by(&:service_id)
     end
 
-    private_class_method :build_request, :cache_key, :fetch, :parse
+    private_class_method :build_request, :cache_key, :fetch, :failed, :parse
 
     attr_reader :status
 
@@ -102,6 +111,7 @@ module MelhorEnvio
     end
 
     def ok? = status == :ok
+
 
     # nil when this carrier service can't take the shipment (or the quote
     # failed): Solidus then simply doesn't offer that shipping method.

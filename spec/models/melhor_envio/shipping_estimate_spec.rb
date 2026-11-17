@@ -97,6 +97,27 @@ RSpec.describe "Melhor Envio shipping estimates" do
     end
   end
 
+  # Freight must never turn the delivery step into a 500.
+  context "when Melhor Envio answers something unusable" do
+    {
+      "an HTTP 500" => -> { { status: 500, body: "" } },
+      "a 200 with an error object instead of a list" => -> { MelhorEnvioApi.json({ "message" => "Unauthenticated." }) },
+      "a 200 with a malformed price" => -> { MelhorEnvioApi.json([ MelhorEnvioApi.service(1, "PAC", price: "n/d", min: 5, max: 7) ]) }
+    }.each do |description, response|
+      it "falls back to the flat rate on #{description}" do
+        stub_request(:post, MelhorEnvioApi::SANDBOX_URL).to_return(instance_exec(&response))
+
+        expect(offered).to eq("Entrega padrão" => 20.to_d)
+      end
+    end
+
+    it "falls back to the flat rate when the connection drops mid-response" do
+      stub_request(:post, MelhorEnvioApi::SANDBOX_URL).to_raise(EOFError)
+
+      expect(offered).to eq("Entrega padrão" => 20.to_d)
+    end
+  end
+
   context "when Melhor Envio is down" do
     let!(:quote_request) { stub_request(:post, MelhorEnvioApi::SANDBOX_URL).to_timeout }
 

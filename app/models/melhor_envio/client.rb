@@ -66,13 +66,20 @@ module MelhorEnvio
       end
 
       parse(response)
-    rescue Timeout::Error, SocketError, SystemCallError, OpenSSL::SSL::SSLError => error
+    rescue Timeout::Error, SocketError, SystemCallError, OpenSSL::SSL::SSLError,
+           IOError, Net::ProtocolError, Net::HTTPBadResponse => error
       raise Error.new("Melhor Envio unreachable: #{error.class}: #{error.message}")
     end
 
     def parse(response)
       body = response.body.present? ? JSON.parse(response.body) : {}
-      return body if response.is_a?(Net::HTTPSuccess)
+      if response.is_a?(Net::HTTPSuccess)
+        # A quote is always a list of services; anything else (an error
+        # object sent with a 200, an empty body) isn't something to price from.
+        raise Error.new("Melhor Envio returned an unexpected #{body.class} body", status: response.code.to_i, body: body) unless body.is_a?(Array)
+
+        return body
+      end
 
       raise Error.new(body.is_a?(Hash) && body["message"] || "Melhor Envio returned HTTP #{response.code}",
                       status: response.code.to_i, body: body)
