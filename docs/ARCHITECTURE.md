@@ -257,7 +257,10 @@ an enqueue:
 Registering the endpoint with Stripe is still to do: production URL is
 `/solidus_stripe/live/webhooks`, everywhere else `/solidus_stripe/test/webhooks`
 (the slug comes from the key prefix). Locally, forward with
-`stripe listen --forward-to http://localhost:3000/solidus_stripe/test/webhooks`.
+`stripe listen --events payment_intent.succeeded,payment_intent.payment_failed,payment_intent.canceled,charge.refunded --forward-to http://localhost:3000/solidus_stripe/test/webhooks`
+— current Stripe CLIs refuse to run without `--events`, and those four are the
+only ones solidus_stripe subscribes to. Subscribe the production endpoint to
+the same four.
 
 ### Not started
 

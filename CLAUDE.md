@@ -32,7 +32,9 @@ skips the payment method and checkout simply shows no Stripe option:
 SOLIDUS_STRIPE_API_KEY=sk_test_... SOLIDUS_STRIPE_PUBLISHABLE_KEY=pk_test_... \
   SOLIDUS_STRIPE_WEBHOOK_SIGNING_SECRET=whsec_... bin/rails db:seed
 
-stripe listen --forward-to http://localhost:3000/solidus_stripe/test/webhooks   # local webhook delivery
+# local webhook delivery; current CLIs require --events (these are the four solidus_stripe handles)
+stripe listen --events payment_intent.succeeded,payment_intent.payment_failed,payment_intent.canceled,charge.refunded \
+  --forward-to http://localhost:3000/solidus_stripe/test/webhooks
 ```
 
 Pix and Boleto go through Mercado Pago and follow the same rule: no credentials, no payment method. Locally
