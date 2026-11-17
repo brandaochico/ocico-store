@@ -6,6 +6,8 @@ require Rails.root.join("spec/support/melhor_envio_api")
 # The whole freight path as checkout runs it: Solidus's estimator asking each
 # shipping method's calculator, against a stubbed Melhor Envio.
 RSpec.describe "Melhor Envio shipping estimates" do
+  include ActiveSupport::Testing::TimeHelpers
+
   let!(:store) { create(:store) }
   let(:order) { create(:order_with_line_items, line_items_price: 79.9) }
   let(:shipment) { order.shipments.first }
@@ -62,6 +64,13 @@ RSpec.describe "Melhor Envio shipping estimates" do
       expect([ sedex_rate.min_delivery_days, sedex_rate.max_delivery_days ]).to eq([ 1, 2 ])
     end
 
+    it "reuses a priced quote for later estimates of the same cart" do
+      rates
+      travel(10.minutes) { Spree::Stock::Estimator.new.shipping_rates(package) }
+
+      expect(quote_request).to have_been_requested.once
+    end
+
     it "asks Melhor Envio once for all four carriers" do
       rates
 
@@ -93,6 +102,15 @@ RSpec.describe "Melhor Envio shipping estimates" do
 
       it "offers nothing rather than a flat rate for a route nobody delivers to" do
         expect(rates).to be_empty
+      end
+
+      # "No carrier" can be a carrier-side outage rather than an unserved
+      # route: it mustn't dead-end checkout for that CEP for half an hour.
+      it "asks again after a minute instead of caching the empty quote for half an hour" do
+        rates
+        travel(2.minutes) { Spree::Stock::Estimator.new.shipping_rates(package) }
+
+        expect(quote_request).to have_been_requested.twice
       end
     end
   end

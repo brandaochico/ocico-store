@@ -28,7 +28,7 @@ module MelhorEnvio
 
       key = cache_key(request)
       cache.read(key) || fetch(request, config).tap do |quote|
-        cache.write(key, quote, expires_in: quote.ok? ? SUCCESS_TTL : FAILURE_TTL)
+        cache.write(key, quote, expires_in: quote.rates? ? SUCCESS_TTL : FAILURE_TTL)
       end
     end
 
@@ -112,6 +112,11 @@ module MelhorEnvio
 
     def ok? = status == :ok
 
+    # A successful quote in which no carrier could take the shipment is
+    # honoured (nothing is offered), but only cached as briefly as a failure:
+    # "no carrier" can be a carrier-side outage rather than an unserved route,
+    # and shouldn't dead-end checkout for that CEP for half an hour.
+    def rates? = @rates.any?
 
     # nil when this carrier service can't take the shipment (or the quote
     # failed): Solidus then simply doesn't offer that shipping method.
