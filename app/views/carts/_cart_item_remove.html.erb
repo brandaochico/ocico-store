@@ -2,10 +2,10 @@
     <use xlink:href="<%= image_path('remixicon.symbol.svg') %>#ri-close-line"></use>
 </svg>
 <%= order_form.submit(
-    'Remove',
+    t('storefront.cart.remove'),
     class: "underline text-body-sm cursor-pointer",
     id: "delete_#{dom_id(line_item)}",
-    data: { disable_with: 'Remove' },
+    data: { disable_with: t('storefront.cart.remove') },
     'data-action': 'click->cart-page#setQuantityToZero',
     # FIXME: `index: nil` is required because otherwise rails will double the index
     'data-cart-page-quantity-id-param': item_form.field_id(:quantity, index: nil),

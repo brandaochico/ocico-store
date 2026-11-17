@@ -2,6 +2,7 @@
 # Convention: never hardcode user-facing text in storefront views/controllers — add it here instead.
 "pt-BR":
   storefront:
+    email_placeholder: "seu@email.com"
     home:
       shop_collection: "Cartas em Destaque"
       new_arrivals: "Chegaram Agora"
@@ -10,6 +11,7 @@
       shop_all: "Ver Tudo"
     cart:
       total_without_shipping: "Total (sem frete)"
+      remove: "Remover"
     order:
       confirmed: "Confirmado"
       sections:

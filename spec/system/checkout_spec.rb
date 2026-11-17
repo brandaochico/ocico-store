@@ -679,7 +679,7 @@ RSpec.describe 'Checkout', :js, type: :system do
         end
 
         fill_in_address
-        fill_in 'Customer email', with: 'test@example.com'
+        fill_in I18n.t('checkout.email.label'), with: 'test@example.com'
 
         state_name_css = "order_bill_address_attributes_state_name"
 

@@ -23,7 +23,7 @@ RSpec.describe 'Cart', type: :system do
     page.execute_script("document.getElementById('update-cart').onsubmit = function(){return false;}")
 
     expect(page).not_to have_selector('button#update-button[disabled]')
-    click_button 'Remove'
+    click_button I18n.t('storefront.cart.remove')
     expect(page).to have_selector('button#update-button[disabled]')
   end
 

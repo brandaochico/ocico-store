@@ -42,7 +42,7 @@ RSpec.describe 'First Order promotion', type: :system do
     click_button I18n.t("spree.apply_code")
     expect(page).to have_content("The coupon code was successfully applied to your order")
     checkout_as_guest
-    fill_in "Customer email", with: "sam@tom.com"
+    fill_in I18n.t("checkout.email.label"), with: "sam@tom.com"
     fill_in_address
     click_on I18n.t("spree.save_and_continue")
     expect(page).to_not have_content("#summary-order-charges")

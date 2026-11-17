@@ -2,6 +2,8 @@
 "pt-BR":
   checkout:
     covered_by_store_credit: "Seu pedido está totalmente coberto por crédito na loja; não é preciso outra forma de pagamento."
+    email:
+      label: "E-mail para acompanhar o pedido"
     summary:
       items_value: "Valor dos itens"
       shipping: "Frete"
