@@ -251,8 +251,10 @@ an enqueue:
   id) and the transition runs inside that row's lock. This covers duplicate
   *and* concurrent delivery — without it a redelivered `charge.refunded` can
   race past `RefundsSynchronizer`'s "already synced?" check and create the
-  same `Spree::Refund` twice. A job that raises leaves `processed_at` unset so
-  an Active Job retry still gets to run.
+  same `Spree::Refund` twice. A job that raises leaves `processed_at` unset
+  and is retried (`retry_on`, up to 10 attempts with growing waits): Stripe
+  already has its 200 and never redelivers, so the retry is the only second
+  chance. An event whose payment method was deleted is dropped, not retried.
 
 Registering the endpoint with Stripe is still to do: production URL is
 `/solidus_stripe/live/webhooks`, everywhere else `/solidus_stripe/test/webhooks`
@@ -299,20 +301,25 @@ offered. Solidus pre-selects the cheapest.
 **Fallback, so checkout never dead-ends.** "Entrega padrão" (R$20,
 `MelhorEnvio::FallbackCalculator`, converted in place from the old provisional
 flat rate) is offered *only* when the quote fails: timeout (3 s open / 6 s
-read), error response, no token configured, or a stock location without a CEP.
+read), dropped connection, error response, a response that can't be parsed
+into prices, no token configured, or a stock location without a CEP. Freight
+never turns the delivery step into a 500.
 When the quote succeeds but no carrier serves the destination, nothing is
 offered — a flat rate for a route nobody delivers to would sell something that
 can't ship.
 
 **Cache.** Its own in-process `MemoryStore`, not `Rails.cache` (test runs a
 null store, and the quote must be shared within one estimate everywhere):
-successful quotes for 30 minutes, failures for 1 minute so one estimate
-doesn't retry once per carrier.
+quotes with at least one price for 30 minutes; failures, and quotes in which
+no carrier could take the shipment, for 1 minute — one estimate still doesn't
+retry once per carrier, but "no carrier" (which can be a carrier-side outage)
+doesn't dead-end checkout for that CEP for half an hour.
 
 **What a quote is made of.**
-- *From:* the stock location's CEP (admin → Estoque → Locais de estoque). It
-  is the store's real dispatch address, so no seed sets it; until it is set,
-  every quote falls back.
+- *From:* the stock location's CEP (admin → Estoque → Locais de estoque), the
+  store's dispatch address. `db/seeds/shipping.rb` sets it to Canoas/RS
+  (92020-300) only when it is blank, so a CEP entered in the admin wins; with
+  none, every quote falls back.
 - *To:* the order's shipping CEP.
 - *Products:* one entry per variant with quantity; Melhor Envio packs them.
   Weight/dimensions come from `MelhorEnvio::PackageDimensions`: the variant's
