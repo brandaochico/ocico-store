@@ -299,7 +299,7 @@ RSpec.describe 'Checkout', :js, type: :system do
       visit checkout_state_path(:confirm)
 
       # Test TOS not checked alert
-      accept_alert('Please review and accept the Terms of Service') { click_button I18n.t("spree.place_order") }
+      accept_alert(I18n.t('checkout.confirm.terms_not_accepted')) { click_button I18n.t("spree.place_order") }
 
       # prevent form submit to verify button is disabled
       page.execute_script("document.getElementById('checkout_form_confirm').onsubmit = function(){return false;}")
