@@ -594,6 +594,14 @@ reasons — worth understanding before changing them:
   load a JS config at all (tried both the `-c` CLI flag and the `@config`
   at-rule — both hit a "missing babel.cjs" bug). If you need new design tokens,
   add them as native `@theme` vars, not a JS config.
+- **solidus_admin's CSS is built with Tailwind *v3*, not the v4 above.** Its
+  stylesheet is a v3 JS-config preset with four plugins, which v4 ignores: the
+  build "succeeded" while emitting ~15 KB of stray utilities, and the new admin
+  rendered completely unstyled (fixed 2026-11-17). `lib/tasks/solidus_admin/tailwind.rake`
+  therefore runs Tailwind's official v3.4.17 standalone CLI — pinned,
+  SHA256-verified, downloaded once into `tmp/` (so the first build, locally,
+  in CI and in the Docker image, needs network). Only the admin uses it; the
+  storefront stays on v4. Don't point that task back at `Tailwindcss::Ruby`.
 - **`bin/ci` explicitly runs `bin/rails tailwindcss:build` as its own step**
   rather than relying on whatever Rake-task enhancement builds it for local
   `bundle exec rspec` runs — that enhancement didn't fire reliably on a fresh
