@@ -445,8 +445,10 @@
     @apply flex flex-col gap-y-1;
   }
 
+  /* Wraps onto a second line on phones: the five steps don't fit in 375px,
+     and they used to push the whole page into horizontal scroll. */
   .checkout-header__steps > ol {
-    @apply flex;
+    @apply flex flex-wrap gap-y-1;
   }
 
   .checkout-header__steps > ol > li {
