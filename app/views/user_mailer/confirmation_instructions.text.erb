@@ -1,5 +1,5 @@
-Welcome <%= @email %>!
+<%= t('storefront.mailer.confirmation.welcome', email: @email) %>
 
-You can confirm your account email through the link below:
+<%= t('storefront.mailer.confirmation.follow_link') %>
 
-<%= link_to 'Confirm my account', @confirmation_url %>
+<%= @confirmation_url %>

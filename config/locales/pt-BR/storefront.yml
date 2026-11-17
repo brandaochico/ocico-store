@@ -37,6 +37,16 @@
       products: "Produtos"
       collections: "Coleções"
       see_all_collections: "Ver todas as coleções..."
+    mailer:
+      reset_password:
+        requested: "Recebemos um pedido para redefinir a senha da sua conta."
+        ignore: "Se não foi você, ignore este e-mail: sua senha continua a mesma."
+        follow_link: "Para escolher uma nova senha, acesse o link abaixo:"
+        copy_link: "Se o link não abrir, copie e cole o endereço no seu navegador."
+        contact: "Se o problema continuar, fale com a gente respondendo este e-mail."
+      confirmation:
+        welcome: "Boas-vindas, %{email}!"
+        follow_link: "Confirme o e-mail da sua conta pelo link abaixo:"
     footer:
       tagline: "Cartas e produtos selados de Pokémon TCG, avulsos e importados."
     collections:
