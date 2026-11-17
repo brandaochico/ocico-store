@@ -264,9 +264,12 @@ the same four.
 
 ### Not started
 
-- System specs for the full card checkout. No longer blocked: the browser
-  driver works and the cart/checkout suite was rescued — what's missing is a
-  spec that drives a Stripe payment, which needs test credentials.
+- An automated system spec for the card checkout. The flow itself was
+  verified by hand against a Stripe sandbox; a spec that repeats it would
+  call Stripe's real test API, so it needs test keys as CI secrets. Test cards
+  that cover the interesting paths: `4242 4242 4242 4242` (approved),
+  `4000 0000 0000 0002` (refused), `4000 0000 0000 9995` (insufficient funds),
+  `4000 0025 0000 3155` (3D Secure challenge).
 - Registering the Mercado Pago webhook (application panel → Webhooks, topic
   "Order", URL `https://<domain>/webhooks/mercado_pago`) and putting the
   generated secret in `MERCADOPAGO_WEBHOOK_SECRET` / credentials. Until then
@@ -643,10 +646,15 @@ reasons — worth understanding before changing them:
   completion, QR code / boleto on the order page, HMAC-verified webhook +
   15-minute sweep syncing payment state, stock released on expiry, partial
   refunds — verified end to end against the sandbox.
-  Left: real Stripe credentials (nothing can transact without them — see the
-  credentials gotcha), registering both webhook endpoints (Stripe dashboard,
-  Mercado Pago panel), and an end-to-end checkout system spec that actually
-  pays with Stripe.
+  Cards on Stripe verified end to end against a Stripe sandbox (2026-11-17):
+  authorize at checkout, capture, partial refund, refusals (generic,
+  insufficient funds) and a 3D Secure challenge, with `payment_intent.*` and
+  `charge.refunded` webhooks forwarded by `stripe listen` and each processed
+  once. Stripe.js runs with the store's locale on both the payment and the
+  confirm page, so the card form and refusal messages are in Portuguese.
+  Left: registering both webhook endpoints in production (Stripe dashboard,
+  Mercado Pago panel), and an automated system spec that pays with Stripe
+  (needs test keys available to CI).
 - ⬜ **Fase 3 — Freight & import duty.** Melhor Envio calculator,
   `ImportDutyRate` + calculator + adjustment, end-to-end order-total specs.
 - ⬜ **Fase 4 — Admin & monetary reporting.** Cash-flow dashboard, import duty
