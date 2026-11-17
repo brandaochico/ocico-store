@@ -10,10 +10,10 @@
 #   at all (MelhorEnvio::FallbackCalculator) — it used to be the provisional
 #   "Frete fixo (provisório)", which is converted in place.
 #
-# Melhor Envio quotes from the stock location's CEP, which this seed does not
-# set: it's the store's real shipping address, entered in the admin (Estoque →
-# Locais de estoque). Until it is, every quote falls back to the flat rate.
-# See "Freight" in docs/ARCHITECTURE.md.
+# Melhor Envio quotes from the stock location's CEP: the store dispatches from
+# Canoas/RS (CEP 92020-300). The seed fills that in only while the stock
+# location has no CEP, so an address edited in the admin (Estoque → Locais de
+# estoque) is never overwritten. See "Freight" in docs/ARCHITECTURE.md.
 module OcicoStore
   module ShippingSeed
     module_function
@@ -43,6 +43,24 @@ module OcicoStore
         seed_melhor_envio_method(service_id, name, zone:, categories:)
       end
       seed_fallback_method(zone:, categories:)
+      seed_dispatch_origin
+    end
+
+    def dispatch_origin
+      { zipcode: "92020-300", city: "Canoas", state_abbr: "RS" }
+    end
+
+    def seed_dispatch_origin
+      stock_location = Spree::StockLocation.order(:id).first
+      return if stock_location.nil? || stock_location.zipcode.present?
+
+      brazil = Spree::Country.find_by!(iso: "BR")
+      stock_location.update!(
+        zipcode: dispatch_origin[:zipcode],
+        city: dispatch_origin[:city],
+        country: brazil,
+        state: brazil.states.find_by(abbr: dispatch_origin[:state_abbr])
+      )
     end
 
     def seed_zone

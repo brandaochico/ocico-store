@@ -39,6 +39,25 @@ RSpec.describe "db/seeds/shipping.rb" do
     expect(Spree::ShippingMethod.where(name: [ "Frete fixo (provisório)", "Entrega padrão" ]).count).to eq(1)
   end
 
+  describe "the dispatch origin Melhor Envio quotes from" do
+    let!(:stock_location) { create(:stock_location, zipcode: nil, city: nil) }
+
+    it "sets the stock location's CEP to Canoas/RS when it has none" do
+      run_seed
+
+      expect(stock_location.reload).to have_attributes(zipcode: "92020-300", city: "Canoas")
+      expect(stock_location.country.iso).to eq("BR")
+    end
+
+    it "never overwrites a CEP entered in the admin" do
+      stock_location.update!(zipcode: "01310-100")
+
+      run_seed
+
+      expect(stock_location.reload.zipcode).to eq("01310-100")
+    end
+  end
+
   it "is idempotent, even after a method is renamed in the admin" do
     run_seed
     Spree::ShippingMethod.find_by!(name: "Correios PAC").update!(name: "PAC")
