@@ -4,6 +4,9 @@
       <div class="col-span-full">
         <p class="font-heading text-h5 mb-2"><%= current_store.name %></p>
         <p class="font-ui text-body-sm text-gray-500 dark:text-sand"><%= t("storefront.footer.tagline") %></p>
+        <p class="font-ui text-body-sm mt-2">
+          <%= link_to t("storefront.footer.terms"), terms_path, class: "underline hover:text-primary" %>
+        </p>
       </div>
     </div>
   </div>

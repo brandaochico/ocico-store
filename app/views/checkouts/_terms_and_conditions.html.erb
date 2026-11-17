@@ -1,0 +1,8 @@
+<%# The same text as /termos-de-servico, in a scrolling box so the confirm
+    step stays short; the link opens the full page in a new tab. %>
+<div class="info-card terms terms--embedded" tabindex="0" aria-label="<%= t('storefront.terms.title') %>">
+  <%= render "terms/content" %>
+</div>
+<p class="mt-3 text-body-sm">
+  <%= link_to t('storefront.terms.open_full'), terms_path, target: "_blank", rel: "noopener", class: "underline" %>
+</p>

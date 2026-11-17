@@ -61,6 +61,8 @@ end
 # collections themselves, not a product listing filtered by one.
 get "/colecoes", to: "collections#index", as: :collections
 
+get "/termos-de-servico", to: "terms#show", as: :terms
+
 # route globbing for pretty nested taxon and product paths
 get "/t/*id", to: "taxons#show", as: :nested_taxons
 

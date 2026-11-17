@@ -47,7 +47,11 @@
       confirmation:
         welcome: "Boas-vindas, %{email}!"
         follow_link: "Confirme o e-mail da sua conta pelo link abaixo:"
+    terms:
+      title: "Termos de serviço"
+      open_full: "Abrir os termos de serviço em uma nova aba"
     footer:
+      terms: "Termos de serviço"
       tagline: "Cartas e produtos selados de Pokémon TCG, avulsos e importados."
     collections:
       title: "Todas as coleções"

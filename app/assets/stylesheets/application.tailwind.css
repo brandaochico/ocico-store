@@ -469,6 +469,42 @@
     @apply text-red-500;
   }
 
+  /* Terms of service (terms/_content.<locale>.html.erb), on its own page and
+     in a scrolling box at checkout's confirm step. */
+  .terms {
+    @apply font-body text-body-sm leading-relaxed;
+  }
+
+  .terms h2 {
+    @apply font-heading text-h6 mt-8 mb-3 first:mt-0;
+  }
+
+  .terms p,
+  .terms ul {
+    @apply mb-3;
+  }
+
+  .terms ul {
+    @apply list-disc pl-5;
+  }
+
+  .terms li {
+    @apply mb-1;
+  }
+
+  /* The body face's bold is a script cut, hard to read in legal text. */
+  .terms strong {
+    @apply font-sans-md;
+  }
+
+  .terms .terms__updated {
+    @apply font-ui text-body-xs text-gray-500 dark:text-sand;
+  }
+
+  .terms--embedded {
+    @apply max-h-80 overflow-y-auto;
+  }
+
   /* Badges */
 
   .badge {
