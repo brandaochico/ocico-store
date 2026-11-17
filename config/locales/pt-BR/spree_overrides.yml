@@ -177,6 +177,49 @@
     locale_changed: "Idioma alterado."
     locale_not_changed: "Não foi possível alterar o idioma."
 
+    # E-mails transacionais (templates do solidus_core): confirmação,
+    # cancelamento, envio com rastreio e reembolso.
+    resend: "Reenvio"
+    order_mailer:
+      confirm_email:
+        subject: "Confirmação do pedido"
+        dear_customer: "Olá,"
+        instructions: "Recebemos o seu pedido. Confira abaixo os detalhes e guarde este e-mail."
+        order_summary: "Resumo do pedido"
+        subtotal: "Subtotal:"
+        total: "Total do pedido:"
+        thanks: "Obrigado pela compra!"
+      cancel_email:
+        subject: "Cancelamento do pedido"
+        dear_customer: "Olá,"
+        instructions: "O seu pedido foi CANCELADO. Guarde este e-mail como registro do cancelamento."
+        order_summary_canceled: "Resumo do pedido [CANCELADO]"
+        subtotal: "Subtotal:"
+        total: "Total do pedido:"
+      inventory_cancellation:
+        subject: "Cancelamento de itens"
+        dear_customer: "Olá,"
+        instructions: "Alguns itens do seu pedido foram CANCELADOS. Guarde este e-mail como registro do cancelamento."
+        order_summary_canceled: "Itens cancelados"
+    shipment_mailer:
+      shipped_email:
+        subject: "Pedido enviado"
+        dear_customer: "Olá,"
+        instructions: "O seu pedido foi enviado."
+        shipment_summary: "Resumo do envio"
+        thanks: "Obrigado pela compra!"
+        track_information: "Código de rastreio: %{tracking}"
+        track_link: "Acompanhe a entrega: %{url}"
+    reimbursement_mailer:
+      reimbursement_email:
+        subject: "Reembolso processado"
+        dear_customer: "Olá,"
+        instructions: "O seu reembolso foi processado."
+        refund_summary: "Resumo do reembolso"
+        exchange_summary: "Resumo da troca"
+        total_refunded: "Total reembolsado: %{total}"
+        days_to_send: "Você tem %{days} dias para enviar de volta os itens aguardando troca."
+        for: "por"
 
     # Genéricos
     date: "Data"
