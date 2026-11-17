@@ -148,6 +148,35 @@
       confirm: "Confirmação"
       complete: "Concluído"
       cart: "Carrinho"
+      # Estados de um pedido já finalizado, mostrados em "Minha conta".
+      canceled: "Cancelado"
+      returned: "Devolvido"
+      awaiting_return: "Aguardando devolução"
+      resumed: "Retomado"
+
+    # Situação da entrega, também em "Minha conta".
+    shipment_states:
+      backorder: "Aguardando estoque"
+      canceled: "Cancelado"
+      partial: "Parcial"
+      pending: "Pendente"
+      ready: "Pronto para envio"
+      shipped: "Enviado"
+
+    # Mensagens (flash) que os controllers do storefront mostram ao cliente.
+    logged_in_succesfully: "Você entrou na sua conta."
+    account_updated: "Conta atualizada."
+    cannot_edit_orders: "Só é possível alterar o carrinho atual."
+    order_not_found: "Não encontramos o seu pedido. Tente de novo."
+    order_mutex_error: "Algo deu errado. Tente de novo."
+    please_enter_reasonable_quantity: "Informe uma quantidade válida."
+    insufficient_stock_for_order: "Não há estoque suficiente para este pedido."
+    inventory_error_flash_for_insufficient_quantity: "%{names} acabou de ficar indisponível."
+    inventory_error_flash_for_insufficient_shipment_quantity: "A quantidade escolhida de %{unavailable_items} não está mais disponível. Revise o pedido e tente de novo."
+    spree_gateway_error_flash_for_checkout: "Houve um problema com os dados de pagamento. Confira as informações e tente de novo."
+    locale_changed: "Idioma alterado."
+    locale_not_changed: "Não foi possível alterar o idioma."
+
 
     # Genéricos
     date: "Data"
@@ -164,6 +193,37 @@
 
     i18n:
       language: "Idioma"
+
+  # Devise (via solidus_auth_devise). A gem traz um pt-BR incompleto: as chaves
+  # abaixo faltavam (e caíam no inglês) ou tinham erro de digitação.
+  devise:
+    failure:
+      invalid: "E-mail ou senha inválidos."
+      not_found_in_database: "E-mail ou senha inválidos."
+      unconfirmed: "Você precisa confirmar sua conta antes de continuar."
+    sessions:
+      signed_in: "Você entrou na sua conta."
+      signed_out: "Você saiu da sua conta."
+      already_signed_out: "Você saiu da sua conta."
+    passwords:
+      send_instructions: "Se houver uma conta com esse e-mail, você vai receber em instantes as instruções para redefinir a senha."
+      send_paranoid_instructions: "Se houver uma conta com esse e-mail, você vai receber em instantes as instruções para redefinir a senha."
+      updated: "Senha alterada. Você já está conectado."
+      updated_not_active: "Senha alterada."
+      no_token: "Esta página só pode ser aberta pelo link do e-mail de redefinição de senha. Confira se usou o link completo."
+    registrations:
+      signed_up: "Boas-vindas! Sua conta foi criada."
+      signed_up_but_unconfirmed: "Enviamos um link de confirmação para o seu e-mail. Abra-o para ativar a conta."
+      updated: "Sua conta foi atualizada."
+      destroyed: "Sua conta foi encerrada. Esperamos ver você de novo em breve."
+    confirmations:
+      send_paranoid_instructions: "Se o seu e-mail estiver cadastrado, você vai receber em instantes as instruções para confirmar a conta."
+
+  errors:
+    messages:
+      # A gem traduz como "E-mail não pode estar em branco", mas a mensagem
+      # aparece para e-mail inválido no checkout como visitante.
+      email_is_invalid: "Informe um e-mail válido."
 
   solidus_stripe:
     loading: "Carregando..."

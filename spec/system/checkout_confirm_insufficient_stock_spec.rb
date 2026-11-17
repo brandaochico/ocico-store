@@ -31,7 +31,7 @@ RSpec.describe 'Checkout confirm page submission', :js, type: :system do
         it 'redirects to cart page and shows an unavailable product message' do
           check I18n.t("spree.agree_to_terms_of_service")
           click_button I18n.t("spree.place_order")
-          expect(page).to have_content "#{order_product.name} became unavailable"
+          expect(page).to have_content "#{order_product.name} acabou de ficar indisponível"
           expect(page).to have_current_path cart_path
         end
       end
@@ -52,7 +52,7 @@ RSpec.describe 'Checkout confirm page submission', :js, type: :system do
         it "redirects to the address checkout page and shows an availability changed message" do
           check I18n.t("spree.agree_to_terms_of_service")
           click_button I18n.t("spree.place_order")
-          error_message = "Quantity selected of #{order_product.name} is not available. Still, items may be available from another stock location, please try again."
+          error_message = I18n.t("spree.inventory_error_flash_for_insufficient_shipment_quantity", unavailable_items: order_product.name)
           expect(page).to have_content error_message
           expect(page).to have_current_path checkout_state_path(:address)
         end

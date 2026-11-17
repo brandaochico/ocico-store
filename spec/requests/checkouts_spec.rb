@@ -446,7 +446,7 @@ RSpec.describe 'Checkouts', type: :request, with_signed_in_user: true do
       end
 
       it "redirects set flash message for no inventory" do
-        expect(flash[:error]).to eq("#{order.line_items.first.name} became unavailable.")
+        expect(flash[:error]).to eq("#{order.line_items.first.name} acabou de ficar indisponível.")
       end
     end
   end
