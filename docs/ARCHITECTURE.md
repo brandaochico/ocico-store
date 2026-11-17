@@ -695,8 +695,10 @@ reasons — worth understanding before changing them:
   (needs test keys available to CI).
 - 🟡 **Fase 3 — Freight & import duty (in progress).** Done: Melhor Envio
   quotes per carrier with delivery times and a fallback flat rate (see
-  "Freight"). Left: verifying against the Melhor Envio sandbox with a real
-  token and the store's CEP, label purchase, and `ImportDutyRate` +
+  "Freight"), verified against the Melhor Envio sandbox on 2026-11-17 (four
+  carriers with prices and delivery times; a remote CEP and an R$899,90 card
+  correctly leave only PAC and SEDEX). Left: the store's real dispatch CEP on
+  the stock location, label purchase, and `ImportDutyRate` +
   calculator + adjustment with end-to-end order-total specs.
 - ⬜ **Fase 4 — Admin & monetary reporting.** Cash-flow dashboard, import duty
   report, CSV exports.
