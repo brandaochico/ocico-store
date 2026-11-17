@@ -279,29 +279,67 @@ the same four.
   real problem, Mercado Pago can take cards too — the client, webhook and
   sync are already in place.
 
-## Freight (Fase 3 — not started)
+## Freight (Fase 3 — Melhor Envio quotes in place)
 
-**Interim:** `db/seeds/shipping.rb` creates a "Brasil" zone with one flat-rate
-method, "Frete fixo (provisório)", R$20 — Solidus' sample data only had North
-America/EU zones, so a Brazilian address couldn't get past checkout's address
-step at all. `Spree::Config.default_country_iso` is `"BR"`. The Melhor Envio
-calculator below replaces the flat rate; delete it then.
+Melhor Envio quotes Correios and Jadlog at checkout (`app/models/melhor_envio/`).
+No maintained gem exists: `solidus_melhor_envio` was last released in 2023 and
+its repository is gone. Correios directly stays out unless Melhor Envio proves
+insufficient.
 
-No maintained gem exists for Correios/Melhor Envio on current Solidus (the
-Spree-era ones are stale). **Start with Melhor Envio only** (aggregates
-Correios + private carriers behind one API, free rate-shopping) — add Correios
-directly later only if needed.
+**How it fits Solidus.** One `Spree::ShippingMethod` per carrier service, each
+with a `MelhorEnvio::ShippingCalculator` holding the service's Melhor Envio id
+(1 PAC, 2 SEDEX, 3 Jadlog .Package, 17 Mini Envios), seeded by
+`db/seeds/shipping.rb`. Solidus asks each calculator separately;
+`MelhorEnvio::Quote` makes **one** API call per package (CEPs + contents) and
+caches it, so the four methods share it. A service that can't take the
+shipment (route not served, over its declared-value or weight limit — Mini
+Envios stops at R$100/300 g) answers `available? == false` and simply isn't
+offered. Solidus pre-selects the cheapest.
 
-- New class extending `Spree::ShippingCalculator`, implementing
-  `compute_package`, registered in
-  `Spree::Config.environment.calculators.shipping_methods`.
-- Credentials via `Rails.application.credentials`, never a loose ENV var or a
-  custom settings table.
-- Synchronous call during checkout (customer needs to see freight before
-  paying), but with an aggressive timeout + a cached rate fallback per weight
-  bracket/CEP, so a slow carrier API never blocks checkout. Cache via
-  `Rails.cache` (Solid Cache, already configured) — there is no Redis in this
-  stack any more, see "Background jobs".
+**Fallback, so checkout never dead-ends.** "Entrega padrão" (R$20,
+`MelhorEnvio::FallbackCalculator`, converted in place from the old provisional
+flat rate) is offered *only* when the quote fails: timeout (3 s open / 6 s
+read), error response, no token configured, or a stock location without a CEP.
+When the quote succeeds but no carrier serves the destination, nothing is
+offered — a flat rate for a route nobody delivers to would sell something that
+can't ship.
+
+**Cache.** Its own in-process `MemoryStore`, not `Rails.cache` (test runs a
+null store, and the quote must be shared within one estimate everywhere):
+successful quotes for 30 minutes, failures for 1 minute so one estimate
+doesn't retry once per carrier.
+
+**What a quote is made of.**
+- *From:* the stock location's CEP (admin → Estoque → Locais de estoque). It
+  is the store's real dispatch address, so no seed sets it; until it is set,
+  every quote falls back.
+- *To:* the order's shipping CEP.
+- *Products:* one entry per variant with quantity; Melhor Envio packs them.
+  Weight/dimensions come from `MelhorEnvio::PackageDimensions`: the variant's
+  own `weight`/`height`/`width`/`depth` (entered in the admin **in kg and cm,
+  packaging included**), then its master's, then a default by the product's
+  "Tipo" taxon (a single card ships as a padded envelope at the Correios
+  minimum, 16×11×2 cm/50 g; a booster box as 25×20×12 cm/1 kg). The defaults
+  are estimates — weigh real products and enter them.
+- *Declared value* (`insurance_value`): each item's price. It's what the
+  carrier insures and what caps the services that can take it.
+
+**Delivery time.** `spree_shipping_rates` gained `min/max_delivery_days`,
+filled by `app/overrides/shipping_rate_delivery_days.rb` for calculators that
+know one, and shown at the delivery step ("Entrega em 5 a 7 dias úteis").
+Melhor Envio's `custom_*` values already include any extra days configured in
+the Melhor Envio account (e.g. handling time).
+
+**Credentials.** `config/initializers/melhor_envio.rb`: encrypted credentials
+first (`melhor_envio: token/sandbox/contact_email`), then ENV
+(`MELHOR_ENVIO_TOKEN`, `MELHOR_ENVIO_SANDBOX`, `MELHOR_ENVIO_CONTACT_EMAIL`).
+The token is a personal access token from the Melhor Envio panel and only works
+in the environment it came from; `sandbox` defaults to on outside production.
+The contact email goes in the User-Agent, which Melhor Envio requires.
+
+**Not done yet:** buying labels after payment (Melhor Envio's cart →
+checkout → generate → print flow) and tracking — today the owner buys labels in
+the Melhor Envio panel.
 
 ## Import duty / landed cost (Fase 3 — not started)
 
@@ -655,8 +693,11 @@ reasons — worth understanding before changing them:
   Left: registering both webhook endpoints in production (Stripe dashboard,
   Mercado Pago panel), and an automated system spec that pays with Stripe
   (needs test keys available to CI).
-- ⬜ **Fase 3 — Freight & import duty.** Melhor Envio calculator,
-  `ImportDutyRate` + calculator + adjustment, end-to-end order-total specs.
+- 🟡 **Fase 3 — Freight & import duty (in progress).** Done: Melhor Envio
+  quotes per carrier with delivery times and a fallback flat rate (see
+  "Freight"). Left: verifying against the Melhor Envio sandbox with a real
+  token and the store's CEP, label purchase, and `ImportDutyRate` +
+  calculator + adjustment with end-to-end order-total specs.
 - ⬜ **Fase 4 — Admin & monetary reporting.** Cash-flow dashboard, import duty
   report, CSV exports.
 - ⬜ **Fase 5 — Production deploy.** Real Kamal deploy, domain, TLS, backups,

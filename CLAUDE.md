@@ -49,6 +49,11 @@ bin/rails db:seed                                               # creates the "P
 bin/rails mercado_pago:sync                                     # dev has no recurring jobs: sync by hand
 ```
 
+Freight quotes go through Melhor Envio, from the same `.env` (`MELHOR_ENVIO_TOKEN`, a sandbox personal access
+token, and `MELHOR_ENVIO_CONTACT_EMAIL`). Without a token, or while the stock location has no CEP, checkout
+offers only the fallback flat rate "Entrega padrão" — that's intended, not a bug (see "Freight" in
+`docs/ARCHITECTURE.md`).
+
 Local dev also requires the `libvips` **system package** (not a gem) — Solidus's product image variant styles
 need it. If image rendering 500s with `ImageProcessing::Error`, check `vips --version` for a glibc mismatch
 before assuming it's an application bug.
