@@ -10,6 +10,9 @@
       currency: current_order.currency.downcase,
       paymentMethodCreation: 'manual',
       captureMethod: payment_method.auto_capture? ? 'automatic' : 'manual',
+      # Labels, placeholders and card errors in the store's language ("pt-BR"
+      # is one of Stripe.js's supported locales).
+      locale: I18n.locale.to_s,
 
       # If you want to allow the display/use of specific payment method types
       # activated from the Stripe Dashboard, you can use this option.

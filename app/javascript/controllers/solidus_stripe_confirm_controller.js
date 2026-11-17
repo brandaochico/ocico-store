@@ -7,10 +7,13 @@ export default class extends Controller {
     publishableKey: String,
     returnUrl: String,
     errorBaseUrl: String,
+    locale: { type: String, default: "auto" },
   }
 
   async connect() {
-    this.stripe = await loadStripe(this.publishableKeyValue)
+    // The locale localizes Stripe.js's error strings, i.e. the refusal
+    // message ("cartão recusado") shown after confirmPayment fails.
+    this.stripe = await loadStripe(this.publishableKeyValue, { locale: this.localeValue })
   }
 
   // action
