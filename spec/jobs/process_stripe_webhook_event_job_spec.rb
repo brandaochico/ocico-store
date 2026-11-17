@@ -82,15 +82,41 @@ RSpec.describe ProcessStripeWebhookEventJob do
     end
   end
 
+  # Stripe already has its 200 and won't redeliver, so a retry is the only way
+  # a failed transition still happens.
   context "when processing raises" do
-    before do
+    include ActiveJob::TestHelper
+
+    it "leaves the event unprocessed and schedules a retry" do
       allow(Spree::Bus).to receive(:publish).and_raise("Stripe subscriber blew up")
+
+      expect { process }.to have_enqueued_job(described_class).with(payload)
+      expect(StripeWebhookEvent.sole).not_to be_processed
     end
 
-    it "leaves the event unprocessed so an Active Job retry can pick it up" do
-      expect { process }.to raise_error("Stripe subscriber blew up")
+    it "runs the transition on the retry once the failure clears" do
+      calls = 0
+      allow(Spree::Bus).to receive(:publish).and_wrap_original do |original, *args, **kwargs, &block|
+        calls += 1
+        raise "Stripe API hiccup" if calls == 1
 
-      expect(StripeWebhookEvent.sole).not_to be_processed
+        original.call(*args, **kwargs, &block)
+      end
+
+      perform_enqueued_jobs { process }
+
+      expect(payment.reload.state).to eq("completed")
+      expect(StripeWebhookEvent.sole).to be_processed
+    end
+  end
+
+  context "when the payment method has since been deleted" do
+    it "drops the event without retrying" do
+      payload # build it while the payment method still exists
+      allow(SolidusStripe::PaymentMethod).to receive(:find_by).and_return(nil)
+
+      expect { process }.not_to have_enqueued_job(described_class)
+      expect(StripeWebhookEvent.count).to eq(0)
     end
   end
 
