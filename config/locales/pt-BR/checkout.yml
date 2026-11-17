@@ -11,6 +11,9 @@
     address:
       cep_not_found: "CEP não encontrado. Confira o número ou preencha o endereço manualmente."
       complement_placeholder: "Apto, bloco, sala… (opcional)"
+    confirm:
+      submitting: "Enviando…"
+      terms_not_accepted: "Para finalizar o pedido, leia e aceite os termos de serviço."
     mercado_pago:
       pix:
         instructions: "Ao confirmar o pedido, você recebe um QR Code Pix. Ele vale por 4 horas, e até lá os itens ficam reservados para você."

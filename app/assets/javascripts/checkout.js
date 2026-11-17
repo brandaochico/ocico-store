@@ -23,10 +23,10 @@ window.addEventListener('DOMContentLoaded', () => {
     const submitButton = form.querySelector('[type="submit"]');
     form.onsubmit = function () {
       if (termsCheckbox.checked) {
-        submitButton.innerHTML = 'Submitting...';
+        submitButton.textContent = termsCheckbox.dataset.submittingText;
         return true;
       } else {
-        alert('Please review and accept the Terms of Service');
+        alert(termsCheckbox.dataset.notAcceptedMessage);
         submitButton.removeAttribute('disabled');
         submitButton.classList.remove('disabled');
         return false;
