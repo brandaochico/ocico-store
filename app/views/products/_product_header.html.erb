@@ -4,7 +4,7 @@
   </h1>
 
   <% if product.price_for_options(current_pricing_options)&.money and !product.price.nil? %>
-    <h2 class="font-body text-body-md" id="product-price">
+    <h2 class="font-body text-body-md" id="product-price" data-unavailable-text="<%= t('storefront.product.combination_unavailable') %>">
       <%= content_tag(
         :span,
         display_price(product),

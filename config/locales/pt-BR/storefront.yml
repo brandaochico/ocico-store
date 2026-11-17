@@ -23,6 +23,7 @@
       shop_now: "Comprar"
       you_may_also_like: "Você Também Pode Gostar"
       badge_new: "Novo"
+      combination_unavailable: "Combinação indisponível"
     search:
       see_all_results: "Ver todos os resultados"
       no_results: "Nenhum resultado"

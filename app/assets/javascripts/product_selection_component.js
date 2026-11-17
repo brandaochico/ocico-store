@@ -88,7 +88,8 @@ function selectVariant() {
     this.variant.click();
     this.updateView(this.variant);
   } else {
-    this.priceTarget.innerText = "Not found, please select all optionTypeSelector";
+    const price = document.querySelector("#product-price");
+    if (price) price.innerText = price.dataset.unavailableText;
   }
 }
 
