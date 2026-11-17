@@ -8,4 +8,14 @@ module CheckoutHelper
       "#{prefix}/#{fallback_name}"
     end
   end
+
+  # "Entrega em 3 a 5 dias úteis", or "em até 4 dias úteis" when the carrier
+  # gives a single number.
+  def delivery_days_text(min_days, max_days)
+    if max_days && max_days > min_days
+      t("checkout.delivery.delivery_days_range", min: min_days, max: max_days)
+    else
+      t("checkout.delivery.delivery_days", count: max_days || min_days)
+    end
+  end
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_05_025027) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_17_143655) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -915,6 +915,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_05_025027) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer "tax_rate_id"
+    t.integer "min_delivery_days"
+    t.integer "max_delivery_days"
     t.index ["shipment_id", "shipping_method_id"], name: "spree_shipping_rates_join_index", unique: true
   end
 

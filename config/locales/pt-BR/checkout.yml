@@ -8,6 +8,10 @@
       quantity: "Qtd.: %{count}"
     delivery:
       items_title: "Itens do pedido"
+      delivery_days:
+        one: "Entrega em até %{count} dia útil"
+        other: "Entrega em até %{count} dias úteis"
+      delivery_days_range: "Entrega em %{min} a %{max} dias úteis"
     address:
       cep_not_found: "CEP não encontrado. Confira o número ou preencha o endereço manualmente."
       complement_placeholder: "Apto, bloco, sala… (opcional)"

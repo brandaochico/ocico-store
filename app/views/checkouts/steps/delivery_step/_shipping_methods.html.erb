@@ -22,7 +22,14 @@
             }
           } : {})
         ) %>
-        <%= "#{rate.name} #{rate.display_cost}" %>
+        <span class="flex flex-col">
+          <span><%= "#{rate.name} #{rate.display_cost}" %></span>
+          <% if rate.min_delivery_days %>
+            <span class="text-body-xs text-gray-500 dark:text-sand">
+              <%= delivery_days_text(rate.min_delivery_days, rate.max_delivery_days) %>
+            </span>
+          <% end %>
+        </span>
       <% end %>
     </li>
   <% end %>
