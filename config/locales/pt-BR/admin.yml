@@ -4,6 +4,9 @@
 # only when we need to change gem-owned copy, not here.
 "pt-BR":
   admin:
+    melhor_envio:
+      calculator_description: "Melhor Envio (cotação por transportadora)"
+      fallback_calculator_description: "Melhor Envio: frete reserva (quando a cotação falha)"
     mercado_pago:
       order_id: "Order no Mercado Pago"
       payment_id: "Pagamento no Mercado Pago"
