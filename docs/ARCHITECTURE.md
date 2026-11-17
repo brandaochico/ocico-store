@@ -9,8 +9,9 @@ repo. Keep it up to date as phases complete or decisions change.
 
 A Pokémon TCG e-commerce store (singles, sealed product, future graded cards)
 for the Brazilian market: web storefront, admin with inventory control, payment,
-freight calculation, import duty calculation (product is imported from
-JP/US), and monetary flow reporting. Storefront and admin live in the same
+freight calculation, landed cost of imported stock (product is imported from
+JP/US; the store pays the import duty, the customer never sees it), and
+monetary flow reporting. Storefront and admin live in the same
 Rails app/server.
 
 The owner has a strong Laravel + PHP + React background and deliberately chose
@@ -211,8 +212,7 @@ reconcile in Fase 4's cash-flow report.
   is `SolidusStripe::PaymentMethod` (the v5 rewrite), *not* the v4-era
   `Spree::PaymentMethod::StripePaymentIntents` an older plan mentioned.
   `auto_capture` is **off**: the card is authorized at checkout and captured
-  when the order ships, so we never charge for stock we can't send, and Fase
-  3's freight/import duty can still move the total before capture.
+  when the order ships, so we never charge for stock we can't send.
 - **Secrets never touch the database.** The payment method's
   `preference_source` points at the `solidus_stripe_env_credentials` static
   preference registered in `config/initializers/solidus_stripe.rb`. That
@@ -341,23 +341,26 @@ The contact email goes in the User-Agent, which Melhor Envio requires.
 checkout → generate → print flow) and tracking — today the owner buys labels in
 the Melhor Envio panel.
 
-## Import duty / landed cost (Fase 3 — not started)
+## Import duty / landed cost — the store pays it, so no checkout logic
 
-The highest financial-risk piece — the only money logic that doesn't reuse
-Solidus's existing adjustment plumbing directly (unlike payment/freight).
+**Decided by the owner on 2026-11-17:** the store imports its stock and pays the
+import duty itself, then resells domestically. The customer pays the shelf
+price plus freight and nothing else.
 
-- Model as its own concept: `Spree::ImportDutyRate` (country of origin →
-  percentage). **Do not** reuse `Spree::TaxRate` — import duty is
-  origin-based, not destination/zone-based like Solidus's native tax system
-  assumes; forcing it into `TaxRate` would mean fake zone modeling.
-- Custom calculator (`app/overrides/.../import_duty_calculator.rb`) mirroring
-  how `Spree::Calculator::DefaultTax` works, applied as a per-item
-  `Spree::Adjustment` — so it flows into `order.total` correctly, shows
-  separately in cart/checkout/admin, and survives native recalculation
-  (`OrderUpdater#update_adjustment_total`).
-- Needs the most rigorous test coverage in the system: single item, multi-item
-  cart with mixed origins, zero-rate country, promotion stacking with duty,
-  partial refund correctly reversing duty.
+That **cancels the original plan** of an `ImportDutyRate` model and a per-item
+`Spree::Adjustment` added at checkout — there is no duty in `order.total` to
+calculate, show or refund. Don't build it unless the business model changes
+to selling imports to order (customer as importer).
+
+What the duty still affects is **cost**, hence margin:
+- A variant's landed cost (purchase price + freight to Brazil + duty + fees,
+  per unit, in BRL) goes in Solidus's native `Spree::Variant#cost_price`
+  (`cost_currency` BRL). No new table.
+- Pricing is the owner's call in the admin; the duty is already inside the
+  price they set.
+- Fase 4's reports compute margin as price − `cost_price`.
+- `country_of_origin` on products stays: it documents where stock comes from,
+  and a landed-cost helper (if one is ever wanted) would key on it.
 
 ## Admin & monetary flow (Fase 4 — not started)
 
@@ -367,8 +370,8 @@ capture/refund/void per order, `Spree::RefundReason`, store credits.
 **Needs custom work:**
 - Daily/monthly cash-flow dashboard (`Spree::Admin::CashFlowController`
   aggregating `Spree::Payment`/`Spree::Refund` by day/method).
-- Import duty collected report (sum of `Spree::Adjustment` filtered by the
-  `ImportDuty` source type) for accounting reconciliation.
+- Margin report: revenue against landed cost (`Spree::Variant#cost_price`,
+  which includes the import duty the store paid) per product/period.
 - CSV export of both, reusing solidus_backend's existing order-export pattern.
 
 Scope proportionally: "good-enough dashboards + CSV" for a single-owner store,
@@ -399,7 +402,9 @@ don't reinvent them). Capybara for checkout system specs. WebMock/VCR so tests
 **never** hit a real external API.
 
 **Mandatory coverage before merge, once those phases start:**
-1. `app/overrides/**/calculator/**` (import duty) — highest rigor.
+1. Freight calculators (`app/models/melhor_envio/`) — done, see
+   `spec/models/melhor_envio/`. (Import duty is no longer checkout logic: see
+   "Import duty / landed cost".)
 2. `app/overrides/**/payment_method/**` + webhooks — every state transition,
    idempotent duplicate-webhook handling. **Partly done:**
    `spec/requests/stripe_webhooks_spec.rb` (verify-in-request, work-in-job,
@@ -693,15 +698,17 @@ reasons — worth understanding before changing them:
   Left: registering both webhook endpoints in production (Stripe dashboard,
   Mercado Pago panel), and an automated system spec that pays with Stripe
   (needs test keys available to CI).
-- 🟡 **Fase 3 — Freight & import duty (in progress).** Done: Melhor Envio
+- ✅ **Fase 3 — Freight (import duty dropped from checkout).** Melhor Envio
   quotes per carrier with delivery times and a fallback flat rate (see
   "Freight"), verified against the Melhor Envio sandbox on 2026-11-17 (four
   carriers with prices and delivery times; a remote CEP and an R$899,90 card
-  correctly leave only PAC and SEDEX). Left: the store's real dispatch CEP on
-  the stock location, label purchase, and `ImportDutyRate` +
-  calculator + adjustment with end-to-end order-total specs.
-- ⬜ **Fase 4 — Admin & monetary reporting.** Cash-flow dashboard, import duty
-  report, CSV exports.
+  correctly leave only PAC and SEDEX), quoting from the store's dispatch CEP
+  in Canoas/RS (seeded). The store pays import duty itself, so there is no
+  duty calculation at checkout (see "Import duty / landed cost"). Deferred:
+  buying labels through the API (labels are bought in the Melhor Envio panel
+  for now).
+- ⬜ **Fase 4 — Admin & monetary reporting.** Cash-flow dashboard, margin
+  report against landed cost (`cost_price`), CSV exports.
 - ⬜ **Fase 5 — Production deploy.** Real Kamal deploy, domain, TLS, backups,
   load test, real-money validation transaction per payment method.
 - ⬜ **Fase 6+ (post-launch, data-driven).** Custom Pagar.me/Mercado Pago
