@@ -17,7 +17,7 @@ gem "stimulus-rails"
 # Use Tailwind CSS [https://github.com/rails/tailwindcss-rails]
 # Pinned to 3.x: solidus_starter_frontend's install generator targets the v3
 # JS-config Tailwind pipeline, not v4's CSS-first config.
-gem "tailwindcss-rails", "~> 3.0"
+gem "tailwindcss-rails", "~> 4.6"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
 
