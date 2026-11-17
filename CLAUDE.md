@@ -24,9 +24,9 @@ bin/setup            # bundle install, db:prepare, etc. (--skip-server to not la
 bin/rails db:seed    # idempotent — safe to re-run; seeds catalog + payment methods
 ```
 
-Stripe is only wired up when credentials are present. Until `config/master.key` is recovered (see
-`docs/ARCHITECTURE.md`, "Environment gotchas"), pass **test-mode** keys through ENV — with none set, the seed
-skips the payment method and checkout simply shows no Stripe option:
+Stripe is only wired up when credentials are present. In development, pass **test-mode** keys through ENV
+(production's live keys go in the encrypted credentials — see `docs/ARCHITECTURE.md`, "Environment gotchas");
+with none set, the seed skips the payment method and checkout simply shows no Stripe option:
 
 ```
 SOLIDUS_STRIPE_API_KEY=sk_test_... SOLIDUS_STRIPE_PUBLISHABLE_KEY=pk_test_... \

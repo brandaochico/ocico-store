@@ -567,16 +567,15 @@ reasons — worth understanding before changing them:
   copies made by `railties:install:migrations` and must stay byte-identical to
   the engine's own — same rationale as `db/schema.rb`.
 
-- **`config/credentials.yml.enc` can't be decrypted right now.** It's committed
-  but `config/master.key` isn't (correctly — it's gitignored), and no copy is
-  available on the current machine, so `Rails.application.credentials` reads
-  back as empty rather than raising. Anything that needs a secret currently
-  goes through ENV; the Stripe initializer supports both. Resolving this is a
-  prerequisite for Fase 5 (`RAILS_MASTER_KEY` is already listed in
-  `config/deploy.yml`'s secrets). Either recover the key or regenerate the
-  credentials pair — regenerating discards whatever the current file holds
-  (probably just `secret_key_base`, but that can't be confirmed without the
-  key).
+- **`config/master.key` exists only on the owner's development machine.**
+  It's gitignored (correctly), and it does decrypt `config/credentials.yml.enc`,
+  which holds just `secret_key_base` (verified 2026-11-17; an earlier note here
+  claimed the key was lost, which was wrong). Keep a copy in a password
+  manager: losing it means production can no longer read its credentials.
+  Kamal passes it as `RAILS_MASTER_KEY` (`.kamal/secrets`). Development and
+  test take service keys from ENV (`.env`); production's live keys go into
+  the encrypted credentials when they exist — every initializer reads
+  credentials first, ENV second.
 - **`config.assets.css_compressor = nil` in `config/application.rb`.**
   `sassc-rails` auto-sets this to `:sass` in any non-development environment,
   which makes Sprockets try to run our already-built Tailwind v4 CSS through
