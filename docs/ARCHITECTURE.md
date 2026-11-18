@@ -497,7 +497,11 @@ credentials; until then nothing is sent. The store's `url` (seeded from
 - **`pedidos@ocico.store`** is send-only: the store's `mail_from_address`,
   sent through Brevo's SMTP relay (`smtp-relay.brevo.com`, credentials under
   `smtp:`). It has no mailbox, so every store email carries
-  `Reply-To: contato@ocico.store` (`app/overrides/mailer_reply_to.rb`).
+  `Reply-To: contato@ocico.store`. `app/overrides/store_mailer_headers.rb`
+  also adds the store name as the sender's display name (the admin field
+  holds a bare address, and Brevo ignores its dashboard sender name for SMTP
+  mail — inboxes showed "pedidos") and drops the store-name prefix Solidus
+  puts on every subject.
 
 DNS: one SPF record (`include:_spf.mail.hostinger.com`; Brevo doesn't ask
 for SPF, and a domain may only have one `v=spf1` record, so merge rather than
