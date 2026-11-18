@@ -70,6 +70,9 @@ production:
     database: ocico_store_production
     username: ocico_store
     password: <%= ENV["OCICO_STORE_DATABASE_PASSWORD"] %>
+    # The Kamal `db` accessory, reached by its container name on the kamal
+    # Docker network (DB_HOST in config/deploy.yml).
+    host: <%= ENV.fetch("DB_HOST", "localhost") %>
   cache:
     <<: *primary_production
     database: ocico_store_production_cache
