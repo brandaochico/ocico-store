@@ -10,7 +10,7 @@ image: brandaochico/ocico-store
 servers:
   web:
     hosts:
-      - 147.15.40.125
+      - 147.15.64.249
 
 # Oracle's Ubuntu images log in as `ubuntu`, not root. Docker was installed by
 # hand and `ubuntu` added to the docker group, so Kamal never needs sudo (it
@@ -81,14 +81,14 @@ asset_path: /rails/public/assets
 # key, since Docker's remote builder uses the system ssh client.
 builder:
   arch: arm64
-  remote: ssh://ubuntu@147.15.40.125
+  remote: ssh://ubuntu@147.15.64.249
 
 # Postgres runs as a Kamal accessory on the same VM. There's no Redis: jobs run
 # on Solid Queue, backed by the dedicated `queue` Postgres database.
 accessories:
   db:
     image: postgres:18
-    host: 147.15.40.125
+    host: 147.15.64.249
     # Bound to localhost only: reachable from the app over the kamal Docker
     # network, never from the internet.
     port: "127.0.0.1:5432:5432"

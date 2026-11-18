@@ -450,8 +450,8 @@ No separate `worker` service: Solid Queue's supervisor runs inside Puma via
 second web server, not before.
 
 **Server:** Oracle Cloud Always Free, `VM.Standard.A1.Flex` (2 OCPU / 12 GB,
-**ARM64**), Ubuntu 24.04, São Paulo, `147.15.40.125` (ephemeral public IP —
-it changes if the instance is stopped and started; reserve it before go-live).
+**ARM64**), Ubuntu 24.04, São Paulo, `147.15.64.249` (a *reserved* public IP,
+`ocico-ip`, so it survives stopping the instance; DNS points here).
 Scale vertically (the free tier allows up to 4 OCPU / 24 GB) before going
 multi-server. How it was prepared, by hand, once:
 
