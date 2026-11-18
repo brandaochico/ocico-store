@@ -31,7 +31,14 @@ module CollectionSpritesHelper
     "paldea-evolved" => { file: "paldea-evolved.png", credit_name: GSC_ESSENTIALS, credit_url: nil }
   }.freeze
 
+  SPRITES_DIR = Rails.root.join("app/assets/images/collections")
+
+  # nil when the collection has no sprite, or when its file isn't on this
+  # machine — the directory is git-ignored, so a fresh clone (or an image
+  # built from one) has none. The card then renders without art instead of
+  # image_tag raising for a missing asset and taking the page down.
   def collection_sprite_for(taxon)
-    SPRITES[taxon.permalink.to_s.split("/").last]
+    sprite = SPRITES[taxon.permalink.to_s.split("/").last]
+    sprite if sprite && SPRITES_DIR.join(sprite[:file]).exist?
   end
 end
