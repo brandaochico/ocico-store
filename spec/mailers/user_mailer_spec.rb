@@ -31,6 +31,11 @@ RSpec.describe UserMailer, type: :mailer do
         end
       end
 
+      it 'is sent from the store address with replies going to the contact inbox' do
+        expect(@message.from).to eq [ store.mail_from_address ]
+        expect(@message.reply_to).to eq [ 'contato@ocico.store' ]
+      end
+
       context 'body includes' do
         it 'password reset url' do
           expect(@message.body.raw_source).to include "http://#{store.url}/user/password/edit"
