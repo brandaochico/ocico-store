@@ -26,8 +26,8 @@ RSpec.describe UserMailer, type: :mailer do
           )
         end
 
-        it 'Spree site name' do
-          expect(@message.subject).to include store.name
+        it 'no store name prefix (the sender name already shows it)' do
+          expect(@message.subject).not_to start_with store.name
         end
       end
 

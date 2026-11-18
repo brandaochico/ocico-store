@@ -17,6 +17,17 @@ RSpec.describe StoreMailerHeaders, type: :mailer do
     it "sends replies to the contact inbox" do
       expect(message.reply_to).to eq [ "contato@ocico.store" ]
     end
+
+    it "drops the store-name prefix from the subject" do
+      expect(message.subject).to eq "#{I18n.t('spree.order_mailer.confirm_email.subject')} ##{order.number}"
+    end
+
+    it "keeps the resend marker" do
+      resent = Spree::OrderMailer.confirm_email(order, true)
+
+      expect(resent.subject).to eq "[#{I18n.t('spree.resend').upcase}] " \
+        "#{I18n.t('spree.order_mailer.confirm_email.subject')} ##{order.number}"
+    end
   end
 
   it "leaves an address that already has a display name alone" do

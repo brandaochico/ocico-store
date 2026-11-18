@@ -9,10 +9,13 @@
 #   set in its dashboard to SMTP mail; without this, inboxes show "pedidos".
 # - Reply-To: pedidos@ has no mailbox, so replies go to contato@ocico.store,
 #   the inbox that is actually read (Hostinger).
+# - Subject: Solidus prefixes subjects with the store name ("ocico store
+#   Confirmação do pedido #R123"); with the name already shown as the sender
+#   that's redundant, so it's dropped (a "[REENVIO] " prefix is kept).
 #
-# The address is a method rather than a constant: app/overrides is loaded
-# twice (Zeitwerk and deface's loader), and a constant would warn "already
-# initialized".
+# The address is a method rather than a constant, and the callback is
+# registered by name: app/overrides is loaded twice (Zeitwerk and deface's
+# loader), and Rails dedupes symbol callbacks.
 module StoreMailerHeaders
   def self.reply_to_address
     "ocico store <contato@ocico.store>"
@@ -20,6 +23,7 @@ module StoreMailerHeaders
 
   def self.prepended(base)
     base.default reply_to: reply_to_address
+    base.after_action :drop_store_name_from_subject
   end
 
   def from_address(store)
@@ -27,6 +31,15 @@ module StoreMailerHeaders
     return address if address.blank? || address.include?("<")
 
     email_address_with_name(address, store.name)
+  end
+
+  private
+
+  def drop_store_name_from_subject
+    name = Spree::Store.default&.name
+    return if name.blank? || message.subject.blank?
+
+    message.subject = message.subject.sub(/\A(\[[^\]]+\] )?#{Regexp.escape(name)} /, '\1')
   end
 
   ::Spree::BaseMailer.prepend self
