@@ -536,6 +536,12 @@ Nightly, off the server and off Oracle, set up 2026-11-18 (`script/backup/`):
   `bin/kamal app boot`.
 - Run on demand with `ssh ocico sudo systemctl start ocico-backup`; logs in
   `journalctl -u ocico-backup`.
+- **Second layer, whole machine:** the boot volume has a custom OCI backup
+  policy, `ocico-semanal` — incremental, Sundays 06:00 UTC, kept 28 days. Not
+  Oracle's built-in Bronze/Silver/Gold: those keep monthly and yearly copies
+  that overflow Always Free's 5 volume backups. These snapshots restore the
+  server itself (OS, Docker, `/etc/ocico-backup`) quickly; the B2 dumps stay
+  the source of truth for data, being nightly and off Oracle.
 
 Still to do before go-live: live payment and freight credentials.
 
