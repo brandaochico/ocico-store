@@ -159,7 +159,7 @@ confira na confirmação: itens + frete = total.
 
 - [ ] `/termos-de-servico` e a caixa rolável na confirmação mostram o mesmo texto.
 - [ ] ⚠️ Antes de publicar: preencher os campos marcados em amarelo (razão social,
-  endereço, e-mail, prazo de postagem, data) e pedir revisão de um advogado.
+  endereço, prazo de postagem, data) e pedir revisão de um advogado.
 
 ## 9. Robustez (opcional, rápido)
 
