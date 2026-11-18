@@ -4,22 +4,30 @@ service: ocico_store
 # Name of the container image.
 image: brandaochico/ocico-store
 
-# Deploy to a single VPS (matches the approved architecture plan: scale the box
-# vertically before going multi-server for a niche-store traffic profile).
-# Replace with the real VPS IP/hostname before the Fase 5 production deploy.
+# A single Oracle Cloud Always Free VM (VM.Standard.A1.Flex: 2 OCPU / 12 GB,
+# ARM64, Ubuntu 24.04, São Paulo). Scale the box vertically before going
+# multi-server — see "Deploy" in docs/ARCHITECTURE.md.
 servers:
   web:
     hosts:
-      - YOUR_VPS_IP
-  worker:
-    hosts:
-      - YOUR_VPS_IP
-    cmd: bin/jobs
+      - 147.15.40.125
 
-# kamal-proxy handles TLS (Let's Encrypt) + zero-downtime releases — no manual nginx/certbot.
+# Oracle's Ubuntu images log in as `ubuntu`, not root. Docker was installed by
+# hand and `ubuntu` added to the docker group, so Kamal never needs sudo (it
+# can't bootstrap Docker itself as a non-root user).
+ssh:
+  user: ubuntu
+  keys_only: true
+  keys:
+    - ~/.ssh/ocico_deploy
+
+# kamal-proxy handles TLS (Let's Encrypt) + zero-downtime releases — no manual
+# nginx/certbot. Certificates are issued once DNS for these hosts points here.
 proxy:
   ssl: true
-  host: YOUR_DOMAIN
+  hosts:
+    - ocico.store
+    - www.ocico.store
 
 # GitHub Container Registry, since the repo already lives on GitHub under brandaochico.
 registry:
@@ -34,19 +42,18 @@ env:
     - RAILS_MASTER_KEY
     - OCICO_STORE_DATABASE_PASSWORD
   clear:
-    # Run the Solid Queue Supervisor inside the web server's Puma process to do jobs.
-    # When you start using multiple servers, you should split out job processing to a dedicated machine.
+    # The db accessory below, by its container name on the kamal Docker network.
+    DB_HOST: ocico_store-db
+
+    # Canonical host: allowed Host header, and the host in links inside emails.
+    APP_HOST: ocico.store
+
+    # Run the Solid Queue supervisor inside Puma — no separate worker role
+    # until there's a second web server (see docs/ARCHITECTURE.md).
     SOLID_QUEUE_IN_PUMA: true
 
     # Set number of processes dedicated to Solid Queue (default: 1)
     # JOB_CONCURRENCY: 3
-
-    # Set number of cores available to the application on each server (default: 1).
-    # WEB_CONCURRENCY: 2
-
-    # Match this to any external database server to configure Active Record correctly
-    # Use ocico_store-db for a db accessory server on same machine via local kamal docker network.
-    # DB_HOST: 192.168.0.2
 
     # Log everything from Rails
     # RAILS_LOG_LEVEL: debug
@@ -59,8 +66,7 @@ aliases:
   logs: app logs -f
   dbc: app exec --interactive --reuse "bin/rails dbconsole --include-password"
 
-# Use a persistent storage volume for sqlite database files and local Active Storage files.
-# Recommended to change this to a mounted volume path that is backed up off server.
+# Active Storage files (product images) on a persistent volume.
 volumes:
   - "ocico_store_storage:/rails/storage"
 
@@ -69,33 +75,22 @@ volumes:
 # version inside the asset_path.
 asset_path: /rails/public/assets
 
-# Configure the image builder.
+# The server is ARM64; building that image on an x86 laptop means QEMU
+# emulation (slow, and flaky for native gems). So the image is built natively
+# on the server itself, over SSH — ~/.ssh/config maps this host to the deploy
+# key, since Docker's remote builder uses the system ssh client.
 builder:
-  arch: amd64
+  arch: arm64
+  remote: ssh://ubuntu@147.15.40.125
 
-  # # Build image via remote server (useful for faster amd64 builds on arm64 computers)
-  # remote: ssh://docker@docker-builder-server
-  #
-  # # Pass arguments and secrets to the Docker build process
-  # args:
-  #   RUBY_VERSION: ruby-3.4.10
-  # secrets:
-  #   - GITHUB_TOKEN
-  #   - RAILS_MASTER_KEY
-
-# Use a different ssh user than root
-# ssh:
-#   user: app
-
-# Postgres runs as a Kamal accessory on the same VPS (single-server setup).
-# There's no Redis accessory: background jobs run on Solid Queue, backed by the
-# dedicated `queue` Postgres database, inside Puma via SOLID_QUEUE_IN_PUMA above
-# (see architecture plan, Fase 2). Split jobs onto their own machine before
-# adding a second web server, not before.
+# Postgres runs as a Kamal accessory on the same VM. There's no Redis: jobs run
+# on Solid Queue, backed by the dedicated `queue` Postgres database.
 accessories:
   db:
     image: postgres:18
-    host: YOUR_VPS_IP
+    host: 147.15.40.125
+    # Bound to localhost only: reachable from the app over the kamal Docker
+    # network, never from the internet.
     port: "127.0.0.1:5432:5432"
     env:
       clear:
