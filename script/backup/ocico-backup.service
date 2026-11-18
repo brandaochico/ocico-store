@@ -1,0 +1,13 @@
+# Installed to /etc/systemd/system by script/backup/install.
+[Unit]
+Description=ocico store nightly backup to Backblaze B2
+Requires=docker.service
+After=docker.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/ocico-backup/env
+ExecStart=/usr/local/bin/ocico-backup
+Nice=10
+IOSchedulingClass=idle

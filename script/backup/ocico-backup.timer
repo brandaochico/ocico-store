@@ -1,0 +1,13 @@
+# Installed to /etc/systemd/system by script/backup/install.
+[Unit]
+Description=Run the ocico store backup every night
+
+[Timer]
+# 04:00 in Brazil, whatever timezone the server keeps (it's UTC).
+OnCalendar=*-*-* 04:00:00 America/Sao_Paulo
+RandomizedDelaySec=10min
+# If the server was off at 04:00, run as soon as it's back.
+Persistent=true
+
+[Install]
+WantedBy=timers.target

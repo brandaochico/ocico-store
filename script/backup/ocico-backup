@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+# Nightly production backup, run on the server by ocico-backup.timer (installed
+# by script/backup/install). See "Backups" in docs/ARCHITECTURE.md.
+#
+# One encrypted archive per run, holding:
+#   database.dump  pg_dump -Fc of the primary database (cache/queue/cable are
+#                  disposable and rebuild themselves)
+#   storage.tar    the Active Storage volume (product images uploaded in the admin)
+#
+# Encrypted with a passphrase before it leaves the server (customer personal
+# data — LGPD), then uploaded to Backblaze B2: daily/ keeps 30 days, monthly/
+# keeps the first backup of each month for a year.
+#
+# Configuration comes from /etc/ocico-backup/env (root-only, written by the
+# installer from the encrypted credentials): B2_BUCKET, RCLONE_CONFIG_B2_*,
+# BACKUP_PASSPHRASE and, optionally, HEALTHCHECK_URL.
+set -euo pipefail
+
+ENV_FILE=/etc/ocico-backup/env
+DB_CONTAINER=ocico_store-db
+DB_NAME=ocico_store_production
+DB_USER=ocico_store
+STORAGE_VOLUME=ocico_store_storage
+# Already on the server (the db accessory); has tar, so no extra image to pull.
+TAR_IMAGE=postgres:18
+RCLONE_IMAGE=rclone/rclone:1.71
+
+: "${B2_BUCKET:?missing — run via ocico-backup.service, which loads $ENV_FILE}"
+: "${BACKUP_PASSPHRASE:?missing}"
+
+# healthchecks.io: /start when a run begins, the bare URL on success, /fail on
+# error. A missing success ping is what raises the alert email.
+ping() {
+  [[ -n "${HEALTHCHECK_URL:-}" ]] || return 0
+  curl -fsS -m 10 --retry 3 -o /dev/null "${HEALTHCHECK_URL}$1" || true
+}
+
+work=$(mktemp -d /var/tmp/ocico-backup.XXXXXX)
+trap 'rm -rf "$work"' EXIT
+trap 'ping /fail' ERR
+
+rclone() {
+  docker run --rm --env-file "$ENV_FILE" -v "$work:/work" "$RCLONE_IMAGE" --log-level ERROR "$@"
+}
+
+ping /start
+
+docker exec "$DB_CONTAINER" pg_dump -U "$DB_USER" -d "$DB_NAME" --format=custom > "$work/database.dump"
+docker run --rm -v "$STORAGE_VOLUME:/data:ro" --entrypoint tar "$TAR_IMAGE" -C /data -cf - . > "$work/storage.tar"
+
+name="ocico-$(date -u +%Y-%m-%dT%H%MZ).tar.gpg"
+tar -C "$work" -cf - database.dump storage.tar |
+  gpg --batch --yes --quiet --pinentry-mode loopback --passphrase-fd 3 \
+    --symmetric --cipher-algo AES256 --output "$work/$name" 3<<<"$BACKUP_PASSPHRASE"
+rm "$work/database.dump" "$work/storage.tar"
+
+rclone copyto "/work/$name" "b2:$B2_BUCKET/daily/$name"
+
+# First successful backup of the month also becomes that month's keeper — a
+# check rather than "is it the 1st", so a failed run on the 1st doesn't lose
+# the whole month.
+month="ocico-$(date -u +%Y-%m)-"
+if [[ -z "$(rclone lsf "b2:$B2_BUCKET/monthly" --include "${month}*")" ]]; then
+  rclone copyto "/work/$name" "b2:$B2_BUCKET/monthly/$name"
+fi
+
+rclone delete --min-age 30d "b2:$B2_BUCKET/daily"
+rclone delete --min-age 365d "b2:$B2_BUCKET/monthly"
+
+echo "backup ok: $name ($(du -h "$work/$name" | cut -f1))"
+ping ""

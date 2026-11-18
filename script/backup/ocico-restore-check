@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+# Proves a backup can actually be restored, without touching production:
+# downloads a backup from B2 (the newest daily one, or the file named as the
+# first argument, e.g. monthly/ocico-2026-12-01T0700Z.tar.gpg), decrypts it,
+# restores the database into a throwaway Postgres container and prints a few
+# row counts. Run on the server as root:
+#
+#   sudo ocico-restore-check
+#   sudo ocico-restore-check daily/ocico-2026-11-18T1950Z.tar.gpg
+#
+# For a real recovery, the same steps apply with pg_restore pointed at the
+# production database instead — see "Backups" in docs/ARCHITECTURE.md.
+set -euo pipefail
+
+ENV_FILE=/etc/ocico-backup/env
+RCLONE_IMAGE=rclone/rclone:1.71
+set -a; source "$ENV_FILE"; set +a
+
+work=$(mktemp -d /var/tmp/ocico-restore.XXXXXX)
+db="ocico-restore-check-$$"
+trap 'docker rm -f "$db" >/dev/null 2>&1 || true; rm -rf "$work"' EXIT
+
+rclone() {
+  docker run --rm --env-file "$ENV_FILE" -v "$work:/work" "$RCLONE_IMAGE" --log-level ERROR "$@"
+}
+
+file="${1:-}"
+if [[ -z "$file" ]]; then
+  file="daily/$(rclone lsf "b2:$B2_BUCKET/daily" | sort | tail -1)"
+fi
+echo "restoring $file"
+rclone copyto "b2:$B2_BUCKET/$file" /work/backup.tar.gpg
+
+gpg --batch --quiet --pinentry-mode loopback --passphrase-fd 3 \
+  --decrypt "$work/backup.tar.gpg" 3<<<"$BACKUP_PASSPHRASE" | tar -C "$work" -xf -
+echo "archive: $(tar -tf "$work/storage.tar" | grep -vc '/$') storage file(s), database dump $(du -h "$work/database.dump" | cut -f1)"
+
+docker run -d --name "$db" -e POSTGRES_PASSWORD=check -e POSTGRES_DB=restore postgres:18 >/dev/null
+until docker exec "$db" pg_isready -U postgres -d restore -q; do sleep 1; done
+sleep 2 # pg_isready can pass during the image's init restart
+docker exec -i "$db" pg_restore -U postgres -d restore --no-owner --exit-on-error < "$work/database.dump"
+
+docker exec "$db" psql -U postgres -d restore -Atc "
+  select 'orders: '   || count(*) from spree_orders
+  union all select 'users: '    || count(*) from spree_users
+  union all select 'products: ' || count(*) from spree_products
+  union all select 'taxons: '   || count(*) from spree_taxons"
+echo "restore check ok"

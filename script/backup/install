@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# Installs (or updates) the nightly backup on the production server. Run from
+# the project root on a machine that has config/master.key and an `ocico` ssh
+# host (see docs/ARCHITECTURE.md, "Deploy"):
+#
+#   script/backup/install
+#
+# Writes /etc/ocico-backup/env from the encrypted credentials (`backup:`),
+# piped over ssh so no secret lands on a command line, then installs the
+# scripts and the systemd timer. Safe to re-run.
+set -euo pipefail
+cd "$(dirname "$0")/../.."
+
+host=${OCICO_HOST:-ocico}
+fetch() { bin/rails credentials:fetch "backup.$1" 2>/dev/null; }
+optional() { fetch "$1" || true; }
+
+{
+  echo "B2_BUCKET=$(fetch b2_bucket)"
+  echo "RCLONE_CONFIG_B2_TYPE=b2"
+  echo "RCLONE_CONFIG_B2_ACCOUNT=$(fetch b2_key_id)"
+  echo "RCLONE_CONFIG_B2_KEY=$(fetch b2_application_key)"
+  # Actually delete expired backups instead of leaving hidden versions behind.
+  echo "RCLONE_CONFIG_B2_HARD_DELETE=true"
+  echo "BACKUP_PASSPHRASE=$(fetch encryption_passphrase)"
+  echo "HEALTHCHECK_URL=$(optional healthcheck_url)"
+} | ssh "$host" 'sudo install -d -m 700 /etc/ocico-backup && sudo tee /etc/ocico-backup/env >/dev/null && sudo chmod 600 /etc/ocico-backup/env'
+
+tar -C script/backup -cf - ocico-backup ocico-restore-check ocico-backup.service ocico-backup.timer |
+  ssh "$host" 'set -e
+    tmp=$(mktemp -d); tar -C "$tmp" -xf -
+    sudo install -m 755 "$tmp/ocico-backup" "$tmp/ocico-restore-check" /usr/local/bin/
+    sudo install -m 644 "$tmp/ocico-backup.service" "$tmp/ocico-backup.timer" /etc/systemd/system/
+    rm -rf "$tmp"
+    sudo systemctl daemon-reload
+    sudo systemctl enable --now ocico-backup.timer >/dev/null
+    systemctl list-timers ocico-backup.timer --no-pager'
