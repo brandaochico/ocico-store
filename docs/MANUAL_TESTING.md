@@ -158,8 +158,9 @@ confira na confirmação: itens + frete = total.
 ## 8. Termos e textos legais
 
 - [ ] `/termos-de-servico` e a caixa rolável na confirmação mostram o mesmo texto.
-- [ ] ⚠️ Antes de publicar: preencher os campos marcados em amarelo (razão social,
-  endereço, prazo de postagem, data) e pedir revisão de um advogado.
+- [ ] Seção 1 mostra razão social, CNPJ, endereço e e-mail de atendimento; seção 5,
+  postagem em até 3 dias úteis.
+- [ ] ⚠️ Pedir a revisão de um advogado (principalmente as seções 7, 8 e 10).
 
 ## 9. Robustez (opcional, rápido)
 
