@@ -79,9 +79,17 @@ asset_path: /rails/public/assets
 # emulation (slow, and flaky for native gems). So the image is built natively
 # on the server itself, over SSH — ~/.ssh/config maps this host to the deploy
 # key, since Docker's remote builder uses the system ssh client.
+#
+# context: "." builds from this working directory instead of Kamal's default
+# fresh git clone. The Vintage font and the collection sprites are git-ignored
+# (their licences don't allow redistributing them in a public repo) but must
+# ship in the image; a clone doesn't have them. The catch: uncommitted edits
+# ship too, so deploy from a clean tree. .dockerignore keeps .env, master.key,
+# logs and local builds out.
 builder:
   arch: arm64
   remote: ssh://ubuntu@147.15.64.249
+  context: .
 
 # Postgres runs as a Kamal accessory on the same VM. There's no Redis: jobs run
 # on Solid Queue, backed by the dedicated `queue` Postgres database.

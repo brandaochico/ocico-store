@@ -51,3 +51,8 @@
 # Ignore Docker-related files
 /.dockerignore
 /Dockerfile*
+
+# Local leftovers that aren't part of the app (the image is built from the
+# working directory, see builder.context in config/deploy.yml).
+/.playwright-mcp/
+/spec/examples.txt
