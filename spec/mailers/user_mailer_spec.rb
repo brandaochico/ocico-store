@@ -33,6 +33,7 @@ RSpec.describe UserMailer, type: :mailer do
 
       it 'is sent from the store address with replies going to the contact inbox' do
         expect(@message.from).to eq [ store.mail_from_address ]
+        expect(@message[:from].display_names).to eq [ store.name ]
         expect(@message.reply_to).to eq [ 'contato@ocico.store' ]
       end
 

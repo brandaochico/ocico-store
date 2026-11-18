@@ -46,7 +46,7 @@ module OcicoStore
         name: "ocico store",
         url: ENV.fetch("APP_HOST", "localhost:3000"),
         default_currency: "BRL",
-        mail_from_address: "ocico store <pedidos@ocico.store>"
+        mail_from_address: "pedidos@ocico.store"
       )
     end
 
