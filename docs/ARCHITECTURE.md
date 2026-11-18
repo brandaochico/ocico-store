@@ -481,7 +481,18 @@ forced (`/up` excluded so kamal-proxy's health check works over plain HTTP),
 credentials; until then nothing is sent. The store's `url` (seeded from
 `APP_HOST`) is the host in password-reset links, so production needs
 `db:seed` run with `APP_HOST` set — Kamal sets it on the container. Sender:
-`store.ocico@gmail.com`.
+`store.ocico@gmail.com`, through Gmail's own SMTP with an app password
+(relays like Brevo/Resend can't send *as* a gmail.com address — DMARC).
+
+**Seeding production.** `bin/docker-entrypoint` runs `db:prepare`, which seeds
+on its own the first time it creates the database — with whatever the seed
+does by default. That's how the first deploy (2026-11-18) briefly got
+solidus_auth_devise's `admin@example.com` / `test123` and the sample catalog;
+both were removed by hand minutes later, before any real data existed. Now
+`db/seeds.rb` takes the production admin from the credentials (`admin.email`,
+`admin.password`) and aborts without them, and the catalog seed skips the
+sample products and their three old collections in production
+(`SEED_SAMPLE_CATALOG=true` overrides). Re-running `db:seed` later is safe.
 
 Still to do before go-live: domain + DNS, the SMTP relay, live payment and
 freight credentials, and scheduled `pg_dump` backups off the server.
