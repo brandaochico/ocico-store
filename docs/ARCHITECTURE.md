@@ -488,9 +488,23 @@ forced (`/up` excluded so kamal-proxy's health check works over plain HTTP),
 `https://APP_HOST`. Mail goes through SMTP when `smtp:` exists in the
 credentials; until then nothing is sent. The store's `url` (seeded from
 `APP_HOST`) is the host in password-reset links, so production needs
-`db:seed` run with `APP_HOST` set — Kamal sets it on the container. Sender:
-`store.ocico@gmail.com`, through Gmail's own SMTP with an app password
-(relays like Brevo/Resend can't send *as* a gmail.com address — DMARC).
+`db:seed` run with `APP_HOST` set — Kamal sets it on the container.
+
+**Email on `ocico.store`** (DNS at Hostinger) is split in two:
+
+- **`contato@ocico.store`** is a real mailbox on Hostinger Email (the domain's
+  MX), used for customer contact and shown in the terms page.
+- **`pedidos@ocico.store`** is send-only: the store's `mail_from_address`,
+  sent through Brevo's SMTP relay (`smtp-relay.brevo.com`, credentials under
+  `smtp:`). It has no mailbox, so every store email carries
+  `Reply-To: contato@ocico.store` (`app/overrides/mailer_reply_to.rb`).
+
+DNS: one SPF record (`include:_spf.mail.hostinger.com`; Brevo doesn't ask
+for SPF, and a domain may only have one `v=spf1` record, so merge rather than
+add if that ever changes), Brevo's `brevo-code` TXT and DKIM CNAMEs
+(`brevo1`/`brevo2._domainkey`), and DMARC `p=none` reporting to Brevo.
+Before the domain existed the store sent as a gmail.com address through
+Gmail's SMTP, because relays can't send *as* gmail.com (DMARC).
 
 **Seeding production.** `bin/docker-entrypoint` runs `db:prepare`, which seeds
 on its own the first time it creates the database — with whatever the seed
