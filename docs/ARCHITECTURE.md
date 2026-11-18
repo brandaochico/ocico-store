@@ -502,8 +502,42 @@ both were removed by hand minutes later, before any real data existed. Now
 sample products and their three old collections in production
 (`SEED_SAMPLE_CATALOG=true` overrides). Re-running `db:seed` later is safe.
 
-Still to do before go-live: domain + DNS, the SMTP relay, live payment and
-freight credentials, and scheduled `pg_dump` backups off the server.
+### Backups
+
+Nightly, off the server and off Oracle, set up 2026-11-18 (`script/backup/`):
+
+- **What:** `pg_dump -Fc` of the primary database (cache/queue/cable rebuild
+  themselves) plus a tar of the Active Storage volume (admin-uploaded product
+  images), in one archive.
+- **Encrypted before upload** (gpg, AES-256, symmetric) — dumps hold customer
+  personal data. The passphrase is `backup.encryption_passphrase` in the
+  credentials, and the owner keeps a copy in a password manager: losing both
+  it and `master.key` makes every backup unreadable.
+- **Where:** Backblaze B2, private bucket `ocico-store-backups-k7q2`, with an
+  application key scoped to that bucket only. Kept off Oracle on purpose, so
+  an Always Free account problem can't take the backups with the server.
+- **When / retention:** systemd timer at 04:00 America/Sao_Paulo
+  (`ocico-backup.timer`, `Persistent=true`). `daily/` keeps 30 days;
+  `monthly/` keeps the first backup of each month for a year. The bucket's
+  lifecycle is "keep only the last version" and rclone hard-deletes, so
+  expired files really go.
+- **Alerting:** optional `backup.healthcheck_url` (healthchecks.io) — pinged
+  on start/success/failure; a missed success emails the owner.
+- **Install / update:** `script/backup/install` from the dev machine. It
+  writes the root-only `/etc/ocico-backup/env` from the credentials (piped over
+  ssh) and installs the scripts and timer. Re-run it after changing any
+  `backup:` credential.
+- **Restore drill:** `ssh ocico sudo ocico-restore-check [file]` downloads a
+  backup, decrypts it and restores it into a throwaway Postgres container,
+  printing row counts — first run passed on 2026-11-18. **Real recovery:**
+  same download and decrypt, then stop the app (`bin/kamal app stop`),
+  `pg_restore --clean --if-exists -d ocico_store_production` inside the db
+  accessory, untar `storage.tar` into the `ocico_store_storage` volume, and
+  `bin/kamal app boot`.
+- Run on demand with `ssh ocico sudo systemctl start ocico-backup`; logs in
+  `journalctl -u ocico-backup`.
+
+Still to do before go-live: live payment and freight credentials.
 
 ## i18n
 
