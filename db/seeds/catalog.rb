@@ -39,10 +39,14 @@ module OcicoStore
       store = Spree::Store.default
       return unless store
 
+      # The url is the host for links in account emails (password reset,
+      # confirmation — see UserMailer), so it follows APP_HOST, which Kamal
+      # sets in production (config/deploy.yml).
       store.update!(
         name: "ocico store",
+        url: ENV.fetch("APP_HOST", "localhost:3000"),
         default_currency: "BRL",
-        mail_from_address: "contato@ocicostore.com.br"
+        mail_from_address: "store.ocico@gmail.com"
       )
     end
 
