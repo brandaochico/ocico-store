@@ -468,6 +468,14 @@ multi-server. How it was prepared, by hand, once:
   is slow and fragile for native gems. Docker's remote builder uses the system
   ssh client, so the dev machine's `~/.ssh/config` maps the host to the
   `~/.ssh/ocico_deploy` key (`ssh ocico` works too).
+- **The image is built from the working directory, not a git clone**
+  (`builder.context: .`). The Vintage font and the collection sprites are
+  git-ignored for licence reasons but must ship; a clone lacked them, which
+  rendered headings in Modak and took `/colecoes` down with a 500 on the first
+  deploy. So deploy from a clean tree — uncommitted edits ship too.
+  `.dockerignore` keeps `.env`, `master.key`, logs and local builds out
+  (verified inside the running container). Vintage's licence is personal-use
+  only: a commercial licence from its author is needed for the live store.
 
 **Secrets:** `RAILS_MASTER_KEY` comes from `config/master.key`; everything else
 Kamal needs lives in the encrypted credentials under `kamal:` —
