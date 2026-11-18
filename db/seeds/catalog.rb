@@ -30,7 +30,7 @@ module OcicoStore
       origins = seed_origin_taxonomy
       types = seed_type_taxonomy
       collections = seed_collections_taxonomy
-      seed_products(option_types:, origins:, types:, collections:)
+      seed_products(option_types:, origins:, types:, collections:) if sample_catalog?
       retire_language_option_type
       retire_demo_products
     end
@@ -120,10 +120,22 @@ module OcicoStore
       ]
     end
 
+    # The illustrative products (and the three old sets they come from) are
+    # for development and demos only. Production gets the catalog structure,
+    # and the real products are entered through the admin. SEED_SAMPLE_CATALOG
+    # overrides either way.
+    def sample_catalog?
+      ENV.fetch("SEED_SAMPLE_CATALOG") { (!Rails.env.production?).to_s } == "true"
+    end
+
+    def collections
+      stocked_collections + (sample_catalog? ? sample_collections : [])
+    end
+
     # Release dates are real and were looked up per set; they are what "the
     # seven most recent" in the header resolves against, so a wrong one here
     # silently reorders the menu.
-    def collections
+    def stocked_collections
       [
         [ "Gem Pack Vol. 6", "CBB6C", "2026-08-07" ],
         [ "Storm Emeralda", "M6", "2026-07-31" ],
@@ -134,9 +146,14 @@ module OcicoStore
         [ "Ascended Heroes", "ASC", "2026-01-30" ],
         [ "Phantasmal Flames", "PFL", "2025-11-14" ],
         [ "Mega Symphonia", "M1S", "2025-08-01" ],
-        [ "Destined Rivals", "DRI", "2025-05-30" ],
-        # Not stocked — kept only because the sample products are real cards
-        # from these sets. They go with the demo catalog.
+        [ "Destined Rivals", "DRI", "2025-05-30" ]
+      ]
+    end
+
+    # Not stocked — kept only because the sample products are real cards from
+    # these sets. They go with the demo catalog.
+    def sample_collections
+      [
         [ "151", "MEW", "2023-09-22" ],
         [ "Obsidian Flames", "OBF", "2023-08-11" ],
         [ "Paldea Evolved", "PAL", "2023-06-09" ]
