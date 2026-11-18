@@ -438,22 +438,53 @@ covering cart, checkout, order and the money adjustments applied along the way
 were kept and fixed. New specs for this store's own flows — condition filter,
 the three navigation axes, Stripe checkout — are still to write.
 
-## Deploy — Kamal 2, single VPS (Fase 5 — not started)
+## Deploy — Kamal 2, single VM (Fase 5 — in progress)
 
 | Service | Role |
 |---|---|
 | `web` | Puma (store+admin+API), behind `kamal-proxy` (automatic Let's Encrypt TLS, zero-downtime deploys) |
-| `db` (accessory) | Postgres 18, persistent volume |
+| `db` (accessory) | Postgres 18, persistent volume, bound to `127.0.0.1` only |
 
 No separate `worker` service: Solid Queue's supervisor runs inside Puma via
-`SOLID_QUEUE_IN_PUMA` (already set in `config/deploy.yml`). Split jobs onto
-their own machine before adding a second web server, not before.
+`SOLID_QUEUE_IN_PUMA`. Split jobs onto their own machine before adding a
+second web server, not before.
 
-One VPS (4vCPU/8GB is plenty for a niche store) — scale vertically before
-considering multiple servers. Config already scaffolded in
-`config/deploy.yml`, pointing at ghcr.io — real VPS IP/domain still need to be
-filled in before a real deploy. Don't forget scheduled `pg_dump` backups to
-S3-compatible storage before going live.
+**Server:** Oracle Cloud Always Free, `VM.Standard.A1.Flex` (2 OCPU / 12 GB,
+**ARM64**), Ubuntu 24.04, São Paulo, `147.15.40.125` (ephemeral public IP —
+it changes if the instance is stopped and started; reserve it before go-live).
+Scale vertically (the free tier allows up to 4 OCPU / 24 GB) before going
+multi-server. How it was prepared, by hand, once:
+
+- **Oracle's Ubuntu image ships an iptables firewall that rejects everything
+  but SSH**, independent of the VCN Security List (which also had to allow
+  TCP 80/443). `/etc/iptables/rules.v4` got an `INPUT` accept for 80/443 and
+  lost its `FORWARD ... REJECT`, which would otherwise block container
+  traffic. The untouched original is at `/etc/iptables/rules.v4.oracle-default`.
+- **Docker installed from Docker's apt repo, `ubuntu` added to the `docker`
+  group.** Kamal connects as `ubuntu` (Oracle images have no root login) and
+  can't bootstrap Docker as a non-root user.
+- **Images are built on the server itself** (`builder.remote` in
+  `config/deploy.yml`): it's ARM, the dev machine is x86, and QEMU emulation
+  is slow and fragile for native gems. Docker's remote builder uses the system
+  ssh client, so the dev machine's `~/.ssh/config` maps the host to the
+  `~/.ssh/ocico_deploy` key (`ssh ocico` works too).
+
+**Secrets:** `RAILS_MASTER_KEY` comes from `config/master.key`; everything else
+Kamal needs lives in the encrypted credentials under `kamal:` —
+`postgres_password` (generated) and `registry_password` (a GitHub PAT with
+`write:packages`, added by the owner). See `.kamal/secrets`.
+
+**Production config** (`config/environments/production.rb`): SSL assumed and
+forced (`/up` excluded so kamal-proxy's health check works over plain HTTP),
+`config.hosts` limited to `APP_HOST` and its `www.`, mail links on
+`https://APP_HOST`. Mail goes through SMTP when `smtp:` exists in the
+credentials; until then nothing is sent. The store's `url` (seeded from
+`APP_HOST`) is the host in password-reset links, so production needs
+`db:seed` run with `APP_HOST` set — Kamal sets it on the container. Sender:
+`store.ocico@gmail.com`.
+
+Still to do before go-live: domain + DNS, the SMTP relay, live payment and
+freight credentials, and scheduled `pg_dump` backups off the server.
 
 ## i18n
 
