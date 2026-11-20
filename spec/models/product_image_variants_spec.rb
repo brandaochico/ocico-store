@@ -45,6 +45,14 @@ RSpec.describe "Product image variants" do
     expect(variant_file(:mini).then { [ it.width, it.height ] }).to eq([ 120, 120 ])
   end
 
+  # Signed service URLs expire in minutes and end up inside cached HTML.
+  it "links to the permanent proxy route, never to an expiring signed URL" do
+    url = image.url(:product)
+
+    expect(url).to start_with("/rails/active_storage/representations/proxy/")
+    expect(url).not_to include("/disk/")
+  end
+
   it "regenerates a variant whose file has gone missing instead of serving a dead link" do
     blob = image.attachment.variant(:product).image.blob
     blob.service.delete(blob.key)
