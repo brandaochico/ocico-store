@@ -7,7 +7,7 @@
       <% products.each_with_index do |product, index| %>
         <% if index > 0 %>
           <div class="basis-1/2">
-            <%= render 'products/featured_product_card', { product: product, size: :small } %>
+            <%= render 'products/featured_product_card', { product: product, size: :product } %>
           </div>
         <% end %>
       <% end %>
