@@ -309,6 +309,29 @@ the same four.
   real problem, Mercado Pago can take cards too — the client, webhook and
   sync are already in place.
 
+### Orders: who can see them, and refunds
+
+- **An order with an owner is visible only to that owner and to admins.**
+  Solidus's `DefaultCustomer` lets anyone with the order's guest token open
+  it, even when it belongs to an account — and the token travels in URLs
+  (`/orders/:number/token/:token`). `app/models/order_ownership_ability.rb`
+  (registered in `config/initializers/spree.rb`) adds a `cannot` for owned
+  orders that aren't the viewer's; the token still opens guest orders, which
+  is what it's for. Admins are exempted explicitly: extension abilities merge
+  after role permission sets, so the `cannot` would beat `can :manage, :all`.
+- **Refunded orders say so.** Solidus has no refunded state — a refund lowers
+  `payment_total`, so a fully refunded order reads as "balance due".
+  `Spree::Order#refund_status` (`app/overrides/order_refund_status.rb`:
+  `:refunded` / `:partially_refunded`, against what completed payments
+  collected) drives the order page's title and notice and a badge in the
+  account's order list.
+- **The customer gets an email for every refund that went through**
+  (`RefundMailer`, triggered by `app/overrides/refund_customer_notification.rb`
+  when a refund gets its gateway `transaction_id`): admin refunds, a paid
+  order's cancellation, and refunds made in Stripe's dashboard (synced by
+  `charge.refunded`). Not for a gateway-rejected refund, and not for a
+  return's refund, which already gets Spree's reimbursement email.
+
 ## Freight (Fase 3 — Melhor Envio quotes in place)
 
 Melhor Envio quotes Correios and Jadlog at checkout (`app/models/melhor_envio/`).
