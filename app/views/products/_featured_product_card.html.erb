@@ -1,16 +1,20 @@
 <%# Light, square card: product photos are transparent PNGs, so whatever sits
     behind the image shows through (it used to be bg-black). The text is
     black in both themes because its band stays white in both. %>
-<div class="relative aspect-square bg-gray-50 overflow-hidden rounded-lg md:rounded-xl lg:rounded-2xl">
+<%# A column: the photo, whole, in the space above; the white band with the
+    name and button below it — not over it, so no part of the photo is hidden. %>
+<div class="flex aspect-square flex-col bg-gray-50 overflow-hidden rounded-lg md:rounded-xl lg:rounded-2xl">
   <% image = product.gallery.images.second || product.gallery.images.first %>
-  <%= render(ImageComponent.new(
-    image: image,
-    size: size,
-    class: 'absolute inset-0 h-full w-full object-contain'
-  )) %>
-  <%# White footer band behind the name and the button, flush with the card's
-      bottom edge and rounded like it, so the text stays readable over any photo. %>
-  <div class="absolute inset-x-0 bottom-0 flex flex-col gap-y-2 bg-white px-6 py-5 rounded-b-lg md:rounded-b-xl lg:gap-y-4 lg:px-8 lg:py-6 lg:rounded-b-2xl">
+  <div class="relative min-h-0 flex-1">
+    <%= render(ImageComponent.new(
+      image: image,
+      size: size,
+      class: 'absolute inset-0 h-full w-full object-contain'
+    )) %>
+  </div>
+  <%# White footer band behind the name and the button, rounded like the card's
+      bottom edge. %>
+  <div class="flex flex-col gap-y-2 bg-white px-6 py-5 rounded-b-lg md:rounded-b-xl lg:gap-y-4 lg:px-8 lg:py-6 lg:rounded-b-2xl">
     <span class="text-black text-h6 font-heading md:text-h5 lg:text-h4"><%= product.name %></span>
     <%= render partial: "shared/call_to_action", :locals => { :label => t("storefront.product.shop_now"), :url => product } %>
   </div>
