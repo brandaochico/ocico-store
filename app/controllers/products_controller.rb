@@ -23,9 +23,17 @@ class ProductsController < StoreController
   # subquery, which copies the order terms but not our select.
   COLLATED_NAME = %(spree_products.name COLLATE "pt-BR-x-icu")
 
+  # Browsing, this is the *products* page — sealed items only; singles have
+  # their own listing ("Cartas Avulsas"), just as sealed items never show up
+  # there. A search (keywords, e.g. from the header's "Ver todos os resultados")
+  # covers everything: someone searching "Charizard" means the card.
   def index
     @searcher = build_searcher(params.merge(include_images: true))
-    @products = @searcher.retrieve_products
+    @sealed_only = params[:keywords].blank?
+    products = @searcher.retrieve_products
+    singles_ids = SinglesCatalog.product_ids if @sealed_only
+    products = products.where.not(id: singles_ids) if singles_ids
+    @products = products
       .select(Spree::Product.arel_table[Arel.star], Arel.sql("#{COLLATED_NAME} AS alphabetical_name"))
       .reorder(Arel.sql("#{COLLATED_NAME} ASC"), Arel.sql("spree_products.id ASC"))
   end

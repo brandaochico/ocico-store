@@ -46,6 +46,34 @@ RSpec.describe "All products page", type: :request do
     expect(assigns(:products).total_pages).to eq(3)
   end
 
+  context "with singles in the catalog" do
+    let!(:singles) { create(:taxon, name: "Cartas Avulsas", taxonomy: tipo, parent: tipo.root) }
+
+    before { create(:product, name: "Charizard ex").tap { it.taxons << singles } }
+
+    it "leaves singles out while browsing — they have their own listing" do
+      get products_path
+
+      expect(names).not_to include("Charizard ex")
+      expect(names).to include("abacaxi")
+    end
+
+    it "includes singles in a search" do
+      get products_path(keywords: "Charizard")
+
+      expect(names).to eq([ "Charizard ex" ])
+    end
+
+    it "offers no singles-only filters while browsing" do
+      get products_path
+
+      filters = Nokogiri::HTML(response.body).css("#sidebar_products_search, form").text
+      expect(response.body).to include("Booster Box")
+      expect(filters).not_to include("Cartas Avulsas")
+      expect(filters).not_to include("Near Mint")
+    end
+  end
+
   it "is linked from the Produtos menu, below the product types" do
     get root_path
 

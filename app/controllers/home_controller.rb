@@ -25,9 +25,10 @@ class HomeController < StoreController
     pick = ->(scope, limit) { scope.where.not(id: shown).limit(limit).to_a.tap { |found| shown.concat(found.map(&:id)) } }
 
     @featured_products = pick.(available.featured.reorder(updated_at: :desc), FEATURED_LIMIT)
-    @singles_taxon = singles_taxon
-    @collection_products = @singles_taxon ? pick.(newest(available.where(id: product_ids_in(@singles_taxon))), ROW_LIMIT) : []
-    sealed = @singles_taxon ? available.where.not(id: product_ids_in(@singles_taxon)) : available
+    @singles_taxon = SinglesCatalog.taxon
+    singles_ids = SinglesCatalog.product_ids(@singles_taxon)
+    @collection_products = singles_ids ? pick.(newest(available.where(id: singles_ids)), ROW_LIMIT) : []
+    sealed = singles_ids ? available.where.not(id: singles_ids) : available
     @cta_collection_products = pick.(newest(sealed), CTA_LIMIT)
     @new_arrivals = pick.(newest(available), ROW_LIMIT)
   end
@@ -40,14 +41,5 @@ class HomeController < StoreController
 
   def newest(scope)
     scope.reorder(available_on: :desc, id: :desc)
-  end
-
-  def singles_taxon
-    Spree::Taxon.joins(:taxonomy)
-      .find_by(name: MainNavigationHelper::SINGLES_TAXON_NAME, spree_taxonomies: { name: "Tipo" })
-  end
-
-  def product_ids_in(taxon)
-    Spree::Classification.where(taxon_id: taxon.self_and_descendants.select(:id)).select(:product_id)
   end
 end
