@@ -137,9 +137,24 @@ RSpec.describe MercadoPago::Gateway do
         )
       end
 
-      it "fails the payment with Mercado Pago's message" do
-        expect { payment.process! }.to raise_error(Spree::Core::GatewayError, /Invalid payer/)
+      it "fails the payment with a pt-BR message, keeping Mercado Pago's own in the log entry" do
+        expect { payment.process! }
+          .to raise_error(Spree::Core::GatewayError, I18n.t("checkout.mercado_pago.charge_failed"))
         expect(payment.reload).to be_failed
+        expect(payment.log_entries.last.parsed_details.params["detail"]).to include("Invalid payer")
+      end
+    end
+
+    context "when Mercado Pago creates the order but its payment fails" do
+      let!(:create_request) do
+        failed = MercadoPagoApi.order_response(status: "failed", status_detail: "processing_error")
+        stub_request(:post, orders_url).to_return(MercadoPagoApi.json(failed))
+      end
+
+      it "fails the payment with the pt-BR message and logs the status detail" do
+        expect { payment.process! }
+          .to raise_error(Spree::Core::GatewayError, I18n.t("checkout.mercado_pago.charge_failed"))
+        expect(payment.log_entries.last.parsed_details.params["detail"]).to include("processing_error")
       end
     end
 

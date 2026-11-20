@@ -38,6 +38,7 @@
       copy: "Copiar"
       copied: "Copiado!"
       generated_on_confirm: "O código para pagamento é gerado assim que você confirmar o pedido."
+      charge_failed: "Não conseguimos gerar o pagamento agora. Tente de novo em alguns minutos ou escolha outra forma de pagamento."
       awaiting_payment: "Assim que o pagamento for confirmado, começamos a preparar seu pedido."
       paid: "Pagamento confirmado."
 

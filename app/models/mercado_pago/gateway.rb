@@ -33,12 +33,14 @@ module MercadoPago
         idempotency_key: options.fetch(:order_id)
       )
 
-      return failure("Mercado Pago order #{order["id"]} is #{order["status"]}") if order["status"] == "failed"
+      if order["status"] == "failed"
+        return checkout_failure("Mercado Pago order #{order["id"]} is #{order["status"]} (#{payment_status_details(order)})")
+      end
 
       source.update!(charge_attributes(order))
       success(order["id"], "Mercado Pago order #{order["id"]} created")
     rescue Client::Error => error
-      failure(error.message)
+      checkout_failure(error.message)
     end
 
     # Cancels an unpaid charge, so the QR code / boleto can no longer be paid.
@@ -161,6 +163,21 @@ module MercadoPago
 
     def failure(message)
       ActiveMerchant::Billing::Response.new(false, message, { "message" => message }, test: @test)
+    end
+
+    # A failed charge at checkout: Spree shows the response's "message" to the
+    # customer, so that one is a plain pt-BR sentence, while Mercado Pago's own
+    # (English, technical — e.g. "The following transactions failed: PAY…:
+    # processing_error") is logged and kept on the payment's log entry under
+    # "detail" for whoever investigates.
+    def checkout_failure(detail)
+      Rails.logger.warn("[MercadoPago] charge failed: #{detail}")
+      message = I18n.t("checkout.mercado_pago.charge_failed")
+      ActiveMerchant::Billing::Response.new(false, message, { "message" => message, "detail" => detail }, test: @test)
+    end
+
+    def payment_status_details(order)
+      Array(order.dig("transactions", "payments")).map { |payment| payment["status_detail"] }.compact.join(", ")
     end
   end
 end
