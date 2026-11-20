@@ -1,11 +1,14 @@
 <div class="product-submit">
   <%= render 'cart_line_items/product_availability', product: product %>
 
-  <div class="flex items-center justify-start gap-x-7">
-    <div class="text-input">
+  <%# Quantity on one line, the button on its own below at the column's full
+      width: side by side, the button's unbreakable label ("Adicionar ao
+      carrinho — R$ 899,90") ran past the narrow column and the page. %>
+  <div class="flex flex-col items-stretch gap-4">
+    <div class="text-input w-32">
       <%= number_field_tag "quantity", 1, step: 1, class: 'min-w-[100px]', :onchange => "addToCartButtonPriceChangeHandler('#{product.price}')" %>
     </div>
     <% cta_label = content_tag(:span, "#{t('spree.add_to_cart')} — ") + content_tag(:span, display_price(product), id: 'cta_price') %>
-    <%= render partial: "shared/call_to_action", :locals => { :label => cta_label, :id => 'add-to-cart-button', :url => nil } %>
+    <%= render partial: "shared/call_to_action", :locals => { :label => cta_label, :id => 'add-to-cart-button', :url => nil, :additional_classes => 'w-full! whitespace-normal! text-center cursor-pointer' } %>
   </div>
 </div>
