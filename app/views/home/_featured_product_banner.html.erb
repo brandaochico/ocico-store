@@ -1,10 +1,14 @@
 <section class="relative my-4 w-full lg:my-12 bg-primary">
   <div class="wrapper-mobile-fullwidth">
-    <%= render(ImageComponent.new(
-      image: product.gallery.images.last,
-      size: :full,
-      class: 'w-full object-cover aspect-square md:aspect-auto'
-    )) %>
+    <%# Fixed-height stage: the square photo is contained in it, never cropped
+        or stretched past it, with the section's color around it. %>
+    <div class="aspect-square w-full md:aspect-auto md:h-[600px]">
+      <%= render(ImageComponent.new(
+        image: product.gallery.images.last,
+        size: :full,
+        class: 'h-full w-full object-contain'
+      )) %>
+    </div>
     <div class="absolute bottom-0 left-0 right-0 text-center pb-14">
       <span class="rounded-full px-3 py-1 bg-white text-sm text-black mb-2"><%= t("storefront.product.badge_new") %></span>
       <div class="text-h3 font-heading mb-6 text-white md:mb-9 md:text-h2"><%= product.name %></div>

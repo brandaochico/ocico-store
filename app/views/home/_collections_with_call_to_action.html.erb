@@ -11,10 +11,10 @@
 
     <%= cache [I18n.locale, current_pricing_options, @taxon, product] do %>
       <%= link_to product_path(product) do %>
-        <div class="relative bg-gray-50 overflow-hidden rounded-lg h-full md:rounded-xl lg:rounded-2xl">
+        <div class="relative aspect-square bg-gray-50 overflow-hidden rounded-lg md:rounded-xl lg:rounded-2xl">
           <%= render(ImageComponent.new(
             image: product_image,
-            class: 'w-full h-full object-cover',
+            class: 'absolute inset-0 h-full w-full object-contain',
             size: :full,
           )) %>
           <%# text-black is explicit and has no dark: variant on purpose: the card behind
