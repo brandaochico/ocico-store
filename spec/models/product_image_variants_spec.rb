@@ -33,6 +33,12 @@ RSpec.describe "Product image variants" do
     end
   end
 
+  it "makes a 1200x1200 version of the same crop for the hover magnifier" do
+    file = variant_file(:zoom)
+
+    expect([ file.width, file.height ]).to eq([ 1200, 1200 ])
+  end
+
   it "keeps a PNG's transparency" do
     file = variant_file(:product)
 

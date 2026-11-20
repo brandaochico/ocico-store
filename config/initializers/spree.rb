@@ -43,7 +43,10 @@ Spree.config do |config|
     product: "600x600^",
     large: "600x600^",
     big: "600x600^",
-    full: "600x600^"
+    full: "600x600^",
+    # Only for the product page's hover magnifier, drawn at 2x over the 600px
+    # image — never shown at its own size.
+    zoom: "1200x1200^"
   }
 
   # Uncomment to recalculate cart prices when the cart changes
