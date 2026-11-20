@@ -14,6 +14,12 @@
       remove: "Remover"
     order:
       confirmed: "Confirmado"
+      refunded: "Reembolsado"
+      partially_refunded: "Reembolso parcial"
+      refund_notice:
+        refunded: "Este pedido foi reembolsado: devolvemos %{amount} pela mesma forma de pagamento usada na compra."
+        partially_refunded: "Reembolsamos %{amount} deste pedido pela mesma forma de pagamento usada na compra."
+        timing: "O prazo para o valor aparecer depende do seu banco ou da operadora do cartão."
       sections:
         billing: "Cobrança"
         shipping: "Entrega"

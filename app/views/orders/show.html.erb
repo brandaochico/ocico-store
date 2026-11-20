@@ -2,10 +2,19 @@
     keeping the scroll position — see MercadoPago::PaymentSynchronizer. %>
 <% content_for :head, turbo_refreshes_with(method: :morph, scroll: :preserve) %>
 
+<% refund_status = @order.refund_status %>
+
 <div class="order-page wrapper">
   <h1 class="order-page__title font-heading my-6 text-h4 lg:text-h5">
-    <%= accurate_title %><% if @order.paid? %> - <%= t("storefront.order.confirmed") %><% end %>
+    <%= accurate_title %><% if refund_status %> - <%= t("storefront.order.#{refund_status}") %><% elsif @order.paid? %> - <%= t("storefront.order.confirmed") %><% end %>
   </h1>
+
+  <% if refund_status %>
+    <p class="order-page__refund mb-6 rounded-lg border border-gray-mid bg-white p-4 font-body text-body-sm dark:bg-light-black">
+      <%= t("storefront.order.refund_notice.#{refund_status}", amount: @order.display_refund_total) %>
+      <%= t("storefront.order.refund_notice.timing") %>
+    </p>
+  <% end %>
 
   <% if order_just_completed?(@order) %>
     <p class="order-page__completed mb-6">

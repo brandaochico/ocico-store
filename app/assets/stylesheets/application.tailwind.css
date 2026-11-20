@@ -521,6 +521,10 @@
     @apply bg-yellow text-black;
   }
 
+  .badge.badge-refunded {
+    @apply bg-accent-blue text-black;
+  }
+
   /* solidus_stripe checkout partial (app/views/checkouts/payment/_stripe.html.erb).
      w-full because the payment step renders each method inside a flex fieldset,
      where the Stripe Elements container would otherwise collapse to its

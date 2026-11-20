@@ -41,6 +41,9 @@
                   <div class="badge badge-<%= order.state %>">
                     <%= I18n.t("spree.order_state.#{order.state}") %>
                   </div>
+                  <% if (refund_status = order.refund_status) %>
+                    <div class="badge badge-refunded mt-1"><%= t("storefront.order.#{refund_status}") %></div>
+                  <% end %>
                 </td>
                 <td class="<%= table_cells_classes %>"><%= I18n.t("spree.payment_states.#{order.payment_state}") if order.payment_state %></td>
                 <td class="<%= table_cells_classes %>">
