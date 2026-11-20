@@ -2,10 +2,22 @@ default: &default
   dispatchers:
     - polling_interval: 1
       batch_size: 500
+  # `queues` must be a YAML list: Solid Queue does not split a string on
+  # commas. "critical,*" was read as one queue literally named "critical,*",
+  # so production ran no background job at all — webhooks, mail, Mercado Pago
+  # sync — from the first deploy until 2026-11-20 (spec/config/queue_spec.rb).
+  #
+  # Payment webhooks get a worker of their own so they never wait behind slower
+  # work (mail, image analysis); the second worker takes every queue, so a
+  # queue added later can't be silently left unprocessed. Listing "*" next to
+  # other names would make Solid Queue ignore the order and poll everything
+  # as one, hence two workers rather than one ordered list.
   workers:
-    # "critical" first, then everything else: payment webhooks shouldn't wait
-    # behind slower background work (mailers, report warmers).
-    - queues: "critical,*"
+    - queues: [ critical ]
+      threads: 2
+      processes: 1
+      polling_interval: 0.5
+    - queues: [ "*" ]
       threads: 3
       processes: <%= ENV.fetch("JOB_CONCURRENCY", 1) %>
       polling_interval: 1
