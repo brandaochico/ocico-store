@@ -663,6 +663,13 @@ Still to do before go-live: live payment and freight credentials.
   resized while a deploy stops the container) left a record with no file and
   a URL that 404'd forever. Now such a variant is dropped and regenerated on
   next render.
+- **Image links never expire** (`app/overrides/permanent_image_urls.rb`).
+  Solidus returned the Disk service's signed URL, valid five minutes, and
+  pages are fragment-cached with those links inside — so images on any cached
+  page 404'd five minutes later. Links now go through Active Storage's proxy
+  route (`/rails/active_storage/representations/proxy/…`), served with a
+  forever cache header; a changed image gets a new variant key, so caching
+  forever is safe.
 - **After changing a size**, old variants linger on disk. Purge them in
   production (they regenerate on demand; originals are untouched) and bust the
   fragment caches: `ActiveStorage::VariantRecord.find_each(&:destroy)` then
