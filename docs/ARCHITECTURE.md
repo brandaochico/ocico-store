@@ -623,6 +623,30 @@ Nightly, off the server and off Oracle, set up 2026-11-18 (`script/backup/`):
 
 Still to do before go-live: live payment and freight credentials.
 
+## Product images
+
+- **Always a square, center-cropped** (`config.product_image_styles`, "^" =
+  `resize_to_fill`): display sizes (`product`/`large`/`big`/`full`) are
+  600x600, thumbnails `small` 300 and `mini` 120 — the owner's rule
+  (2026-11-20). Cards, the product page and the home banners show the 600
+  version; `small`/`mini` are for the gallery strip, cart and checkout.
+- **Format is kept**, so transparent PNGs stay transparent: product photos are
+  shot with the background removed. Containers behind images are light
+  (`bg-gray-50`, or the banner's color), never black — the featured card's old
+  `bg-black` is what made a transparent PNG look black.
+- **Containers are squares and images are `object-contain`** inside them; the
+  product page's photo is capped at 600px (its own size — never upscaled).
+- **Missing variant files heal themselves**
+  (`app/overrides/self_healing_image_variants.rb`). Active Storage records a
+  variant before uploading its file; a generation cut short (a big phone photo
+  resized while a deploy stops the container) left a record with no file and
+  a URL that 404'd forever. Now such a variant is dropped and regenerated on
+  next render.
+- **After changing a size**, old variants linger on disk. Purge them in
+  production (they regenerate on demand; originals are untouched) and bust the
+  fragment caches: `ActiveStorage::VariantRecord.find_each(&:destroy)` then
+  `Spree::Product.find_each(&:touch)` — done once on 2026-11-20.
+
 ## i18n
 
 `pt-BR` is the default and only active locale. Never hardcode user-facing
