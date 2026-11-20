@@ -102,3 +102,9 @@ end
 # the class name:
 #
 # Spree::UserLastUrlStorer.rules << 'Spree::UserLastUrlStorer::Rules::AuthenticationRule'
+
+# Orders with an owner are visible only to that owner and to admins, never to
+# whoever holds the order's token — see app/models/order_ownership_ability.rb.
+Rails.application.config.to_prepare do
+  Spree::Ability.register_ability(OrderOwnershipAbility)
+end

@@ -23,8 +23,10 @@ RSpec.describe 'Order permissions', type: :request do
   end
 
   context 'when no authenticated user' do
-    let(:order) { create(:order, number: 'R123') }
-    let(:another_order) { create(:order) }
+    # Guest orders: a token never opens an order that belongs to an account
+    # (spec/requests/order_ownership_spec.rb).
+    let(:order) { create(:order, number: 'R123', user: nil, email: 'visitante@example.com') }
+    let(:another_order) { create(:order, user: nil, email: 'outro@example.com') }
 
     context '#show' do
       context 'when token parameter present' do
