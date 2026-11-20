@@ -30,6 +30,9 @@
       you_may_also_like: "Você Também Pode Gostar"
       badge_new: "Novo"
       combination_unavailable: "Combinação indisponível"
+      gallery:
+        thumbnails: "Imagens do produto"
+        show_image: "Mostrar imagem %{number}"
     search:
       see_all_results: "Ver todos os resultados"
       no_results: "Nenhum resultado"

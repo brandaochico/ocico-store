@@ -17,6 +17,9 @@ en:
       shop_now: "Buy now"
       you_may_also_like: "You May Also Like"
       badge_new: "New"
+      gallery:
+        thumbnails: "Product images"
+        show_image: "Show image %{number}"
     search:
       see_all_results: "See all results"
       no_results: "No results"

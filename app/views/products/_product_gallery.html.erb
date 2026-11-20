@@ -1,0 +1,59 @@
+<%#
+  Product gallery: the selected image large, every image of the product as a
+  clickable thumbnail beside it (a column on the left from lg up, a row below
+  on phones), and a hover magnifier. Behaviour in
+  app/javascript/controllers/product_gallery_controller.js.
+
+  All of the product's images are listed — master and variants alike: a
+  condition (NM/LP/...) doesn't get photos of its own here. Thumbnails only
+  show up when there is more than one image.
+
+  The magnifier paints the 1200px "zoom" variant at 2x behind the cursor, so
+  it is sharp where the 600px display image would just be blown up.
+%>
+<% images = product.gallery.images.to_a %>
+
+<div class="col-span-full lg:col-span-8" data-controller="product-gallery">
+  <div class="flex flex-col gap-4 lg:flex-row lg:items-start">
+    <% if images.size > 1 %>
+      <ul class="order-2 flex shrink-0 gap-3 overflow-x-auto no-scrollbar lg:order-1 lg:max-h-[600px] lg:flex-col lg:overflow-y-auto"
+          aria-label="<%= t("storefront.product.gallery.thumbnails") %>">
+        <% images.each_with_index do |image, index| %>
+          <li class="shrink-0">
+            <button type="button"
+                    class="block h-20 w-20 cursor-pointer overflow-hidden rounded-lg border-2 bg-gray-50 transition-colors duration-150 hover:border-gray-mid lg:h-24 lg:w-24 <%= index.zero? ? "border-primary" : "border-transparent" %>"
+                    aria-label="<%= t("storefront.product.gallery.show_image", number: index + 1) %>"
+                    aria-current="<%= index.zero? %>"
+                    data-product-gallery-target="thumbnail"
+                    data-action="product-gallery#select"
+                    data-url="<%= image.url(:product) %>"
+                    data-zoom-url="<%= image.url(:zoom) %>"
+                    data-alt="<%= image.alt %>">
+              <%= image_tag image.url(:small), alt: "", class: "h-full w-full object-contain", loading: "lazy" %>
+            </button>
+          </li>
+        <% end %>
+      </ul>
+    <% end %>
+
+    <div class="order-1 mx-auto w-full max-w-[600px] lg:order-2 lg:mx-0">
+      <div class="relative aspect-square overflow-hidden rounded-lg bg-gray-50 md:rounded-xl lg:rounded-2xl <%= "[@media(hover:hover)]:cursor-zoom-in" if images.any? %>"
+           data-product-gallery-target="stage"
+           data-action="mouseenter->product-gallery#zoomIn mousemove->product-gallery#zoomMove mouseleave->product-gallery#zoomOut">
+        <% if (image = images.first) %>
+          <%= image_tag image.url(:product),
+                alt: image.alt,
+                itemprop: "image",
+                class: "h-full w-full object-contain",
+                data: { product_gallery_target: "main", zoom_url: image.url(:zoom) } %>
+          <div class="pointer-events-none absolute inset-0 hidden bg-gray-50 bg-no-repeat"
+               style="background-size: 200%;"
+               aria-hidden="true"
+               data-product-gallery-target="lens"></div>
+        <% else %>
+          <div class="image-placeholder product h-full w-full"></div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
