@@ -24,17 +24,26 @@ Spree.config do |config|
   config.image_attachment_module = "Spree::Image::ActiveStorageAttachment"
   config.taxon_attachment_module = "Spree::Taxon::ActiveStorageAttachment"
 
-  # solidus_starter_frontend's views render images at size: :big and :full,
-  # neither of which Solidus's default product_image_styles defines —
-  # ImageProcessing then errors with "either width or height must be
-  # specified". Add them alongside the defaults (mini/small/product/large).
+  # Every product image is shown as a square: resized and center-cropped
+  # ("^" = ImageProcessing's resize_to_fill), never letterboxed by the photo's
+  # own proportions — the owner's call (2026-11-20). Display sizes are all
+  # 600x600; the two thumbnail sizes are smaller squares of the same crop, to
+  # keep the cart and the thumbnail strip light. The file format is kept, so a
+  # transparent PNG stays transparent (product photos are shot that way).
+  #
+  # big and full exist because solidus_starter_frontend's views ask for them;
+  # without them ImageProcessing errors with "either width or height must be
+  # specified".
+  #
+  # Changing a size here makes new variants on next view; the old ones stay on
+  # disk until purged (see "Product images" in docs/ARCHITECTURE.md).
   config.product_image_styles = {
-    mini: "48x48>",
-    small: "400x400>",
-    product: "680x680>",
-    large: "1200x1200>",
-    big: "900x900>",
-    full: "1600x1600>"
+    mini: "120x120^",
+    small: "300x300^",
+    product: "600x600^",
+    large: "600x600^",
+    big: "600x600^",
+    full: "600x600^"
   }
 
   # Uncomment to recalculate cart prices when the cart changes
