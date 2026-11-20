@@ -663,6 +663,14 @@ Still to do before go-live: live payment and freight credentials.
   resized while a deploy stops the container) left a record with no file and
   a URL that 404'd forever. Now such a variant is dropped and regenerated on
   next render.
+- **Product page gallery** (`products/_product_gallery`, Stimulus
+  `product_gallery_controller.js`): the selected image at up to 600px, every
+  image of the product as a thumbnail — a column on its left from lg up, a row
+  below on phones, none at all for a single image — and a hover magnifier
+  that paints the `zoom` variant (1200x1200, same crop, never shown at its own
+  size) at 2x under the cursor, for mouse users only. It replaced the starter
+  theme's `product.js` thumbnail code, which bound on `DOMContentLoaded` and
+  died after Turbo navigations; `product.js` now only updates variant prices.
 - **Image links never expire** (`app/overrides/permanent_image_urls.rb`).
   Solidus returned the Disk service's signed URL, valid five minutes, and
   pages are fragment-cached with those links inside — so images on any cached
