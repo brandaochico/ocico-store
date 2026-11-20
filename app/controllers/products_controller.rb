@@ -12,9 +12,22 @@ class ProductsController < StoreController
     raise ActionController::BadRequest.new, error.message
   end
 
+  # The full product list is always alphabetical — the owner's rule
+  # (2026-11-20). Collated as Brazilian Portuguese so accents and case sort
+  # the way people read them ("Énergie" next to "Energy", not after "Zekrom");
+  # the ICU collation ships with the Postgres images used in dev and production.
+  # The searcher's query is SELECT DISTINCT spree_products.*, and Postgres only
+  # orders such a query by expressions in its select list — so the collated
+  # name is also selected. The order repeats the expression rather than using
+  # the alias: with a category filter Rails first runs an ids-only DISTINCT
+  # subquery, which copies the order terms but not our select.
+  COLLATED_NAME = %(spree_products.name COLLATE "pt-BR-x-icu")
+
   def index
     @searcher = build_searcher(params.merge(include_images: true))
     @products = @searcher.retrieve_products
+      .select(Spree::Product.arel_table[Arel.star], Arel.sql("#{COLLATED_NAME} AS alphabetical_name"))
+      .reorder(Arel.sql("#{COLLATED_NAME} ASC"), Arel.sql("spree_products.id ASC"))
   end
 
   def show
