@@ -558,6 +558,18 @@ multi-server. How it was prepared, by hand, once:
   (verified inside the running container). Vintage's licence is personal-use
   only: a commercial licence from its author is needed for the live store.
 
+- **The Sprockets manifest has a fixed name**
+  (`config.assets.manifest` in `config/initializers/assets.rb`). Kamal's asset
+  bridging (`asset_path`) copies the previous release's `public/assets` next
+  to the new one so in-flight pages keep their files — and with Sprockets'
+  default random manifest name that copy brought the *old* manifest too.
+  Sprockets then read whichever it found first, and after a deploy pages
+  linked the previous build's CSS and JS (2026-11-20: the new product gallery
+  came out unstyled in production while fine locally). With one fixed name,
+  each build overwrites it and the bridging `cp -rn` never clobbers it. If CSS
+  in production ever looks older than the code, check which
+  `tailwind-<digest>.css` the page links and whether it has the new classes.
+
 **Secrets:** `RAILS_MASTER_KEY` comes from `config/master.key`; everything else
 Kamal needs lives in the encrypted credentials under `kamal:` —
 `postgres_password` (generated) and `registry_password` (a GitHub PAT with
