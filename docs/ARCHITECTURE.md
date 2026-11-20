@@ -410,7 +410,15 @@ since been removed from `docker-compose.yml` and `config/deploy.yml`.
 
 Queues: `critical` (payment webhooks, order confirmation), `default` (Melhor
 Envio label purchase post-payment, mailers), `low` (report/cache warmers).
-`config/queue.yml` lists `"critical,*"` so workers poll payment work first.
+`config/queue.yml` runs two workers: one on `[critical]` alone, one on
+`["*"]`, so payment work never waits and no queue is ever left unpolled.
+**`queues` must be a YAML list** — Solid Queue doesn't split a string on
+commas. The earlier `"critical,*"` was one queue literally named that, so
+production ran no background job at all (webhooks, mail, Mercado Pago sync)
+from the first deploy until it was caught on 2026-11-20; the ~300 queued jobs
+then drained in seconds. `spec/config/queue_spec.rb` guards both the shape and
+that every job's queue has a worker. To check production:
+`SolidQueue::ReadyExecution.count` should hover at 0.
 
 No jobs dashboard is mounted yet. If one is wanted later, Mission Control —
 Jobs is the Solid Queue equivalent of the Sidekiq Web UI the old plan
