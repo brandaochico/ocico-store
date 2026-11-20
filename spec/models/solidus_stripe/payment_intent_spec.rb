@@ -40,6 +40,27 @@ RSpec.describe SolidusStripe::PaymentIntent do
     end
   end
 
+  it "asks for 3D Secure as configured (STRIPE_REQUEST_THREE_D_SECURE)" do
+    allow(Rails.configuration.x).to receive(:stripe_request_three_d_secure).and_return("any")
+    allow(Stripe::PaymentIntent).to receive(:create).and_return(Stripe::PaymentIntent.construct_from(id: "pi_new"))
+
+    described_class.prepare_for_payment(payment)
+
+    expect(Stripe::PaymentIntent).to have_received(:create) do |params|
+      expect(params[:payment_method_options]).to eq(card: { request_three_d_secure: "any" })
+    end
+  end
+
+  it "leaves 3D Secure to Stripe by default" do
+    allow(Stripe::PaymentIntent).to receive(:create).and_return(Stripe::PaymentIntent.construct_from(id: "pi_new"))
+
+    described_class.prepare_for_payment(payment)
+
+    expect(Stripe::PaymentIntent).to have_received(:create) do |params|
+      expect(params.dig(:payment_method_options, :card, :request_three_d_secure)).to eq("automatic")
+    end
+  end
+
   it "updates a reusable intent without payment_method_types" do
     described_class.create!(order:, payment_method:, stripe_intent_id: "pi_existing")
     allow_any_instance_of(described_class).to receive(:usable?).and_return(true) # rubocop:disable RSpec/AnyInstance

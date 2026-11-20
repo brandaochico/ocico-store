@@ -49,3 +49,22 @@ if stripe_api_key.present?
       stripe_credentials[:webhook_signing_secret] || ENV["SOLIDUS_STRIPE_WEBHOOK_SIGNING_SECRET"]
   )
 end
+
+# When to ask the card's bank for 3D Secure authentication, sent with every
+# PaymentIntent (app/overrides/stripe_intent_without_payment_method_types.rb):
+#
+#   any        always request it; the bank still decides whether to challenge
+#              the customer (app confirmation, SMS) or approve frictionlessly
+#   automatic  only when Stripe or the bank requires it (Stripe's default)
+#
+# Production runs `any` for the store's first weeks (STRIPE_REQUEST_THREE_D_SECURE
+# in config/deploy.yml): a brand-new merchant's unauthenticated card payments
+# get declined by issuers (Nubank refused the first live test purchase with
+# do_not_honor), and authenticated ones shift fraud liability to the bank.
+# Included at no extra cost on Stripe's standard Brazilian pricing (checked
+# 2026-11-20; custom-priced accounts pay per attempt).
+stripe_three_d_secure = ENV.fetch("STRIPE_REQUEST_THREE_D_SECURE", "automatic")
+unless %w[any automatic].include?(stripe_three_d_secure)
+  raise ArgumentError, "STRIPE_REQUEST_THREE_D_SECURE must be any or automatic, got #{stripe_three_d_secure.inspect}"
+end
+Rails.application.config.x.stripe_request_three_d_secure = stripe_three_d_secure

@@ -15,7 +15,8 @@
 # PaymentMethod, and on the API version stripe-ruby 8.x pins (2022-11-15)
 # Stripe then defaults the types to ["card"] — checked against the live
 # account. Both methods below are upstream's (solidus_stripe 5.0.2, ref
-# cdf1784) minus that one key; re-check them when bumping the gem.
+# cdf1784) minus that one key — plus, on creation, the 3D Secure option —
+# so re-check them when bumping the gem.
 module StripeIntentWithoutPaymentMethodTypes
   def create_stripe_intent(payment, **stripe_intent_options)
     stripe_customer_id = ::SolidusStripe::Customer.retrieve_or_create_stripe_customer_id(
@@ -31,6 +32,11 @@ module StripeIntentWithoutPaymentMethodTypes
         setup_future_usage: payment_method.preferred_setup_future_usage.presence,
         customer: stripe_customer_id,
         payment_method: payment.source.stripe_payment_method_id,
+        # Not upstream: see config.x.stripe_request_three_d_secure in
+        # config/initializers/solidus_stripe.rb.
+        payment_method_options: {
+          card: { request_three_d_secure: Rails.configuration.x.stripe_request_three_d_secure }
+        },
         metadata: { solidus_order_number: order.number },
         **stripe_intent_options
       })

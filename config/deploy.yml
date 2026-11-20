@@ -52,6 +52,11 @@ env:
     # until there's a second web server (see docs/ARCHITECTURE.md).
     SOLID_QUEUE_IN_PUMA: true
 
+    # Ask the bank for 3D Secure on every card payment while the store is new
+    # (fewer issuer declines, fraud liability on the bank). Switch to
+    # "automatic" once the merchant has history — config/initializers/solidus_stripe.rb.
+    STRIPE_REQUEST_THREE_D_SECURE: any
+
     # Set number of processes dedicated to Solid Queue (default: 1)
     # JOB_CONCURRENCY: 3
 
