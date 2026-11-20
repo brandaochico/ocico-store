@@ -190,6 +190,21 @@ reconcile in Fase 4's cash-flow report.
   `MercadoPago::SyncPendingPaymentsJob` every 15 minutes in production
   (`config/recurring.yml`) — a missed webhook delays a transition, never loses
   it.
+- **The order page updates itself.** While a Pix/Boleto is pending, its
+  partial renders `turbo_stream_from order`; when the synchronizer changes the
+  payment's state it calls `Turbo::StreamsChannel.broadcast_refresh_to(order)`
+  and the page re-fetches and morphs in place (`turbo_refreshes_with morph` in
+  `orders/show`), so the QR code becomes "Pagamento confirmado" by itself. The
+  broadcast carries no order data and the stream name is signed, so it can't
+  leak one customer's order to another. Runs over Action Cable on Solid Cable
+  (`/cable`, same-origin only — checked through kamal-proxy, 101 for
+  ocico.store, refused for other origins).
+- **Pix needs a Pix key on the receiving account.** A brand-new Mercado Pago
+  account has none, and every Pix charge then fails with a bare
+  `processing_error` (the order is created, its payment isn't). Registering a
+  random key fixed it on 2026-11-20. Customers see a pt-BR message
+  (`checkout.mercado_pago.charge_failed`); Mercado Pago's own text goes to the
+  log and the payment's log entry (`detail`).
 - Void cancels the Mercado Pago order (only works while unpaid; Spree then
   falls back to a refund). Refunds use `POST /v1/orders/:id/refund` with an
   explicit amount, so partial refunds work. All of the above was exercised
