@@ -30,7 +30,10 @@ module OcicoStore
       origins = seed_origin_taxonomy
       types = seed_type_taxonomy
       collections = seed_collections_taxonomy
-      seed_products(option_types:, origins:, types:, collections:) if sample_catalog?
+      if sample_catalog?
+        seed_products(option_types:, origins:, types:, collections:)
+        feature_sample_products
+      end
       retire_language_option_type
       retire_demo_products
     end
@@ -292,6 +295,17 @@ module OcicoStore
     # the home page entirely. Soft-delete them by name if present so this fixes
     # itself the next time anyone (re-)runs db:seed, instead of needing a
     # one-off console command per affected machine.
+    # Fills the home page's "destaques" in a demo catalog. Only while nothing
+    # is featured yet, so a choice made in the admin is never overwritten.
+    def feature_sample_products
+      return if Spree::Product.featured.exists?
+
+      Spree::Product.where(name: [
+        "Charizard ex (Illustration Rare)", "Mew ex (Special Art Rare)",
+        "Obsidian Flames Booster Box", "151 Booster Box (Japonês)"
+      ]).update_all(featured: true)
+    end
+
     def retire_demo_products
       demo_names = [
         "Solidus Water Bottle", "Solidus tote", "Solidus hoodie", "Solidus mug set",
