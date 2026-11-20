@@ -17,6 +17,7 @@ SolidusAdmin::Config.configure do |config|
 
   # Address form with street number and neighbourhood (Brazilian addresses).
   config.components["ui/forms/address"] = "OcicoAdmin::AddressFormComponent"
+  config.components["products/show"] = "OcicoAdmin::ProductShowComponent"
 
   # Add custom paths to importmap files to be loaded.
   # config.importmap_paths << Rails.root.join("config/solidus_admin_importmap.rb")

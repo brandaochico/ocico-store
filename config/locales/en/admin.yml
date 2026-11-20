@@ -1,0 +1,11 @@
+# English counterparts of config/locales/pt-BR/admin.yml. Both admins
+# (solidus_backend and solidus_admin) still run in English, so these are the
+# strings actually shown there until the admin is translated.
+en:
+  activerecord:
+    attributes:
+      spree/product:
+        featured: "Featured on the home page"
+  admin:
+    product:
+      featured_hint: "Shown among the featured products at the top of the home page (up to 4, most recently edited first)."

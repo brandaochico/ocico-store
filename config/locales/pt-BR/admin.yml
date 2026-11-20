@@ -3,7 +3,13 @@
 # via solidus_backend/solidus_admin — override specific keys under spree_overrides.yml
 # only when we need to change gem-owned copy, not here.
 "pt-BR":
+  activerecord:
+    attributes:
+      spree/product:
+        featured: "Destaque na home"
   admin:
+    product:
+      featured_hint: "Aparece nos destaques do topo da página inicial (até 4, os editados mais recentemente primeiro)."
     melhor_envio:
       calculator_description: "Melhor Envio (cotação por transportadora)"
       fallback_calculator_description: "Melhor Envio: frete reserva (quando a cotação falha)"

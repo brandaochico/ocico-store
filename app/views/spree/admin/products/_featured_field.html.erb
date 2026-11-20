@@ -1,0 +1,9 @@
+<div data-hook="admin_product_form_featured">
+  <%= f.field_container :featured do %>
+    <label>
+      <%= f.check_box :featured %>
+      <%= Spree::Product.human_attribute_name(:featured) %>
+    </label>
+    <p class="field-hint"><%= t("admin.product.featured_hint") %></p>
+  <% end %>
+</div>
