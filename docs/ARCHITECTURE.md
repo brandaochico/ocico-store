@@ -213,6 +213,19 @@ reconcile in Fase 4's cash-flow report.
   `Spree::PaymentMethod::StripePaymentIntents` an older plan mentioned.
   `auto_capture` is **off**: the card is authorized at checkout and captured
   when the order ships, so we never charge for stock we can't send.
+- **Live accounts reject `payment_method_types`.** solidus_stripe sends it
+  with every PaymentIntent; Stripe accounts created from late 2026 refuse it
+  next to a customer and a PaymentMethod, which 500'd the confirm step on the
+  live account (2026-11-20). `app/overrides/stripe_intent_without_payment_method_types.rb`
+  drops it (types still default to `["card"]` on the pinned 2022-11-15 API).
+- **3D Secure is requested on every card payment** while the store is new
+  (`STRIPE_REQUEST_THREE_D_SECURE: any` in `config/deploy.yml`; default
+  `automatic`). The first live purchase was declined by the issuer
+  (`do_not_honor`, Stripe risk "normal") — typical for a merchant with no
+  history. With `any` the bank still picks frictionless or a challenge (app
+  confirmation, SMS), and authenticated payments move fraud liability to it.
+  No extra fee on Stripe's standard Brazilian pricing (custom pricing pays per
+  attempt). Flip to `automatic` and redeploy once declines settle down.
 - **Secrets never touch the database.** The payment method's
   `preference_source` points at the `solidus_stripe_env_credentials` static
   preference registered in `config/initializers/solidus_stripe.rb`. That
