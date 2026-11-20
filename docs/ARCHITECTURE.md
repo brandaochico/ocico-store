@@ -145,6 +145,27 @@ chaining two scopes onto one `joins(:taxons)` asks a single joined row to match
 two different taxons at once, so combining any two filters silently returned
 nothing — a failure that surfaces as "no products found" rather than an error.
 
+## Home page blocks
+
+`HomeController` picks each block on purpose (it used to be the first twelve
+products in database order, split in fours):
+
+| Block | Products |
+|---|---|
+| Destaques (square cards, two per row) | marked **Destaque na home** in the admin (`spree_products.featured`), most recently edited first, up to 4 |
+| Cartas em Destaque | newest singles ("Cartas Avulsas"); "Ver tudo" links to that listing |
+| Catalog call to action (+ banner) | newest sealed products (everything not a single) |
+| Chegaram Agora | newest products overall |
+
+"Newest" = `available_on`. A product appears once on the page — each block
+skips what an earlier one shows — and an empty block isn't rendered. The flag
+is a checkbox in both admins: solidus_admin through
+`OcicoAdmin::ProductShowComponent` (a copy of solidus_admin 0.4.0's product
+page plus the field — re-copy when bumping it), the classic admin through a
+Deface override (`app/overrides/admin_product_featured_field.rb`). Both admins
+still run in English, so the label shown there comes from
+`config/locales/en/admin.yml`.
+
 ## Payment (Fase 2 — cards on Stripe, Pix/Boleto on Mercado Pago)
 
 **Decision: cards on `solidus_stripe` (official gem, Payment Intents); Pix and
