@@ -1,0 +1,21 @@
+<table>
+  <tr>
+    <td>
+      <p class="lede"><%= t(".greeting") %></p>
+      <p>
+        <%= t(@full ? ".full" : ".partial", number: @order.number, amount: @refund.display_amount,
+              method: @refund.payment.payment_method.name) %>
+      </p>
+      <% unless @full %>
+        <p>
+          <%= t(".total_refunded", refunded: @order.display_refund_total,
+                paid: Spree::Money.new(@order.payments.completed.sum(:amount), currency: @order.currency)) %>
+        </p>
+      <% end %>
+      <p><%= t(".timing") %></p>
+      <p><%= link_to t(".view_order"), @order_link %></p>
+      <p><%= t(".questions") %></p>
+    </td>
+    <td class="expander"></td>
+  </tr>
+</table>

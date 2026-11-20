@@ -1,0 +1,15 @@
+<%= t(".greeting") %>
+
+<%= t(@full ? ".full" : ".partial", number: @order.number, amount: @refund.display_amount,
+      method: @refund.payment.payment_method.name) %>
+<% unless @full %>
+
+<%= t(".total_refunded", refunded: @order.display_refund_total,
+      paid: Spree::Money.new(@order.payments.completed.sum(:amount), currency: @order.currency)) %>
+<% end %>
+
+<%= t(".timing") %>
+
+<%= t(".view_order") %>: <%= @order_link %>
+
+<%= t(".questions") %>

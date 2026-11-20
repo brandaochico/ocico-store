@@ -64,3 +64,15 @@
       title: "Todas as coleções"
       empty: "Nenhuma coleção cadastrada."
       sprite_credit: "Sprite:"
+
+  # RefundMailer (app/mailers/refund_mailer.rb) — sent when a refund goes through.
+  refund_mailer:
+    refund_email:
+      subject: "Reembolso do pedido"
+      greeting: "Olá,"
+      full: "Reembolsamos o valor do seu pedido #%{number}: %{amount}, pela mesma forma de pagamento usada na compra (%{method})."
+      partial: "Reembolsamos %{amount} do seu pedido #%{number}, pela mesma forma de pagamento usada na compra (%{method})."
+      total_refunded: "Total reembolsado neste pedido até agora: %{refunded} de %{paid}."
+      timing: "O prazo para o valor aparecer depende do seu banco ou da operadora do cartão."
+      view_order: "Ver pedido"
+      questions: "Dúvidas? É só responder este e-mail."
