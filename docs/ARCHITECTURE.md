@@ -658,17 +658,27 @@ Still to do before go-live: live payment and freight credentials.
 
 ## Product images
 
-- **Always a square, center-cropped** (`config.product_image_styles`, "^" =
-  `resize_to_fill`): display sizes (`product`/`large`/`big`/`full`) are
-  600x600, thumbnails `small` 300 and `mini` 120 — the owner's rule
-  (2026-11-20). Cards, the product page and the home banners show the 600
-  version; `small`/`mini` are for the gallery strip, cart and checkout.
+- **Always whole, fitted inside a square box** (`config.product_image_styles`;
+  a plain "WxH" means `resize_to_fit` via
+  `app/overrides/fit_product_image_styles.rb` — Solidus alone only knows
+  crop-to-fill "^" and never-enlarge limit). Display sizes fit 600x600 (a
+  portrait card comes out 429x600), thumbnails fit 300 and 120, the
+  magnifier's `zoom` fits 1200. The owner's rule (2026-11-20); an earlier
+  version center-cropped to a full square, which cut the top and bottom off
+  cards. Cards, the product page and the home banners show the 600 version;
+  `small`/`mini` are for the gallery strip, cart and checkout. Home cards and
+  the banner show a product's *first* (main) image — the starter theme used
+  the second or last.
+- **Home cards are a column**: the photo in the space above, the white
+  name/button band below it — never laid over the photo, which would hide its
+  bottom.
 - **Format is kept**, so transparent PNGs stay transparent: product photos are
   shot with the background removed. Containers behind images are light
   (`bg-gray-50`, or the banner's color), never black — the featured card's old
   `bg-black` is what made a transparent PNG look black.
-- **Containers are squares and images are `object-contain`** inside them; the
-  product page's photo is capped at 600px (its own size — never upscaled).
+- **Containers are squares and images are `object-contain`** inside them, the
+  leftover space showing the container's light background; the product page's
+  photo is capped at 600px (its own size — never upscaled).
 - **Missing variant files heal themselves**
   (`app/overrides/self_healing_image_variants.rb`). Active Storage records a
   variant before uploading its file; a generation cut short (a big phone photo
