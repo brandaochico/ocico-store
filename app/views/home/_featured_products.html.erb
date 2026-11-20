@@ -1,16 +1,10 @@
+<%# Every featured product gets the same square card — two per row from md up
+    (about 600px, the images' own size), one per row on phones. The starter
+    theme made the first one large and stacked the rest in a narrow column. %>
 <section class="wrapper pt-3 pb-14 md:pb-24">
-  <div class="grid-container">
-    <div class="col-span-full md:col-span-8 md:max">
-      <%= render 'products/featured_product_card', { product: products[0], size: :big } %>
-    </div>
-    <div class="col-span-full flex flex-col gap-y-6 md:col-span-4">
-      <% products.each_with_index do |product, index| %>
-        <% if index > 0 %>
-          <div class="basis-1/2">
-            <%= render 'products/featured_product_card', { product: product, size: :product } %>
-          </div>
-        <% end %>
-      <% end %>
-    </div>
+  <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+    <% products.each do |product| %>
+      <%= render 'products/featured_product_card', { product: product, size: :product } %>
+    <% end %>
   </div>
 </section>
