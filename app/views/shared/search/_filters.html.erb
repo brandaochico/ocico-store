@@ -1,4 +1,4 @@
-<% filters = applicable_filters_for(taxon) %>
+<% filters = applicable_filters_for(taxon, sealed_only: local_assigns[:sealed_only]) %>
 
 <% unless filters.empty? %>
   <%# Collapsed by default on every device — nav-dropdown (shared/navigation/_main_nav)
