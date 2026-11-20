@@ -4,7 +4,7 @@
         or stretched past it, with the section's color around it. %>
     <div class="aspect-square w-full md:aspect-auto md:h-[600px]">
       <%= render(ImageComponent.new(
-        image: product.gallery.images.last,
+        image: product.gallery.images.first,
         size: :full,
         class: 'h-full w-full object-contain'
       )) %>

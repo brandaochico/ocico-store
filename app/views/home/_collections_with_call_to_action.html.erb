@@ -6,7 +6,7 @@
 
   <% products.each_with_index do |product, index| %>
     <%
-      product_image = product.gallery.images.second || product.gallery.images.first
+      product_image = product.gallery.images.first
     %>
 
     <%= cache [I18n.locale, current_pricing_options, @taxon, product] do %>

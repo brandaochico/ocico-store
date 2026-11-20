@@ -4,7 +4,7 @@
 <%# A column: the photo, whole, in the space above; the white band with the
     name and button below it — not over it, so no part of the photo is hidden. %>
 <div class="flex aspect-square flex-col bg-gray-50 overflow-hidden rounded-lg md:rounded-xl lg:rounded-2xl">
-  <% image = product.gallery.images.second || product.gallery.images.first %>
+  <% image = product.gallery.images.first %>
   <div class="relative min-h-0 flex-1">
     <%= render(ImageComponent.new(
       image: image,
