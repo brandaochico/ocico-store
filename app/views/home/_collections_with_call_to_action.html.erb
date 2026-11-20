@@ -17,9 +17,10 @@
             class: 'absolute inset-0 h-full w-full object-contain',
             size: :full,
           )) %>
-          <%# text-black is explicit and has no dark: variant on purpose: the card behind
-             it is bg-gray-50 in both themes, so the label must not follow the theme. %>
-          <div class="absolute bottom-0 left-0 right-0 flex flex-col items-start w-full gap-y-1 p-3 !pt-0 text-black md:p-6 md:flex-row md:justify-between md:items-center md:gap-y-0 md:gap-x-2">
+          <%# White band behind the name and price, flush with the card's bottom
+              edge and rounded like it, as on the featured cards. text-black has no
+              dark: variant on purpose: the band stays white in both themes. %>
+          <div class="absolute bottom-0 left-0 right-0 flex flex-col items-start w-full gap-y-1 bg-white px-3 py-3 text-black rounded-b-lg md:px-6 md:py-4 md:flex-row md:justify-between md:items-center md:gap-y-0 md:gap-x-2 md:rounded-b-xl lg:rounded-b-2xl">
             <span class="w-full text-body-sm md:text-body">
               <%= product.name %>
             </span>
