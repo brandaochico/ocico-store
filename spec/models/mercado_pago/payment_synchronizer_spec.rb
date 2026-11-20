@@ -37,6 +37,10 @@ RSpec.describe MercadoPago::PaymentSynchronizer do
       expect(order.reload.payment_state).to eq("paid")
     end
 
+    it "tells an open order page to refresh" do
+      expect { sync }.to have_broadcasted_to(Turbo::StreamsChannel.send(:stream_name_from, [ order ]))
+    end
+
     it "records the capture, so refunds have something to refund against" do
       expect { sync }.to change { payment.capture_events.count }.by(1)
     end
@@ -65,6 +69,10 @@ RSpec.describe MercadoPago::PaymentSynchronizer do
     it "changes nothing" do
       expect { sync }.not_to change { [ payment.reload.state, order.reload.state ] }
     end
+
+    it "doesn't refresh open order pages" do
+      expect { sync }.not_to have_broadcasted_to(Turbo::StreamsChannel.send(:stream_name_from, [ order ]))
+    end
   end
 
   %w[expired canceled failed].each do |status|
@@ -75,6 +83,10 @@ RSpec.describe MercadoPago::PaymentSynchronizer do
         sync
 
         expect(payment.reload).to be_failed
+      end
+
+      it "tells an open order page to refresh" do
+        expect { sync }.to have_broadcasted_to(Turbo::StreamsChannel.send(:stream_name_from, [ order ]))
       end
 
       it "cancels the order, putting its stock back on sale" do

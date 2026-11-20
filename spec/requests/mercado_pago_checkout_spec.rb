@@ -47,6 +47,15 @@ RSpec.describe "Paying with Pix or Boleto", type: :request, with_signed_in_user:
       get order_path(order)
       expect(response.body).to include("Pague com Pix", "00020126580014br.gov.bcb.pix0136spec", "data:image/png;base64,")
     end
+
+    it "keeps the order page listening for the payment confirmation while the Pix is unpaid" do
+      choose(pix)
+      patch update_checkout_path(state: "confirm")
+
+      get order_path(order.reload)
+
+      expect(response.body).to include("<turbo-cable-stream-source", 'name="turbo-refresh-method" content="morph"')
+    end
   end
 
   context "with Boleto" do

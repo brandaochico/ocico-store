@@ -4,6 +4,8 @@
   <% if payment.completed? %>
     <p class="font-body text-body-sm"><%= t("checkout.mercado_pago.paid") %></p>
   <% elsif payment.pending? && source&.charge_created? %>
+    <%# Live refresh once Mercado Pago confirms (MercadoPago::PaymentSynchronizer). %>
+    <%= turbo_stream_from payment.order %>
     <div class="flex max-w-md flex-col gap-y-4">
       <h4 class="font-heading text-h6"><%= t("checkout.mercado_pago.boleto.title") %></h4>
 

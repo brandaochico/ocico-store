@@ -21,6 +21,7 @@ module MercadoPago
       return unless @payment.pending? && @payment.response_code.present?
 
       mp_order = client.get_order(@payment.response_code)
+      state_before = @payment.state
 
       @payment.with_lock do
         next unless @payment.pending?
@@ -30,6 +31,8 @@ module MercadoPago
         when *UNPAYABLE_STATUSES then fail_and_release_stock
         end
       end
+
+      refresh_open_order_pages if @payment.state != state_before
     end
 
     private
@@ -57,6 +60,16 @@ module MercadoPago
 
       # Cancelling restocks the order's inventory and emails the customer.
       order.cancel!
+    end
+
+    # The order page subscribes while a Pix/Boleto is pending (see
+    # orders/payment_info/_mercado_pago_*.html.erb). The broadcast carries no
+    # order data — it only tells the browser to re-fetch the page, which it
+    # does with its own authorization — so the QR code turns into "Pagamento
+    # confirmado" (or the cancellation) without the customer reloading.
+    # After the lock's transaction, so the re-fetch already sees the new state.
+    def refresh_open_order_pages
+      Turbo::StreamsChannel.broadcast_refresh_to(@payment.order)
     end
 
     def client
