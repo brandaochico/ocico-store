@@ -27,7 +27,9 @@ module OcicoStore
         1 => "Correios PAC",
         2 => "Correios SEDEX",
         3 => "Jadlog .Package",
-        17 => "Correios Mini Envios"
+        17 => "Correios Mini Envios",
+        31 => "Loggi Express",
+        34 => "Loggi Ponto"
       }
     end
 

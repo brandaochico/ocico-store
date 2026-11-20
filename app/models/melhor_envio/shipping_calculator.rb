@@ -7,6 +7,7 @@ module MelhorEnvio
   #
   #   1  Correios PAC        2  Correios SEDEX
   #   3  Jadlog .Package    17  Correios Mini Envios
+  #  31  Loggi Express      34  Loggi Ponto
   #
   # A service that can't take the shipment (destination not served, over its
   # declared-value or weight limit — Mini Envios stops at R$100 and 300 g) is

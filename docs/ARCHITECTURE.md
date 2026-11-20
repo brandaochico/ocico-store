@@ -290,10 +290,11 @@ insufficient.
 
 **How it fits Solidus.** One `Spree::ShippingMethod` per carrier service, each
 with a `MelhorEnvio::ShippingCalculator` holding the service's Melhor Envio id
-(1 PAC, 2 SEDEX, 3 Jadlog .Package, 17 Mini Envios), seeded by
+(1 PAC, 2 SEDEX, 3 Jadlog .Package, 17 Mini Envios, 31 Loggi Express, 34 Loggi
+Ponto), seeded by
 `db/seeds/shipping.rb`. Solidus asks each calculator separately;
 `MelhorEnvio::Quote` makes **one** API call per package (CEPs + contents) and
-caches it, so the four methods share it. A service that can't take the
+caches it, so all the methods share it. A service that can't take the
 shipment (route not served, over its declared-value or weight limit — Mini
 Envios stops at R$100/300 g) answers `available? == false` and simply isn't
 offered. Solidus pre-selects the cheapest.

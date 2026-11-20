@@ -16,7 +16,8 @@ RSpec.describe "db/seeds/shipping.rb" do
     run_seed
 
     expect(melhor_envio_services).to eq(
-      1 => "Correios PAC", 2 => "Correios SEDEX", 3 => "Jadlog .Package", 17 => "Correios Mini Envios"
+      1 => "Correios PAC", 2 => "Correios SEDEX", 3 => "Jadlog .Package", 17 => "Correios Mini Envios",
+      31 => "Loggi Express", 34 => "Loggi Ponto"
     )
     expect(Spree::ShippingMethod.all.flat_map(&:zones).map(&:name).uniq).to eq([ "Brasil" ])
   end

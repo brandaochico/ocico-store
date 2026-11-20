@@ -89,7 +89,7 @@ Dados úteis:
   preenchidos pelo ViaCEP. Número e bairro são obrigatórios.
 - [ ] CEP com formato inválido → erro de validação.
 - [ ] **Entrega** com Melhor Envio (sandbox):
-  - CEP de SP/RJ → aparecem PAC, SEDEX, Jadlog e Mini Envios (se o pedido for
+  - CEP de SP/RJ → aparecem PAC, SEDEX, Jadlog, Loggi Express, Loggi Ponto e Mini Envios (se o pedido for
     leve e < ~R$100), cada um com preço e "Entrega em X a Y dias úteis";
     o mais barato vem selecionado.
   - Pedido caro ou pesado (ex. booster box) → Mini Envios some.
