@@ -24,12 +24,16 @@ Spree.config do |config|
   config.image_attachment_module = "Spree::Image::ActiveStorageAttachment"
   config.taxon_attachment_module = "Spree::Taxon::ActiveStorageAttachment"
 
-  # Every product image is shown as a square: resized and center-cropped
-  # ("^" = ImageProcessing's resize_to_fill), never letterboxed by the photo's
-  # own proportions — the owner's call (2026-11-20). Display sizes are all
-  # 600x600; the two thumbnail sizes are smaller squares of the same crop, to
-  # keep the cart and the thumbnail strip light. The file format is kept, so a
-  # transparent PNG stays transparent (product photos are shot that way).
+  # Every product image is shown whole: scaled to fit inside a square box,
+  # aspect ratio kept, nothing cropped ("WxH" = resize_to_fit, see
+  # app/overrides/fit_product_image_styles.rb). A portrait card comes out 600px
+  # tall and proportionally narrower; the square containers around images show
+  # their light background in the leftover space. Display sizes all fit 600; the
+  # two thumbnail sizes fit smaller boxes. The owner's rule (2026-11-20) —
+  # an earlier version center-cropped to fill the square, which cut the top and
+  # bottom off cards.
+  #
+  # The file format is kept, so a transparent PNG stays transparent.
   #
   # big and full exist because solidus_starter_frontend's views ask for them;
   # without them ImageProcessing errors with "either width or height must be
@@ -38,15 +42,15 @@ Spree.config do |config|
   # Changing a size here makes new variants on next view; the old ones stay on
   # disk until purged (see "Product images" in docs/ARCHITECTURE.md).
   config.product_image_styles = {
-    mini: "120x120^",
-    small: "300x300^",
-    product: "600x600^",
-    large: "600x600^",
-    big: "600x600^",
-    full: "600x600^",
+    mini: "120x120",
+    small: "300x300",
+    product: "600x600",
+    large: "600x600",
+    big: "600x600",
+    full: "600x600",
     # Only for the product page's hover magnifier, drawn at 2x over the 600px
     # image — never shown at its own size.
-    zoom: "1200x1200^"
+    zoom: "1200x1200"
   }
 
   # Uncomment to recalculate cart prices when the cart changes

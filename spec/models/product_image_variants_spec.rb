@@ -2,17 +2,18 @@
 
 require "solidus_starter_frontend_spec_helper"
 
-# Product images: always a 600x600 square, transparency kept, and a variant
-# whose file went missing comes back (config/initializers/spree.rb,
+# Product images: always whole — fitted inside a 600x600 box, never cropped —
+# transparency kept, and a variant whose file went missing comes back
+# (config/initializers/spree.rb, app/overrides/fit_product_image_styles.rb,
 # app/overrides/self_healing_image_variants.rb).
 RSpec.describe "Product image variants" do
   let!(:store) { create(:store) }
 
-  # A portrait, fully transparent PNG — the shape of a product photo with its
-  # background removed.
+  # A small portrait, fully transparent PNG (2:3, like a card) — the shape of
+  # a product photo with its background removed.
   let(:png_path) do
     path = Rails.root.join("tmp/spec-transparent-#{Process.pid}.png")
-    Vips::Image.black(400, 600, bands: 4).write_to_file(path.to_s)
+    Vips::Image.black(200, 300, bands: 4).write_to_file(path.to_s)
     path
   end
   let(:image) do
@@ -26,17 +27,17 @@ RSpec.describe "Product image variants" do
     Vips::Image.new_from_buffer(blob.download, "")
   end
 
-  it "resizes and crops every display size to a 600x600 square" do
+  it "fits every display size whole inside 600x600: full height, aspect kept, nothing cropped" do
     %i[product large big full].each do |style|
       file = variant_file(style)
-      expect([ file.width, file.height ]).to eq([ 600, 600 ]), "#{style} is #{file.width}x#{file.height}"
+      expect([ file.width, file.height ]).to eq([ 400, 600 ]), "#{style} is #{file.width}x#{file.height}"
     end
   end
 
-  it "makes a 1200x1200 version of the same crop for the hover magnifier" do
+  it "makes a version fitted inside 1200x1200 for the hover magnifier" do
     file = variant_file(:zoom)
 
-    expect([ file.width, file.height ]).to eq([ 1200, 1200 ])
+    expect([ file.width, file.height ]).to eq([ 800, 1200 ])
   end
 
   it "keeps a PNG's transparency" do
@@ -46,9 +47,9 @@ RSpec.describe "Product image variants" do
     expect(file.extract_band(3).max).to eq(0) # still fully transparent
   end
 
-  it "makes the thumbnails smaller squares of the same crop" do
-    expect(variant_file(:small).then { [ it.width, it.height ] }).to eq([ 300, 300 ])
-    expect(variant_file(:mini).then { [ it.width, it.height ] }).to eq([ 120, 120 ])
+  it "fits the thumbnails whole inside smaller boxes" do
+    expect(variant_file(:small).then { [ it.width, it.height ] }).to eq([ 200, 300 ])
+    expect(variant_file(:mini).then { [ it.width, it.height ] }).to eq([ 80, 120 ])
   end
 
   # Signed service URLs expire in minutes and end up inside cached HTML.
