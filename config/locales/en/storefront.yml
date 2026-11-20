@@ -31,6 +31,7 @@ en:
       products: "Products"
       collections: "Collections"
       see_all_collections: "See all collections..."
+      see_all_products: "See all products..."
     footer:
       tagline: "Pokémon TCG singles and sealed product, imported."
     collections:

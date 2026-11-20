@@ -47,6 +47,7 @@
       products: "Produtos"
       collections: "Coleções"
       see_all_collections: "Ver todas as coleções..."
+      see_all_products: "Ver todos os produtos..."
     mailer:
       reset_password:
         requested: "Recebemos um pedido para redefinir a senha da sua conta."

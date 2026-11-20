@@ -16,16 +16,20 @@
   panel_classes = "hidden mt-2 pl-3 lg:absolute lg:left-0 lg:top-full lg:z-30 lg:mt-2 lg:min-w-60 " \
                   "lg:rounded-xl lg:bg-white lg:p-3 lg:shadow-lg lg:text-black"
 
+  # Label, taxons, and the "see all" entry closing the panel below a divider
+  # (nil for none).
   groups = [
     [ t("storefront.navigation.countries"), nav_origin_taxons, nil ],
-    [ t("storefront.navigation.products"), nav_product_type_taxons, nil ],
-    [ t("storefront.navigation.collections"), nav_recent_collections, collections_path ]
+    [ t("storefront.navigation.products"), nav_product_type_taxons,
+      [ t("storefront.navigation.see_all_products"), products_path ] ],
+    [ t("storefront.navigation.collections"), nav_recent_collections,
+      [ t("storefront.navigation.see_all_collections"), collections_path ] ]
   ]
 %>
 
 <ul class="flex flex-col gap-y-4 lg:flex-row lg:items-center lg:gap-x-5 xl:gap-x-7"
     aria-label="<%= t('storefront.navigation.main') %>">
-  <% groups.each do |label, taxons, see_all_path| %>
+  <% groups.each do |label, taxons, see_all| %>
     <% next if taxons.empty? %>
 
     <li
@@ -50,7 +54,7 @@
       <div class="<%= panel_classes %>" data-nav-dropdown-target="menu">
         <%
           entries = taxons.map { |taxon| [ taxon.name, taxon_seo_url(taxon), nil ] }
-          entries << [ t("storefront.navigation.see_all_collections"), see_all_path, "italic" ] if see_all_path
+          entries << [ *see_all, "italic" ] if see_all
         %>
         <ul class="flex flex-col gap-y-1 text-left">
           <% entries.each do |name, url, extra_classes| %>
